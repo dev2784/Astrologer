@@ -1,5 +1,3 @@
-// webandadmin/app/(public)/contact/page.tsx
-
 export default function ServicesPage() {
   return (
     <main className="container mx-auto py-10 px-4">
