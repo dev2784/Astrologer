@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
@@ -17,7 +17,7 @@ type Puja = {
   noOfYajman?: string | null;
 };
 
-export default function PublicPujasPage() {
+function PublicPujasContent() {
   const searchParams = useSearchParams();
   const subcategoryId = searchParams.get("subcategoryId");
   const { language, t } = useLanguage();
@@ -26,7 +26,10 @@ export default function PublicPujasPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let url = "process.env.NEXT_PUBLIC_API_BASE_URL/pujas";
+    // Fix: Resolve NEXT_PUBLIC_API_BASE_URL via template string
+    const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
+    let url = `${API_URL}/pujas`;
+
     if (subcategoryId) {
       url += `?subcategoryId=${subcategoryId}`;
     }
@@ -134,5 +137,18 @@ export default function PublicPujasPage() {
         )}
       </main>
     </div>
+  );
+}
+
+// Wrap searchParams hook user with Suspense boundary
+export default function PublicPujasPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-50 py-12 flex justify-center items-center">
+        <div className="text-slate-500 font-medium">Loading Pujas...</div>
+      </div>
+    }>
+      <PublicPujasContent />
+    </Suspense>
   );
 }
