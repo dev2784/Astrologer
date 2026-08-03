@@ -73,8 +73,8 @@ export default function CategoriesPage() {
   const handleSaveCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     const url = editingCatId 
-      ? `http://127.0.0.1:8080/categories/${editingCatId}` 
-      : "http://127.0.0.1:8080/categories";
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/categories/${editingCatId}` 
+      : `${process.env.NEXT_PUBLIC_API_BASE_URL}/categories`;
     
     const method = editingCatId ? "PUT" : "POST";
 
@@ -109,7 +109,7 @@ export default function CategoriesPage() {
       title: "Delete Category?",
       message: `Are you sure you want to delete "${name}"? This will permanently delete all associated subcategories.`,
       onConfirm: async () => {
-        const res = await fetch(`http://127.0.0.1:8080/categories/${id}`, { method: "DELETE" });
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/categories/${id}`, { method: "DELETE" });
         if (res.ok) refreshCategories();
         closeModal();
       },
@@ -130,8 +130,8 @@ export default function CategoriesPage() {
     if (!editingSubId && !selectedCategoryId) return alert("Please select a parent category.");
 
     const url = editingSubId 
-      ? `http://127.0.0.1:8080/categories/subcategories/${editingSubId}` 
-      : "http://127.0.0.1:8080/categories/subcategories";
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/categories/subcategories/${editingSubId}` 
+      : `${process.env.NEXT_PUBLIC_API_BASE_URL}/categories/subcategories`;
     
     const method = editingSubId ? "PUT" : "POST";
 
@@ -164,7 +164,7 @@ export default function CategoriesPage() {
       title: "Delete Subcategory?",
       message: `Are you sure you want to delete "${name}"?`,
       onConfirm: async () => {
-        const res = await fetch(`http://127.0.0.1:8080/categories/subcategories/${id}`, { method: "DELETE" });
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/categories/subcategories/${id}`, { method: "DELETE" });
         if (res.ok) refreshCategories();
         closeModal();
       },

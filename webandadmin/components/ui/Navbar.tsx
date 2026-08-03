@@ -27,7 +27,7 @@ export default function Navbar() {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8080/categories")
+    fetch("process.env.NEXT_PUBLIC_API_BASE_URL/categories")
       .then((res) => res.json())
       .then((data) => {
         if (data.categories) {

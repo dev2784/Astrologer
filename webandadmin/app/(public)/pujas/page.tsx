@@ -26,7 +26,7 @@ export default function PublicPujasPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let url = "http://127.0.0.1:8080/pujas";
+    let url = "process.env.NEXT_PUBLIC_API_BASE_URL/pujas";
     if (subcategoryId) {
       url += `?subcategoryId=${subcategoryId}`;
     }

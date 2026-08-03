@@ -5,7 +5,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 export function useCategories(search: string = "", skip: number = 0, take: number = 10) {
   // Only search if length is >= 3, otherwise pass empty string to get standard paginated batch
   const activeSearch = search.trim().length >= 3 ? search.trim() : "";
-  const url = `http://127.0.0.1:8080/categories?search=${encodeURIComponent(activeSearch)}&skip=${skip}&take=${take}`;
+  const url = `process.env.NEXT_PUBLIC_API_BASE_URL/categories?search=${encodeURIComponent(activeSearch)}&skip=${skip}&take=${take}`;
 
   const { data: res, error: err, isLoading: loading, mutate: refresh } = useSWR(
     url,

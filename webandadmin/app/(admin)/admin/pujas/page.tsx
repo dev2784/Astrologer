@@ -32,7 +32,7 @@ export default function PujasListPage() {
 
   const fetchPujas = async (currentSkip = 0, currentSearch = "", append = false) => {
     setIsLoading(true);
-    const res = await fetch(`http://127.0.0.1:8080/pujas?search=${encodeURIComponent(currentSearch)}&skip=${currentSkip}&take=${BATCH_SIZE}`);
+    const res = await fetch(`process.env.NEXT_PUBLIC_API_BASE_URL/pujas?search=${encodeURIComponent(currentSearch)}&skip=${currentSkip}&take=${BATCH_SIZE}`);
     const data = await res.json();
     
     if (data.pujas) {
@@ -63,7 +63,7 @@ export default function PujasListPage() {
       title: "Delete Puja?",
       message: `Are you sure you want to delete "${title}"?`,
       onConfirm: async () => {
-        const res = await fetch(`http://127.0.0.1:8080/pujas/${id}`, { method: "DELETE" });
+        const res = await fetch(`process.env.NEXT_PUBLIC_API_BASE_URL/pujas/${id}`, { method: "DELETE" });
         if (res.ok) {
           fetchPujas(0, "", false);
         }

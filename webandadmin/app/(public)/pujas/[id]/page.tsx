@@ -45,7 +45,7 @@ export default function PublicPujaDetailPage() {
   useEffect(() => {
     if (!id) return;
 
-    fetch(`http://127.0.0.1:8080/pujas/${id}`)
+    fetch(`process.env.NEXT_PUBLIC_API_BASE_URL/pujas/${id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.puja) setPuja(data.puja);

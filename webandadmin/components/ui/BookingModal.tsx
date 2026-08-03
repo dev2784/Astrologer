@@ -40,7 +40,7 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
   // Fetch categories when opened without a pre-selected pujaId
   useEffect(() => {
     if (isOpen && !pujaId) {
-      fetch("http://127.0.0.1:8080/categories")
+      fetch("process.env.NEXT_PUBLIC_API_BASE_URL/categories")
         .then((res) => res.json())
         .then((data) => {
           if (data.categories) setCategories(data.categories);
@@ -78,7 +78,7 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
         address,
       };
 
-      const res = await fetch("http://127.0.0.1:8080/bookings", {
+      const res = await fetch("process.env.NEXT_PUBLIC_API_BASE_URL/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

@@ -61,8 +61,8 @@ export default function EditPujaPage() {
     async function loadInitialData() {
       try {
         const [catRes, pujaRes] = await Promise.all([
-          fetch("http://127.0.0.1:8080/categories"),
-          fetch(`http://127.0.0.1:8080/pujas/${id}`),
+          fetch("process.env.NEXT_PUBLIC_API_BASE_URL/categories"),
+          fetch(`process.env.NEXT_PUBLIC_API_BASE_URL/pujas/${id}`),
         ]);
 
         const catData = await catRes.json();
@@ -123,7 +123,7 @@ export default function EditPujaPage() {
 
     setUploadingImage(true);
     try {
-      const res = await fetch("http://127.0.0.1:8080/upload", {
+      const res = await fetch("process.env.NEXT_PUBLIC_API_BASE_URL/upload", {
         method: "POST",
         body: formData,
       });
@@ -157,7 +157,7 @@ export default function EditPujaPage() {
     setAlertData(null);
 
     try {
-      const res = await fetch(`http://127.0.0.1:8080/pujas/${id}`, {
+      const res = await fetch(`process.env.NEXT_PUBLIC_API_BASE_URL/pujas/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

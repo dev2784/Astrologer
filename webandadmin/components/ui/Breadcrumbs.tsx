@@ -25,7 +25,7 @@ export default function Breadcrumbs() {
     }
 
     // Fetch categories to resolve the IDs to names
-    fetch("http://127.0.0.1:8080/categories")
+    fetch("process.env.NEXT_PUBLIC_API_BASE_URL/categories")
       .then((res) => res.json())
       .then((data) => {
         if (data.categories) {
