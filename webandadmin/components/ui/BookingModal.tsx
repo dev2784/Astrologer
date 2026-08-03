@@ -34,8 +34,8 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState(false);
 
-  const gurujiPhone = "+919876543210";
-  const gurujiName = language === "hi" ? "आचार्य पंडित जी" : "Acharya Pandit Ji";
+  const gurujiPhone = "+919340553012";
+  const gurujiName = language === "hi" ? "आचार्य ऋषि नगर" : "Acharya Rishi nagar";
 
   // Fetch categories when opened without a pre-selected pujaId
   useEffect(() => {
