@@ -10,7 +10,7 @@ async function getProfile() {
   if (!token) return null;
 
   // 2. Hit your Fastify backend with the token attached
-  const res = await fetch("process.env.NEXT_PUBLIC_API_BASE_URL/users/me", {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/me`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
