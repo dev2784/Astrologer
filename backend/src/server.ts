@@ -46,6 +46,7 @@ server.register(fastifyCors, {
       'http://127.0.0.1:3000',
       'http://localhost:3001',
       'http://127.0.0.1:3001',
+      'https://vedicapp-nine.vercel.app',
     ];
 
     if (allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
