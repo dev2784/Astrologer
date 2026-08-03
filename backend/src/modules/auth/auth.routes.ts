@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import '@fastify/jwt'; // <-- This tells TypeScript about server.jwt
-import bcrypt from 'bcrypt';
+import bcrypt from "bcryptjs";
 import { prisma } from '../../db';
 
 export async function authRoutes(server: FastifyInstance) {
