@@ -28,7 +28,7 @@ export default function PujaDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`process.env.NEXT_PUBLIC_API_BASE_URL/pujas/${id}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/pujas/${id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.puja) setPuja(data.puja);
