@@ -44,20 +44,12 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           
           {/* Brand */}
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-orange-600 rounded-full flex items-center justify-center text-white shadow-md">
-              <svg className="w-6 h-6 animate-spin-slow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-2xl font-serif font-bold tracking-tight text-stone-900 leading-none">
-                {t("brand.name")}
-              </span>
-              <span className="text-[10px] font-bold tracking-widest text-orange-600 uppercase mt-1">
-                {t("brand.subtitle")}
-              </span>
-            </div>
+          <Link href="/" className="flex items-center gap-3 group">
+            <img
+              src="/logo.png" 
+              alt={t("brand.name")} 
+              className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            />
           </Link>
 
           {/* Navigation Links */}
