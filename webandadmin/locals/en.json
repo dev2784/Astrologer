@@ -1,0 +1,44 @@
+{
+    "brand": {
+      "name": "Acharya Ji",
+      "subtitle": "Vedic Astrologer"
+    },
+    "nav": {
+      "home": "Home",
+      "services": "Services",
+      "about": "About Us",
+      "bookPuja": "Book Puja",
+      "categories": "Categories",
+      "subcategories": "Subcategories",
+      "noSubcategories": "No subcategories listed"
+    },
+      "pujaList": {
+        "badge": "Sacred Services",
+        "heroTitle": "Book Authentic Vedic Pujas Online",
+        "heroSubtitle": "Perform authentic rituals conducted by experienced Pandits at sacred temples and holy pilgrimage spots.",
+        "noPujasFound": "No Pujas Found",
+        "noPujasDesc": "There are currently no listed pujas for this selection.",
+        "yajmanLabel": "Yajman",
+        "viewDetails": "View Details"
+      },
+      "pujaDetail": {
+        "backToPujas": "Back to All Pujas",
+        "location": "Location",
+        "duration": "Duration",
+        "yajmanCapacity": "Yajman Capacity",
+        "aboutTab": "About Puja",
+        "samagriTab": "Puja Samagri",
+        "benefitsTab": "Benefits",
+        "faqsTab": "FAQs",
+        "samagriHeading": "Required Samagri Items",
+        "noSamagri": "Puja samagri list will be arranged by Panditji.",
+        "noFaqs": "No FAQs available for this puja.",
+        "totalCharges": "Total Dakshina / Charges",
+        "includedNotice": "(Includes Pandit Dakshina & Samagri)",
+        "benefit1": "Verified Authorized Pandit Ji",
+        "benefit2": "Complete Puja Samagri Included",
+        "benefit3": "Instant Booking Confirmation",
+        "bookNow": "Book Puja Now",
+        "needHelp": "Need help? Contact our support team for custom arrangements."
+      }
+  }

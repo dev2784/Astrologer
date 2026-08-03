@@ -1,5 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "cjs"
 }
 
 datasource db {
@@ -12,11 +14,81 @@ enum Role {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String   // This will store the hashed password, never plain text
-  role      Role     @default(USER)
-  
+  id       String @id @default(uuid())
+  email    String @unique
+  password String // This will store the hashed password, never plain text
+  role     Role   @default(USER)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id            String        @id @default(uuid())
+  nameEn        String        @unique
+  nameHi        String        @unique
+  slug          String        @unique
+  descriptionEn String?
+  descriptionHi String?
+  subcategories Subcategory[]
+  pujas         Puja[] // <--- Add this opposite relation
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Subcategory {
+  id         String   @id @default(uuid())
+  nameEn     String
+  nameHi     String
+  slug       String   @unique
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  pujas      Puja[] // <--- Add this opposite relation
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Puja {
+  id            String       @id @default(uuid())
+  titleEn       String
+  titleHi       String
+  slug          String       @unique
+  categoryId    String
+  category      Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  subcategoryId String?
+  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
+  imageUrl      String?
+  placeOfPuja   String // e.g., "Temple / Home"
+  noOfYajman    String // e.g., "1-4 Persons"
+  estimatedTime String // e.g., "30 to 45 min"
+  charges       String // (e.g., "₹2100" or "2500")
+  samagri       String? // Puja samagri text
+  about         String? // About puja text
+  benefits      String? // Benefits text
+  faqs          PujaFaq[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  bookings      Booking[]
+}
+
+model PujaFaq {
+  id         String  @id @default(uuid())
+  pujaId     String
+  puja       Puja    @relation(fields: [pujaId], references: [id], onDelete: Cascade)
+  questionEn String
+  answerEn   String
+  questionHi String?
+  answerHi   String?
+}
+
+model Booking {
+  id        String   @id @default(uuid())
+  pujaId    String
+  puja      Puja     @relation(fields: [pujaId], references: [id], onDelete: Cascade)
+  name      String
+  phone     String
+  email     String?
+  address   String
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
 }
