@@ -13,19 +13,32 @@ interface MuhuratItem {
 
 export default function PublicMuhuratPage() {
   const { language } = useLanguage();
-  
-  // Format YYYY-MM-DD
-  const getTodayString = () => new Date().toISOString().split("T")[0];
 
-  const [selectedDate, setSelectedDate] = useState<string>(getTodayString());
+  // Selected date state
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  
+  // Calendar view Month/Year navigation state
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  
   const [muhurats, setMuhurats] = useState<MuhuratItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
 
+  // Format Date object to YYYY-MM-DD string
+  const formatDateString = (d: Date) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  // Fetch Muhurats whenever selectedDate changes
   useEffect(() => {
     setLoading(true);
-    fetch(`${API_URL}/muhurat?date=${selectedDate}`)
+    const dateStr = formatDateString(selectedDate);
+
+    fetch(`${API_URL}/muhurat?date=${dateStr}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.muhurats) setMuhurats(data.muhurats);
@@ -33,6 +46,31 @@ export default function PublicMuhuratPage() {
       .catch((err) => console.error("Error loading Muhurats:", err))
       .finally(() => setLoading(false));
   }, [selectedDate, API_URL]);
+
+  // Calendar Grid Generation Logic
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth();
+
+  const firstDayOfMonth = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const prevMonth = () => setCurrentMonth(new Date(year, month - 1, 1));
+  const nextMonth = () => setCurrentMonth(new Date(year, month + 1, 1));
+
+  const monthNamesEn = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  const monthNamesHi = [
+    "जनवरी", "फरवरी", "मार्च", "अप्रैल", "मई", "जून",
+    "जुलाई", "अगस्त", "सितंबर", "अक्टूबर", "नवंबर", "दिसंबर"
+  ];
+
+  const weekDaysEn = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const weekDaysHi = ["रवि", "सोम", "मंगल", "बुध", "गुरु", "शुक्र", "शनि"];
+
+  const todayStr = formatDateString(new Date());
+  const selectedStr = formatDateString(selectedDate);
 
   return (
     <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -53,31 +91,96 @@ export default function PublicMuhuratPage() {
         {/* Main Grid: Calendar Side-By-Side with Details */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* Left Column: Date Selector / Calendar Card */}
-          <div className="lg:col-span-5 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 sticky top-24">
-            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <span>📅</span>
-              <span>{language === "hi" ? "तारीख चुनें" : "Select Date"}</span>
-            </h2>
+          {/* Left Column: Custom Interactive Calendar Card */}
+          <div className="lg:col-span-5 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-md space-y-5 sticky top-24">
+            
+            {/* Calendar Header / Month Nav */}
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-1.5">
+                <span>📅</span>
+                <span>
+                  {language === "hi" ? monthNamesHi[month] : monthNamesEn[month]} {year}
+                </span>
+              </h2>
 
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-full px-4 py-3 border border-slate-300 rounded-xl text-base font-semibold text-slate-800 focus:ring-2 focus:ring-orange-500 focus:outline-none bg-orange-50/30"
-            />
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={prevMonth}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-600 hover:text-slate-900 transition"
+                  aria-label="Previous Month"
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={() => {
+                    const now = new Date();
+                    setCurrentMonth(now);
+                    setSelectedDate(now);
+                  }}
+                  className="px-2.5 py-1 text-xs font-bold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition"
+                >
+                  {language === "hi" ? "आज" : "Today"}
+                </button>
+                <button
+                  onClick={nextMonth}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-600 hover:text-slate-900 transition"
+                  aria-label="Next Month"
+                >
+                  ›
+                </button>
+              </div>
+            </div>
 
-            <div className="pt-2 text-xs text-slate-500 space-y-1">
-              <p>
-                <strong>{language === "hi" ? "चयनित तिथि:" : "Selected Date:"}</strong>{" "}
-                <span className="text-orange-600 font-bold">{selectedDate}</span>
-              </p>
-              <button
-                onClick={() => setSelectedDate(getTodayString())}
-                className="text-orange-600 hover:underline font-bold text-xs"
-              >
-                {language === "hi" ? "आज की तिथि पर जाएं" : "Jump to Today"}
-              </button>
+            {/* Days of Week Header */}
+            <div className="grid grid-cols-7 gap-1 text-center text-xs font-bold text-slate-400 border-b border-slate-100 pb-2">
+              {(language === "hi" ? weekDaysHi : weekDaysEn).map((day) => (
+                <div key={day}>{day}</div>
+              ))}
+            </div>
+
+            {/* Days Grid */}
+            <div className="grid grid-cols-7 gap-1.5 text-center">
+              {/* Blank leading slots for month start padding */}
+              {Array.from({ length: firstDayOfMonth }).map((_, i) => (
+                <div key={`empty-${i}`} className="h-10" />
+              ))}
+
+              {/* Day numbers */}
+              {Array.from({ length: daysInMonth }).map((_, i) => {
+                const dayNum = i + 1;
+                const dateObj = new Date(year, month, dayNum);
+                const dateStr = formatDateString(dateObj);
+
+                const isToday = dateStr === todayStr;
+                const isSelected = dateStr === selectedStr;
+
+                return (
+                  <button
+                    key={dayNum}
+                    onClick={() => setSelectedDate(dateObj)}
+                    className={`h-10 w-full rounded-2xl flex items-center justify-center text-sm font-semibold transition-all duration-200 relative ${
+                      isSelected
+                        ? "bg-gradient-to-r from-orange-600 to-amber-500 text-white shadow-md scale-105"
+                        : isToday
+                        ? "bg-orange-50 text-orange-600 font-extrabold border border-orange-200"
+                        : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                    }`}
+                  >
+                    <span>{dayNum}</span>
+                    {isToday && !isSelected && (
+                      <span className="absolute bottom-1 w-1 h-1 bg-orange-600 rounded-full"></span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Active Date Label */}
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+              <span className="text-slate-500">{language === "hi" ? "चयनित तिथि:" : "Selected Date:"}</span>
+              <span className="font-extrabold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-md">
+                {selectedStr}
+              </span>
             </div>
           </div>
 
@@ -85,9 +188,9 @@ export default function PublicMuhuratPage() {
           <div className="lg:col-span-7 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <h2 className="text-xl font-bold text-slate-900">
-                {selectedDate === getTodayString()
+                {selectedStr === todayStr
                   ? language === "hi" ? "आज के शुभ मुहूर्त" : "Today's Muhurats"
-                  : `${language === "hi" ? "मुहूर्त विवरण" : "Muhurats for"} ${selectedDate}`}
+                  : `${language === "hi" ? "मुहूर्त विवरण" : "Muhurats for"} ${selectedStr}`}
               </h2>
               <span className="text-xs font-semibold px-2.5 py-1 bg-amber-100 text-amber-800 rounded-full">
                 {muhurats.length} {language === "hi" ? "प्रविष्टियाँ" : "Entries"}

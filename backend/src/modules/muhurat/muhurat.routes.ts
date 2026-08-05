@@ -1,63 +1,87 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { prisma } from '../../db';
+import { FastifyInstance } from "fastify";
+import { prisma } from "../../db";
 
-interface MuhuratBody {
-  date: string; // YYYY-MM-DD
-  tithi: string;
-  muhurat: string;
-  details?: string;
-}
-
-export async function muhuratRoutes(fastify: FastifyInstance) {
-  // Public: Get muhurats by date (or all upcoming)
-  fastify.get("/muhurat", async (req: FastifyRequest, reply: FastifyReply) => {
-    const { date } = req.query as { date?: string };
-
-    if (date) {
-      // Parse ISO date
-      const queryDate = new Date(date);
-      const muhurats = await prisma.muhurat.findMany({
-        where: { date: queryDate },
-        orderBy: { createdAt: "asc" },
-      });
-      return reply.send({ muhurats });
-    }
-
-    // Default: fetch all muhurats
-    const muhurats = await prisma.muhurat.findMany({
-      orderBy: { date: "asc" },
-    });
-    return reply.send({ muhurats });
+export async function muhuratRoutes(server: FastifyInstance) {
+  // Ensure OPTIONS preflight doesn't throw 404
+  server.options("/*", async (request, reply) => {
+    return reply.status(200).send();
   });
 
-  // Admin: Create new Muhurat
-  fastify.post("/admin/muhurat", async (req: FastifyRequest, reply: FastifyReply) => {
-    const { date, tithi, muhurat, details } = req.body as MuhuratBody;
+  // Get Muhurats (Public) - Filters by 'date' query parameter if passed, otherwise fetches all
+  server.get("/", async (request, reply) => {
+    const { date } = request.query as { date?: string };
+
+    try {
+      if (date) {
+        // Parse date query parameter (expected YYYY-MM-DD)
+        const queryDate = new Date(date);
+
+        const muhurats = await prisma.muhurat.findMany({
+          where: { date: queryDate },
+          orderBy: { createdAt: "asc" },
+        });
+
+        return reply.send({ muhurats });
+      }
+
+      // Default: Fetch all muhurats ordered by date ascending
+      const muhurats = await prisma.muhurat.findMany({
+        orderBy: { date: "asc" },
+      });
+
+      return reply.send({ muhurats });
+    } catch (error) {
+      console.error("Fetch Muhurats error:", error);
+      return reply.code(500).send({ error: "Failed to fetch muhurats." });
+    }
+  });
+
+  // Create a new Muhurat entry (Admin)
+  server.post("/", async (request, reply) => {
+    const { date, tithi, muhurat, details } = request.body as any;
 
     if (!date || !tithi || !muhurat) {
-      return reply.status(400).send({ error: "Date, Tithi, and Muhurat are required." });
+      return reply
+        .code(400)
+        .send({ error: "Date, Tithi, and Muhurat timing are required." });
     }
 
-    const newMuhurat = await prisma.muhurat.create({
-      data: {
-        date: new Date(date),
-        tithi,
-        muhurat,
-        details: details || null,
-      },
-    });
+    try {
+      const newMuhurat = await prisma.muhurat.create({
+        data: {
+          date: new Date(date),
+          tithi,
+          muhurat,
+          details: details || null,
+        },
+      });
 
-    return reply.status(201).send({ success: true, muhurat: newMuhurat });
+      return reply
+        .code(201)
+        .send({ message: "Muhurat added successfully!", muhurat: newMuhurat });
+    } catch (error) {
+      console.error("Create Muhurat error:", error);
+      return reply.code(500).send({ error: "Failed to create muhurat." });
+    }
   });
 
-  // Admin: Delete Muhurat
-  fastify.delete("/admin/muhurat/:id", async (req: FastifyRequest, reply: FastifyReply) => {
-    const { id } = req.params as { id: string };
+  // Delete a Muhurat entry (Admin)
+  server.delete<{ Params: { id: string } }>("/:id", async (request, reply) => {
+    const { id } = request.params;
 
-    await prisma.muhurat.delete({
-      where: { id },
-    });
+    if (!id) {
+      return reply.code(400).send({ error: "Muhurat ID is required." });
+    }
 
-    return reply.send({ success: true, message: "Muhurat deleted successfully" });
+    try {
+      await prisma.muhurat.delete({
+        where: { id },
+      });
+
+      return reply.send({ message: "Muhurat deleted successfully." });
+    } catch (error) {
+      console.error("Delete Muhurat error:", error);
+      return reply.code(500).send({ error: "Failed to delete muhurat." });
+    }
   });
 }
