@@ -38,7 +38,7 @@ export default function AdminMuhuratPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/admin/muhurat`, {
+      const res = await fetch(`${API_URL}/muhurat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ date, tithi, muhurat, details }),
