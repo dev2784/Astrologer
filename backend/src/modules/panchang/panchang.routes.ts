@@ -21,25 +21,40 @@ export async function panchangRoutes(server: FastifyInstance) {
   });
 
   // 2. POST: Bulk Upload Excel
-  server.post("/bulk-upload", async (request, reply) => {
+ server.post("/bulk-upload", async (request, reply) => {
     try {
       const data = await request.file();
       if (!data) return reply.code(400).send({ error: "No Excel file found in request." });
 
       const buffer = await data.toBuffer();
-      const workbook = XLSX.read(buffer, { type: "buffer" });
+      
+      // FIX 1: Add cellDates: true so SheetJS translates Excel epochs to JS Dates
+      const workbook = XLSX.read(buffer, { type: "buffer", cellDates: true }); 
       const sheetName = workbook.SheetNames[0];
       const rows: any[] = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
       if (!rows || rows.length === 0) return reply.code(400).send({ error: "Excel file is empty." });
 
       let successCount = 0;
+
       const parseTime = (timeStr: string) => {
         if (!timeStr) return { hour: 0, minute: 0, second: 0 };
         const parts = String(timeStr).split(":");
         return { hour: parseInt(parts[0] || "0"), minute: parseInt(parts[1] || "0"), second: parseInt(parts[2] || "0") };
       };
 
+      // FIX 2: Helper to handle both String dates and Excel Serial Numbers
+      const parseSafeDate = (rawDate: any) => {
+        if (!rawDate) return null;
+        if (typeof rawDate === "number") {
+          // Convert Excel serial number to JS Date
+          return new Date(Math.round((rawDate - 25569) * 86400 * 1000));
+        }
+        const parsed = new Date(rawDate);
+        return isNaN(parsed.getTime()) ? null : parsed;
+      };
+
+      // FIX 3: Parse Choghadiya helper
       const parseChoghadiya = (rawStr: string) => {
         if (!rawStr) return [];
         return rawStr.split(";").map(slot => {
@@ -49,10 +64,12 @@ export async function panchangRoutes(server: FastifyInstance) {
       };
 
       for (const row of rows) {
-        if (!row.date) continue;
+        // Use the safe date parser
+        const validDate = parseSafeDate(row.date);
+        if (!validDate) continue; // Skip rows with invalid or missing dates
 
         const nestedJsonData = {
-          day: new Date(row.date).toLocaleDateString('en-US', { weekday: 'long' }),
+          day: validDate.toLocaleDateString('en-US', { weekday: 'long' }),
           sunrise: row.sunrise || "", sunset: row.sunset || "",
           tithi: { details: { tithi_name: row.tithi_name || "" }, end_time: parseTime(row.tithi_end) },
           nakshatra: { details: { nak_name: row.nakshatra_name || "" }, end_time: parseTime(row.nakshatra_end) },
@@ -64,15 +81,14 @@ export async function panchangRoutes(server: FastifyInstance) {
           vikram_samvat: parseInt(row.vikram_samvat) || 0, shaka_samvat: parseInt(row.shaka_samvat) || 0,
           abhijit_muhurta: { start: row.abhijit_start || "", end: row.abhijit_end || "" },
           rahukaal: { start: row.rahukaal_start || "", end: row.rahukaal_end || "" },
-          // THIS IS THE NEW ADDITION:
           choghadiya_day: parseChoghadiya(row.choghadiya_day),
           choghadiya_night: parseChoghadiya(row.choghadiya_night)
         };
 
         await prisma.panchang.upsert({
-          where: { date: new Date(row.date) },
+          where: { date: validDate },
           update: { data: nestedJsonData },
-          create: { date: new Date(row.date), data: nestedJsonData }
+          create: { date: validDate, data: nestedJsonData }
         });
         successCount++;
       }
