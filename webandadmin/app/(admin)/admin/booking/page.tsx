@@ -225,6 +225,7 @@ export default function AdminBookingsPage() {
                 <tr>
                   <th className="p-4">Customer</th>
                   <th className="p-4">Contact</th>
+                  <th className="p-4">Date</td>
                   <th className="p-4">Puja Service</th>
                   <th className="p-4">Address</th>
                   <th className="p-4">Date Requested</th>
@@ -239,6 +240,15 @@ export default function AdminBookingsPage() {
                     <td className="p-4 space-y-0.5">
                       <div className="font-semibold text-orange-600">{b.phone}</div>
                       {b.email && <div className="text-xs text-slate-400">{b.email}</div>}
+                    </td>
+                    <td className="p-4 font-bold text-slate-900">
+                      {new Date(b.bookingDate).toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </td>
 
                     <td className="p-4 font-medium text-slate-800">
