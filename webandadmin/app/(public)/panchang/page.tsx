@@ -7,11 +7,23 @@ interface PanchangData {
   day: string;
   sunrise: string;
   sunset: string;
-  tithi: { details: {tithi_name: string}; end_time: {hour: string; minute: string; second: string}};
-  nakshatra: { details: {nak_name: string}; end_time: {hour: string; minute: string; second: string}};
-  yoga: { details: {yog_name: string}};
-  karana: { details: {karan_name: string} };
-  hindu_maah: { purnimanta: string };
+  tithi: { 
+    details: { tithi_name: string }; 
+    end_time: { hour: number; minute: number; second: number } 
+  };
+  nakshatra: { 
+    details: { nak_name: string }; 
+    end_time: { hour: number; minute: number; second: number } 
+  };
+  yoga: { 
+    details: { yog_name: string } 
+  };
+  karana: { 
+    details: { karan_name: string } 
+  };
+  hindu_maah: { 
+    purnimanta: string 
+  };
   paksha: string;
   ritu: string;
   ayana: string;
@@ -20,7 +32,6 @@ interface PanchangData {
   sun_sign: string;
   moon_sign: string;
 }
-
 export default function UjjainPanchangView({ selectedDate }: { selectedDate: any }) {
   const [panchang, setPanchang] = useState<PanchangData | null>(null);
   const [loading, setLoading] = useState(true);
