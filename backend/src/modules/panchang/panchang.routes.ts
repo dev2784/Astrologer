@@ -27,8 +27,6 @@ export async function panchangRoutes(server: FastifyInstance) {
       if (!data) return reply.code(400).send({ error: "No Excel file found in request." });
 
       const buffer = await data.toBuffer();
-      
-      // FIX 1: Add cellDates: true so SheetJS translates Excel epochs to JS Dates
       const workbook = XLSX.read(buffer, { type: "buffer", cellDates: true }); 
       const sheetName = workbook.SheetNames[0];
       const rows: any[] = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
@@ -37,40 +35,62 @@ export async function panchangRoutes(server: FastifyInstance) {
 
       let successCount = 0;
 
-      const parseTime = (timeStr: string) => {
-        if (!timeStr) return { hour: 0, minute: 0, second: 0 };
-        const parts = String(timeStr).split(":");
-        return { hour: parseInt(parts[0] || "0"), minute: parseInt(parts[1] || "0"), second: parseInt(parts[2] || "0") };
-      };
-
-      // FIX 2: Helper to handle both String dates and Excel Serial Numbers
+      // FIX 1: Safely parse Date
       const parseSafeDate = (rawDate: any) => {
         if (!rawDate) return null;
         if (typeof rawDate === "number") {
-          // Convert Excel serial number to JS Date
           return new Date(Math.round((rawDate - 25569) * 86400 * 1000));
         }
         const parsed = new Date(rawDate);
         return isNaN(parsed.getTime()) ? null : parsed;
       };
 
-      // FIX 3: Parse Choghadiya helper
+      // FIX 2: Safely extract JUST the time (HH:MM:SS) from Excel's weird 1899 dates
+      const extractTime = (val: any): string => {
+        if (!val) return "";
+        // If it parsed as a Date (e.g. 1899-12-30T12:13:00.000Z)
+        if (val instanceof Date) {
+          return val.toISOString().substr(11, 8); // Strips out everything except HH:MM:SS
+        }
+        // If it's a string that got ISO formatted
+        if (typeof val === "string" && val.includes("1899-12-30T")) {
+          return new Date(val).toISOString().substr(11, 8);
+        }
+        // If it's a raw Excel time decimal (e.g., 0.5 = 12:00:00)
+        if (typeof val === "number" && val < 1) {
+          const totalSeconds = Math.round(val * 86400);
+          const h = Math.floor(totalSeconds / 3600);
+          const m = Math.floor((totalSeconds % 3600) / 60);
+          const s = totalSeconds % 60;
+          return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+        return String(val); // Fallback if it's already a clean string
+      };
+
+      const parseTime = (timeStr: any) => {
+        const cleanStr = extractTime(timeStr);
+        if (!cleanStr) return { hour: 0, minute: 0, second: 0 };
+        const parts = String(cleanStr).split(":");
+        return { hour: parseInt(parts[0] || "0"), minute: parseInt(parts[1] || "0"), second: parseInt(parts[2] || "0") };
+      };
+
       const parseChoghadiya = (rawStr: string) => {
         if (!rawStr) return [];
         return rawStr.split(";").map(slot => {
           const [name, start, end, type] = slot.split("|");
-          return { name: name || "", start: start || "", end: end || "", type: type || "neutral" };
+          return { name: name || "", start: extractTime(start), end: extractTime(end), type: type || "neutral" };
         });
       };
 
       for (const row of rows) {
-        // Use the safe date parser
         const validDate = parseSafeDate(row.date);
-        if (!validDate) continue; // Skip rows with invalid or missing dates
+        if (!validDate) continue;
 
+        // Ensure every time field runs through `extractTime`
         const nestedJsonData = {
           day: validDate.toLocaleDateString('en-US', { weekday: 'long' }),
-          sunrise: row.sunrise || "", sunset: row.sunset || "",
+          sunrise: extractTime(row.sunrise), 
+          sunset: extractTime(row.sunset),
           tithi: { details: { tithi_name: row.tithi_name || "" }, end_time: parseTime(row.tithi_end) },
           nakshatra: { details: { nak_name: row.nakshatra_name || "" }, end_time: parseTime(row.nakshatra_end) },
           yog: { details: { yog_name: row.yog_name || "" } },
@@ -79,8 +99,8 @@ export async function panchangRoutes(server: FastifyInstance) {
           paksha: row.paksha || "", ritu: row.ritu || "",
           sun_sign: row.sun_sign || "", moon_sign: row.moon_sign || "", ayana: row.ayana || "",
           vikram_samvat: parseInt(row.vikram_samvat) || 0, shaka_samvat: parseInt(row.shaka_samvat) || 0,
-          abhijit_muhurta: { start: row.abhijit_start || "", end: row.abhijit_end || "" },
-          rahukaal: { start: row.rahukaal_start || "", end: row.rahukaal_end || "" },
+          abhijit_muhurta: { start: extractTime(row.abhijit_start), end: extractTime(row.abhijit_end) },
+          rahukaal: { start: extractTime(row.rahukaal_start), end: extractTime(row.rahukaal_end) },
           choghadiya_day: parseChoghadiya(row.choghadiya_day),
           choghadiya_night: parseChoghadiya(row.choghadiya_night)
         };
