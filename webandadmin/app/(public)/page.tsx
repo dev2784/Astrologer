@@ -36,6 +36,13 @@ export default function HomePage() {
               <Calendar size={20} />
               {t("home.checkMuhurat")}
             </Link>
+            <Link
+              href="/panchang"
+              className="px-8 py-4 bg-transparent border-2 border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white font-bold rounded-lg transition text-lg flex items-center justify-center gap-2"
+            >
+              <Calendar size={20} />
+              {t("home.panchang")}
+            </Link>
           </div>
         </div>
       </section>

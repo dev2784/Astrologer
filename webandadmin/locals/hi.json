@@ -52,6 +52,7 @@
       "fullName": "पूरा नाम",
       "phone": "फ़ोन नंबर",
       "serviceRequired": "आवश्यक सेवा",
-      "submit": "अनुरोध भेजें"
+      "submit": "अनुरोध भेजें",      
+      "panchang": "पंचांग"
   }
 }
