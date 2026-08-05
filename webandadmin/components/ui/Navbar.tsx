@@ -141,6 +141,9 @@ export default function Navbar() {
             <Link href="/panchang" className="hover:text-orange-600 transition">
               {t("nav.panchang")}
             </Link>
+            <Link href="/contact" className="hover:text-orange-600 transition">
+              {t("nav.contact")}
+            </Link>
           </nav>
 
           {/* Action Controls & Mobile Hamburger */}
