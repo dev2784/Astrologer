@@ -21,7 +21,7 @@ interface PanchangData {
   moon_sign: string;
 }
 
-export default function UjjainPanchangView({ selectedDate }: { selectedDate: string }) {
+export default function UjjainPanchangView({ selectedDate }: { selectedDate: any }) {
   const [panchang, setPanchang] = useState<PanchangData | null>(null);
   const [loading, setLoading] = useState(true);
 
