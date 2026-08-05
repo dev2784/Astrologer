@@ -23,7 +23,7 @@ export async function bookingRoutes(server: FastifyInstance) {
           phone,
           email: email || null,
           address,
-          bookingDate ? new Date(bookingDate) : null,
+          bookingDate: bookingDate ? new Date(bookingDate) : null,
         },
       });
 
