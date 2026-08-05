@@ -10,6 +10,12 @@ interface Category {
   subcategories: { id: string; nameEn: string; nameHi?: string }[];
 }
 
+interface PujaItem {
+  id: string;
+  titleEn: string;
+  titleHi?: string;
+}
+
 interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -24,13 +30,18 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
-  const [bookingDate, setBookingDate] = useState(""); // Date picker state
+  const [bookingDate, setBookingDate] = useState("");
 
-  // Category selection states (used when pujaId is not present)
+  // Category, Subcategory, and Puja selection states
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
-  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState("");
   const [subcategories, setSubcategories] = useState<{ id: string; nameEn: string; nameHi?: string }[]>([]);
+  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState("");
+  
+  // Dynamic Puja loading based on subcategory
+  const [pujas, setPujas] = useState<PujaItem[]>([]);
+  const [selectedPujaId, setSelectedPujaId] = useState("");
+  const [loadingPujas, setLoadingPujas] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState(false);
@@ -38,10 +49,9 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
   const gurujiPhone = "+919340553012";
   const gurujiName = language === "hi" ? "आचार्य ऋषि नगर" : "Acharya Rishi nagar";
 
-  // Get today's date in YYYY-MM-DD format to prevent past date selection
   const todayDate = new Date().toISOString().split("T")[0];
 
-  // Fetch categories when opened without a pre-selected pujaId
+  // Fetch initial categories when modal opens without a preset pujaId
   useEffect(() => {
     if (isOpen && !pujaId) {
       fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/categories`)
@@ -53,15 +63,41 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
     }
   }, [isOpen, pujaId]);
 
-  // Handle Category dropdown change
+  // Handle Category selection -> reset downstream options
   const handleCategoryChange = (catId: string) => {
     setSelectedCategoryId(catId);
     setSelectedSubcategoryId("");
+    setSelectedPujaId("");
+    setPujas([]);
+
     const matchedCat = categories.find((c) => c.id === catId);
     setSubcategories(matchedCat?.subcategories || []);
   };
 
+  // Handle Subcategory selection -> fetch Pujas for this subcategory
+  const handleSubcategoryChange = (subCatId: string) => {
+    setSelectedSubcategoryId(subCatId);
+    setSelectedPujaId("");
+    setPujas([]);
+
+    if (!subCatId) return;
+
+    setLoadingPujas(true);
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/pujas?subcategoryId=${subCatId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.pujas) {
+          setPujas(data.pujas);
+        }
+      })
+      .catch((err) => console.error("Error fetching pujas:", err))
+      .finally(() => setLoadingPujas(false));
+  };
+
   if (!isOpen) return null;
+
+  // Final Puja ID sent to backend (either passed via prop or selected via dropdown)
+  const finalPujaId = pujaId || selectedPujaId;
 
   const formattedDate = bookingDate ? ` for Date: ${bookingDate}` : "";
   const whatsappMessage = encodeURIComponent(
@@ -74,14 +110,14 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
 
     try {
       const payload = {
-        pujaId: pujaId || null,
+        pujaId: finalPujaId || null,
         categoryId: selectedCategoryId || null,
         subcategoryId: selectedSubcategoryId || null,
         name,
         phone,
         email,
         address,
-        bookingDate, // Included in payload
+        bookingDate,
       };
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/bookings`, {
@@ -137,9 +173,10 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             
-            {/* Show Category & Subcategory Selection if pujaId is missing */}
+            {/* Show Category, Subcategory, & Puja Dropdowns if pujaId is missing */}
             {!pujaId && (
               <div className="space-y-3 p-3.5 bg-orange-50/50 rounded-xl border border-orange-100">
+                {/* 1. Category Dropdown */}
                 <div>
                   <label className="block text-xs font-bold text-stone-700 uppercase mb-1">
                     {language === "hi" ? "श्रेणी चुनें *" : "Select Category *"}
@@ -159,6 +196,7 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
                   </select>
                 </div>
 
+                {/* 2. Subcategory Dropdown */}
                 {subcategories.length > 0 && (
                   <div>
                     <label className="block text-xs font-bold text-stone-700 uppercase mb-1">
@@ -167,7 +205,7 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
                     <select
                       required
                       value={selectedSubcategoryId}
-                      onChange={(e) => setSelectedSubcategoryId(e.target.value)}
+                      onChange={(e) => handleSubcategoryChange(e.target.value)}
                       className="w-full px-3 py-2 border rounded-xl text-sm bg-white focus:ring-2 focus:ring-orange-500 outline-hidden"
                     >
                       <option value="">{language === "hi" ? "-- उप-श्रेणी चुनें --" : "-- Select Subcategory --"}</option>
@@ -177,6 +215,34 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
                         </option>
                       ))}
                     </select>
+                  </div>
+                )}
+
+                {/* 3. Dynamic Puja List Dropdown based on Subcategory */}
+                {selectedSubcategoryId && (
+                  <div>
+                    <label className="block text-xs font-bold text-stone-700 uppercase mb-1">
+                      {language === "hi" ? "पूजा चुनें *" : "Select Specific Puja *"}
+                    </label>
+                    {loadingPujas ? (
+                      <div className="text-xs text-stone-500 py-1">
+                        {language === "hi" ? "पूजा सूची लोड हो रही है..." : "Loading pujas..."}
+                      </div>
+                    ) : (
+                      <select
+                        required
+                        value={selectedPujaId}
+                        onChange={(e) => setSelectedPujaId(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-xl text-sm bg-white focus:ring-2 focus:ring-orange-500 outline-hidden"
+                      >
+                        <option value="">{language === "hi" ? "-- पूजा चुनें --" : "-- Select Puja --"}</option>
+                        {pujas.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {language === "hi" && p.titleHi ? p.titleHi : p.titleEn}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </div>
                 )}
               </div>
@@ -256,7 +322,7 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition"
+              className="w-full py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition disabled:opacity-50"
             >
               {loading
                 ? language === "hi"
