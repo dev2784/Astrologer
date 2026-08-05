@@ -134,6 +134,10 @@ export default function Navbar() {
             <Link href="/about" className="hover:text-orange-600 transition">
               {t("nav.about")}
             </Link>
+
+            <Link href="/muhurat" className="hover:text-orange-600 transition">
+              {t("nav.muhurat")}
+            </Link>
           </nav>
 
           {/* Action Controls & Mobile Hamburger */}

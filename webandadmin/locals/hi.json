@@ -10,7 +10,8 @@
     "bookPuja": "पूजा बुक करें",
     "categories": "श्रेणियां",
     "subcategories": "उप-श्रेणियां",
-    "noSubcategories": "कोई उप-श्रेणी उपलब्ध नहीं है"
+    "noSubcategories": "कोई उप-श्रेणी उपलब्ध नहीं है",    
+    "muhurat": "मुहुर्त"
   },
   "pujaList": {
     "badge": "पवित्र सेवाएं",

@@ -93,3 +93,15 @@ model Booking {
   bookingDate DateTime?
   createdAt DateTime @default(now())
 }
+
+model Muhurat {
+  id          String   @id @default(uuid())
+  date        DateTime @db.Date // English calendar date (YYYY-MM-DD)
+  tithi       String   // e.g., "शुक्ल पक्ष एकादशी" or "Ekadashi"
+  muhurat     String   // e.g., "Abhijit Muhurat (11:45 AM - 12:35 PM)"
+  details     String?  @db.Text // Full details or guidelines
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([date])
+}

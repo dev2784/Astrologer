@@ -10,7 +10,8 @@
       "bookPuja": "Book Puja",
       "categories": "Categories",
       "subcategories": "Subcategories",
-      "noSubcategories": "No subcategories listed"
+      "noSubcategories": "No subcategories listed",
+      "muhurat": "Muhurat"
     },
       "pujaList": {
         "badge": "Sacred Services",
