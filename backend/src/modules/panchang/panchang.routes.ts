@@ -27,7 +27,7 @@ export async function panchangRoutes(server: FastifyInstance) {
         headers: {
           // "Authorization": authHeader,
           "Content-Type": "application/json",
-          'x-astrologyapi-key': apiKey,
+          'x-astrologyapi-key': 'ak-bfa576d2836811814a40ccea794dbcb2052e1430',
 
         },
         body: JSON.stringify({ "day": 12,
