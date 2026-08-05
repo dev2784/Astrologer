@@ -8,12 +8,10 @@ interface PanchangData {
   sunrise: string;
   sunset: string;
   tithi: { 
-    details: { tithi_name: string }; 
-    end_time: string
+    details: { tithi_name: string }
   };
   nakshatra: { 
-    details: { nak_name: string }; 
-    end_time: string 
+    details: { nak_name: string }
   };
   yoga: { 
     details: { yog_name: string } 
@@ -89,12 +87,10 @@ export default function UjjainPanchangView({ selectedDate }: { selectedDate: any
             <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
               <span className="text-slate-500 block text-xs">Tithi</span>
               <span className="font-bold text-slate-900">{panchang.tithi.details.tithi_name}</span>
-              <span className="text-xs text-orange-600 block mt-1">Ends at {panchang.tithi.end_time.hour +':'+ panchang.tithi.end_time.minute+':'+ panchang.tithi.end_time.second}</span>
             </div>
             <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
               <span className="text-slate-500 block text-xs">Nakshatra</span>
               <span className="font-bold text-slate-900">{panchang.nakshatra.details.nak_name}</span>
-              <span className="text-xs text-orange-600 block mt-1">Ends at {panchang.nakshatra.end_time.hour +':'+ panchang.tithi.end_time.minute+':'+ panchang.tithi.end_time.second}</span>
             </div>
             <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
               <span className="text-slate-500 block text-xs">Yoga</span>
