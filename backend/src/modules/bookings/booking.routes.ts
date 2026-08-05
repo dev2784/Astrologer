@@ -9,7 +9,7 @@ export async function bookingRoutes(server: FastifyInstance) {
   });
   // Create a new booking (Public)
   server.post("/", async (request, reply) => {
-    const { pujaId, name, phone, email, address } = request.body as any;
+    const { pujaId, name, phone, email, address, bookingDate } = request.body as any;
 
     if (!pujaId || !name || !phone || !address) {
       return reply.code(400).send({ error: "Name, Phone, Address, and Puja ID are required." });
@@ -23,6 +23,7 @@ export async function bookingRoutes(server: FastifyInstance) {
           phone,
           email: email || null,
           address,
+          bookingDate ? new Date(bookingDate) : null,
         },
       });
 

@@ -90,5 +90,6 @@ model Booking {
   email     String?
   address   String
   status    String   @default("PENDING")
+  bookingDate DateTime?
   createdAt DateTime @default(now())
 }
