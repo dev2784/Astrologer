@@ -23,6 +23,20 @@ export default function AdminMuhuratPage() {
 
   const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
 
+
+  const fetchMuhurats = () => {
+    fetch(`${API_URL}/muhurat`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.muhurats) setMuhurats(data.muhurats);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  useEffect(() => {
+    fetchMuhurats();
+  }, []);
+
   const handleExcelUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!excelFile) {
@@ -44,6 +58,7 @@ export default function AdminMuhuratPage() {
       if (res.ok) {
         alert(data.message || "Bulk upload successful!");
         setExcelFile(null);
+        fetchMuhurats();
         // Refresh your list here if you have a fetch function
       } else {
         alert(data.error || "Failed to upload Excel file");
@@ -55,19 +70,6 @@ export default function AdminMuhuratPage() {
       setUploading(false);
     }
   };
-
-  const fetchMuhurats = () => {
-    fetch(`${API_URL}/muhurat`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.muhurats) setMuhurats(data.muhurats);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  useEffect(() => {
-    fetchMuhurats();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
