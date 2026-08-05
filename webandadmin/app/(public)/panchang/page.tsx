@@ -7,11 +7,11 @@ interface PanchangData {
   day: string;
   sunrise: string;
   sunset: string;
-  tithi: { details: string; end_time: string };
-  nakshatra: { details: string; end_time: string };
-  yoga: { details: string; end_time: string };
-  karana: { details: string; end_time: string };
-  hindu_maah: { purnimanta: string; amanta: string };
+  tithi: { details: {tithi_name: string}};
+  nakshatra: { details: {nak_name: string}};
+  yoga: { details: {yog_name: string}};
+  karana: { details: {karan_name: string} };
+  hindu_maah: { purnimanta: string };
   paksha: string;
   ritu: string;
   ayana: string;
