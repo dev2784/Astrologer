@@ -8,6 +8,7 @@ import { categoryRoutes } from './modules/categories/categories.routes';
 import { pujaRoutes } from './modules/pujas/pujas.routes';
 import { uploadRoutes } from './modules/uploads/upload.routes';
 import { bookingRoutes } from "./modules/bookings/booking.routes";
+import { muhuratRoutes } from "./modules/muhurat/muhurat.routes";
 import fastifyMultipart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static';
 
@@ -67,6 +68,7 @@ server.register(categoryRoutes, { prefix: '/categories' });
 server.register(pujaRoutes, { prefix: '/pujas' });
 server.register(uploadRoutes, { prefix: '/uploads' });
 server.register(bookingRoutes, { prefix: '/bookings' });
+server.register(muhuratRoutes, { prefix: '/muhurat' });
 // Basic health check route
 server.get('/health', async (request, reply) => {
   return { status: 'System Online' };
