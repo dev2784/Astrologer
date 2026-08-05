@@ -11,7 +11,8 @@
     "categories": "श्रेणियां",
     "subcategories": "उप-श्रेणियां",
     "noSubcategories": "कोई उप-श्रेणी उपलब्ध नहीं है",    
-    "muhurat": "मुहुर्त"
+    "muhurat": "मुहुर्त",
+    "panchang": "पंचांग"
   },
   "pujaList": {
     "badge": "पवित्र सेवाएं",
