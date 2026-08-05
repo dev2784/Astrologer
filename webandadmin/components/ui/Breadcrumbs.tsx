@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useSearchParams, usePathname } from "next/navigation";
+import { useState, useEffect, Suspense, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 interface Category {
@@ -12,57 +12,43 @@ interface Category {
 
 function BreadcrumbsContent() {
   const searchParams = useSearchParams();
-  const pathname = usePathname(); // Added to track actual route changes
   const subcategoryId = searchParams.get("subcategoryId");
 
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
+  // Store all categories in memory
+  const [categories, setCategories] = useState<Category[]>([]);
 
+  // 1. Fetch data EXACTLY ONCE when the component mounts
   useEffect(() => {
-    // 1. Flag to prevent race conditions if the user clicks multiple links quickly
-    let isMounted = true; 
-
-    // 2. Always reset state when the URL changes so old data doesn't get stuck
-    setActiveCategory(null);
-    setActiveSubcategory(null);
-
-    if (!subcategoryId) {
-      return;
-    }
-
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
 
     fetch(`${API_URL}/categories`)
       .then((res) => res.json())
       .then((data) => {
-        // 3. Only update state if this is the most recent link clicked
-        if (!isMounted) return; 
-
-        let foundCategory = null;
-        let foundSubcategory = null;
-
         if (data.categories) {
-          for (const cat of data.categories as Category[]) {
-            const matchedSub = cat.subcategories?.find((sub) => sub.id === subcategoryId);
-            if (matchedSub) {
-              foundCategory = cat.nameEn;
-              foundSubcategory = matchedSub.nameEn;
-              break;
-            }
-          }
+          setCategories(data.categories);
         }
-
-        // Apply the found categories (will remain null if ID was invalid)
-        setActiveCategory(foundCategory);
-        setActiveSubcategory(foundSubcategory);
       })
       .catch((err) => console.error("Breadcrumb fetch error:", err));
+  }, []); // Empty dependency array = only runs once!
 
-    // Cleanup function runs when the component unmounts or before the next effect runs
-    return () => {
-      isMounted = false;
-    };
-  }, [subcategoryId, pathname]); // Re-run whenever the ID or Path changes
+  // 2. Instantly calculate the active breadcrumbs whenever the URL changes
+  const { activeCategory, activeSubcategory } = useMemo(() => {
+    if (!subcategoryId || categories.length === 0) {
+      return { activeCategory: null, activeSubcategory: null };
+    }
+
+    for (const cat of categories) {
+      const matchedSub = cat.subcategories?.find((sub) => sub.id === subcategoryId);
+      if (matchedSub) {
+        return { 
+          activeCategory: cat.nameEn, 
+          activeSubcategory: matchedSub.nameEn 
+        };
+      }
+    }
+
+    return { activeCategory: null, activeSubcategory: null };
+  }, [subcategoryId, categories]); // Re-calculates instantly without network requests
 
   return (
     <nav className="bg-stone-100/70 border-b border-stone-200/60 py-2.5 px-4 sm:px-6 lg:px-8 text-xs font-medium text-stone-600">
@@ -76,7 +62,10 @@ function BreadcrumbsContent() {
         <span className="text-stone-400">/</span>
 
         {/* Services / All Pujas */}
-        <Link href="/pujas" className={`hover:text-orange-600 transition ${!activeCategory ? "text-orange-600 font-bold" : ""}`}>
+        <Link 
+          href="/pujas" 
+          className={`hover:text-orange-600 transition ${!activeCategory ? "text-orange-600 font-bold" : ""}`}
+        >
           Services
         </Link>
 
