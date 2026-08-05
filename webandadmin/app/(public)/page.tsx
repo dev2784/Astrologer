@@ -307,21 +307,21 @@ export default function HomePage() {
                 {language === "hi" ? "हमारे बारे में" : "About Us"}
               </span>
               <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900">
-                Acharya Pandit Ji
+                Acharya Rishi Nagar Ji
               </h2>
               <div className="w-16 h-1 bg-orange-500 mx-auto md:mx-0"></div>
               <p className="text-slate-600 text-lg leading-relaxed">
                 {language === "hi" 
-                  ? "काशी (वाराणसी) के प्रतिष्ठित गुरुकुलों से शिक्षित, आचार्य जी को वैदिक अनुष्ठान, ज्योतिष, वास्तु शास्त्र और कर्मकांड में 20 से अधिक वर्षों का गहन अनुभव है। हमारा उद्देश्य प्राचीन वैदिक परंपराओं को पूर्ण शुद्धता और प्रामाणिकता के साथ आपके जीवन में लाना है।"
-                  : "Educated from the prestigious Gurukuls of Kashi (Varanasi), Acharya Ji holds over 20 years of profound experience in Vedic rituals, Astrology, Vastu Shastra, and Karmakand. Our mission is to bring ancient Vedic traditions into your life with absolute purity and authenticity."}
+                  ? "उज्जैन के प्रतिष्ठित गुरुकुल से शिक्षित, आचार्य जी को वैदिक अनुष्ठान, ज्योतिष, वास्तु शास्त्र और कर्मकांड में 20 से अधिक वर्षों का गहन अनुभव है। हमारा उद्देश्य प्राचीन वैदिक परंपराओं को पूर्ण शुद्धता और प्रामाणिकता के साथ आपके जीवन में लाना है।"
+                  : "Educated from the prestigious Gurukuls of Ujjain , Acharya Ji holds over 20 years of profound experience in Vedic rituals, Astrology, Vastu Shastra, and Karmakand. Our mission is to bring ancient Vedic traditions into your life with absolute purity and authenticity."}
               </p>
               <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
                 <div className="text-center md:text-left">
-                  <h4 className="text-3xl font-bold text-orange-600">20+</h4>
+                  <h4 className="text-3xl font-bold text-orange-600">10+</h4>
                   <p className="text-sm text-slate-500 font-medium">Years Experience</p>
                 </div>
                 <div className="text-center md:text-left">
-                  <h4 className="text-3xl font-bold text-orange-600">5000+</h4>
+                  <h4 className="text-3xl font-bold text-orange-600">500+</h4>
                   <p className="text-sm text-slate-500 font-medium">Pujas Performed</p>
                 </div>
               </div>

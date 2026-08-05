@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, usePathname } from "next/navigation";
 import Link from "next/link";
 
 interface Category {
@@ -12,37 +12,57 @@ interface Category {
 
 function BreadcrumbsContent() {
   const searchParams = useSearchParams();
+  const pathname = usePathname(); // Added to track actual route changes
   const subcategoryId = searchParams.get("subcategoryId");
 
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
 
   useEffect(() => {
+    // 1. Flag to prevent race conditions if the user clicks multiple links quickly
+    let isMounted = true; 
+
+    // 2. Always reset state when the URL changes so old data doesn't get stuck
+    setActiveCategory(null);
+    setActiveSubcategory(null);
+
     if (!subcategoryId) {
-      setActiveCategory(null);
-      setActiveSubcategory(null);
       return;
     }
 
-    // Fix: Resolve NEXT_PUBLIC_API_BASE_URL using template literals
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
 
     fetch(`${API_URL}/categories`)
       .then((res) => res.json())
       .then((data) => {
+        // 3. Only update state if this is the most recent link clicked
+        if (!isMounted) return; 
+
+        let foundCategory = null;
+        let foundSubcategory = null;
+
         if (data.categories) {
           for (const cat of data.categories as Category[]) {
             const matchedSub = cat.subcategories?.find((sub) => sub.id === subcategoryId);
             if (matchedSub) {
-              setActiveCategory(cat.nameEn);
-              setActiveSubcategory(matchedSub.nameEn);
+              foundCategory = cat.nameEn;
+              foundSubcategory = matchedSub.nameEn;
               break;
             }
           }
         }
+
+        // Apply the found categories (will remain null if ID was invalid)
+        setActiveCategory(foundCategory);
+        setActiveSubcategory(foundSubcategory);
       })
       .catch((err) => console.error("Breadcrumb fetch error:", err));
-  }, [subcategoryId]);
+
+    // Cleanup function runs when the component unmounts or before the next effect runs
+    return () => {
+      isMounted = false;
+    };
+  }, [subcategoryId, pathname]); // Re-run whenever the ID or Path changes
 
   return (
     <nav className="bg-stone-100/70 border-b border-stone-200/60 py-2.5 px-4 sm:px-6 lg:px-8 text-xs font-medium text-stone-600">
