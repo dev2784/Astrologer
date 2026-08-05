@@ -40,6 +40,14 @@ export async function panchangRoutes(server: FastifyInstance) {
         return { hour: parseInt(parts[0] || "0"), minute: parseInt(parts[1] || "0"), second: parseInt(parts[2] || "0") };
       };
 
+      const parseChoghadiya = (rawStr: string) => {
+        if (!rawStr) return [];
+        return rawStr.split(";").map(slot => {
+          const [name, start, end, type] = slot.split("|");
+          return { name: name || "", start: start || "", end: end || "", type: type || "neutral" };
+        });
+      };
+
       for (const row of rows) {
         if (!row.date) continue;
 
@@ -55,7 +63,10 @@ export async function panchangRoutes(server: FastifyInstance) {
           sun_sign: row.sun_sign || "", moon_sign: row.moon_sign || "", ayana: row.ayana || "",
           vikram_samvat: parseInt(row.vikram_samvat) || 0, shaka_samvat: parseInt(row.shaka_samvat) || 0,
           abhijit_muhurta: { start: row.abhijit_start || "", end: row.abhijit_end || "" },
-          rahukaal: { start: row.rahukaal_start || "", end: row.rahukaal_end || "" }
+          rahukaal: { start: row.rahukaal_start || "", end: row.rahukaal_end || "" },
+          // THIS IS THE NEW ADDITION:
+          choghadiya_day: parseChoghadiya(row.choghadiya_day),
+          choghadiya_night: parseChoghadiya(row.choghadiya_night)
         };
 
         await prisma.panchang.upsert({

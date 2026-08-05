@@ -3,6 +3,13 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 
+interface ChoghadiyaSlot {
+  name: string;
+  start: string;
+  end: string;
+  type: "shubh" | "ashubh" | "neutral" | "";
+}
+
 interface PanchangData {
   day: string;
   sunrise: string;
@@ -21,6 +28,8 @@ interface PanchangData {
   moon_sign: string;
   abhijit_muhurta?: { start: string; end: string };
   rahukaal?: { start: string; end: string };
+  choghadiya_day?: ChoghadiyaSlot[];
+  choghadiya_night?: ChoghadiyaSlot[];
 }
 
 export default function PublicPanchangPage() {
@@ -44,6 +53,13 @@ export default function PublicPanchangPage() {
   const formatTimeObj = (time?: { hour: number; minute: number; second: number }) => {
     if (!time) return "";
     return `${String(time.hour).padStart(2, "0")}:${String(time.minute).padStart(2, "0")}:${String(time.second).padStart(2, "0")}`;
+  };
+
+  // Helper for Choghadiya styling
+  const getChoghadiyaColor = (type: string) => {
+    if (type === "shubh") return "bg-green-50 text-green-800 border-green-200";
+    if (type === "ashubh") return "bg-red-50 text-red-800 border-red-200";
+    return "bg-slate-50 text-slate-800 border-slate-200";
   };
 
   useEffect(() => {
@@ -266,6 +282,54 @@ export default function PublicPanchangPage() {
                     <div className="p-2 border border-slate-200 rounded-lg">
                       <span className="block text-slate-400">Ayana</span>
                       <span className="font-bold text-slate-800">{panchang.ayana || "—"}</span>
+                    </div>
+                  </div>
+
+                  {/* CHOGHADIYA SECTION */}
+                  <div className="pt-6 border-t border-slate-100 mt-6">
+                    <h3 className="text-lg font-bold text-slate-900 mb-4 text-center font-serif">
+                      {language === "hi" ? "आज का चौघड़िया" : "Today's Choghadiya"}
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Day Choghadiya */}
+                      <div>
+                        <h4 className="text-sm font-bold text-orange-600 mb-3 flex items-center gap-2">
+                          <span>☀️</span> {language === "hi" ? "दिन का चौघड़िया" : "Day Choghadiya"}
+                        </h4>
+                        <div className="space-y-2">
+                          {panchang.choghadiya_day && panchang.choghadiya_day.length > 0 ? (
+                            panchang.choghadiya_day.map((slot, i) => (
+                              <div key={i} className={`flex justify-between items-center p-2.5 rounded-lg border text-sm ${getChoghadiyaColor(slot.type)}`}>
+                                <span className="font-bold w-20">{slot.name}</span>
+                                <span className="text-xs font-mono">{slot.start} - {slot.end}</span>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-xs text-slate-400 italic">No day slots recorded.</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Night Choghadiya */}
+                      <div>
+                        <h4 className="text-sm font-bold text-indigo-600 mb-3 flex items-center gap-2">
+                          <span>🌙</span> {language === "hi" ? "रात का चौघड़िया" : "Night Choghadiya"}
+                        </h4>
+                        <div className="space-y-2">
+                          {panchang.choghadiya_night && panchang.choghadiya_night.length > 0 ? (
+                            panchang.choghadiya_night.map((slot, i) => (
+                              <div key={i} className={`flex justify-between items-center p-2.5 rounded-lg border text-sm ${getChoghadiyaColor(slot.type)}`}>
+                                <span className="font-bold w-20">{slot.name}</span>
+                                <span className="text-xs font-mono">{slot.start} - {slot.end}</span>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-xs text-slate-400 italic">No night slots recorded.</p>
+                          )}
+                        </div>
+                      </div>
+
                     </div>
                   </div>
 
