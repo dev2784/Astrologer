@@ -86,7 +86,7 @@ export default function HomePage() {
       {/* 1. HERO SECTION (Parallax Background) */}
       <section 
         className="relative bg-fixed bg-center bg-cover py-32 px-4 sm:px-6 lg:px-8 flex items-center justify-center min-h-[85vh]"
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1604005934273-047f3b89b4f6?auto=format&fit=crop&q=80')" }}
+        style={{ backgroundImage: "url('./pbanner.png')" }}
       >
         {/* Dark Overlay */}
         <div className="absolute inset-0 bg-black/60 z-0"></div>
@@ -291,7 +291,7 @@ export default function HomePage() {
               {/* Add your Pandit ji image url in src below */}
               <div className="w-64 h-64 md:w-80 md:h-80 bg-orange-200 rounded-full border-8 border-orange-50 overflow-hidden shadow-xl relative">
                 <img 
-                  src="https://images.unsplash.com/photo-1579227114347-15d08fc37cae?auto=format&fit=crop&q=80" 
+                  src="./pandit-logo.png" 
                   alt="Pandit Ji" 
                   className="w-full h-full object-cover"
                 />
