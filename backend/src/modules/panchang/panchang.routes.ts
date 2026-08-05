@@ -5,7 +5,7 @@ import * as XLSX from "xlsx";
 
 export async function panchangRoutes(server: FastifyInstance) {
   // ADMIN: Manual Single Upload/Update
-  server.post("/", async (request, reply) => {
+  server.post("/bulk-upload", async (request, reply) => {
     const { date, data } = request.body as { date: string; data: any };
 
     if (!date || !data) {
