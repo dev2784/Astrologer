@@ -28,7 +28,7 @@ export default function UjjainPanchangView({ selectedDate }: { selectedDate: str
   const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
 
   useEffect(() => {
-    if (!selectedDate) return;
+    !selectedDate ? selectedDate = new Date() : selectedDate
     
     setLoading(true);
     fetch(`${API_URL}/panchang?date=${selectedDate}`)
