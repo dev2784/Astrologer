@@ -9,6 +9,7 @@ interface Booking {
   name: string;
   phone: string;
   email?: string;
+  bookingDate: string;
   address: string;
   status: BookingStatus;
   createdAt: string;
