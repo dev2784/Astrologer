@@ -105,3 +105,13 @@ model Muhurat {
 
   @@index([date])
 }
+
+model Panchang {
+  id        String   @id @default(uuid())
+  date      DateTime @unique @db.Date // Ensures one entry per day (YYYY-MM-DD)
+  data      Json     // Stores the entire complex Panchang JSON object
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([date])
+}

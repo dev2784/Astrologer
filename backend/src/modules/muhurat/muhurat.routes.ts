@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../../db";
-import * as XLSX from "xlsx"; // <-- ADD THIS LINE
+import * as XLSX from "xlsx"; 
 
 export async function muhuratRoutes(server: FastifyInstance) {
   // Ensure OPTIONS preflight doesn't throw 404
