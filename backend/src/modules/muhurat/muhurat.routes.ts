@@ -84,4 +84,58 @@ export async function muhuratRoutes(server: FastifyInstance) {
       return reply.code(500).send({ error: "Failed to delete muhurat." });
     }
   });
+
+
+// Bulk Excel Upload for Muhurats
+  server.post("/bulk-upload", async (request, reply) => {
+    try {
+      const data = await request.file();
+      if (!data) {
+        return reply.code(400).send({ error: "No Excel file uploaded." });
+      }
+
+      // Read file buffer into XLSX
+      const buffer = await data.toBuffer();
+      const workbook = XLSX.read(buffer, { type: "buffer" });
+      
+      // Get first worksheet
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+
+      // Convert sheet rows to JSON
+      // Expected Excel columns: date, tithi, muhurat, details
+      const rows: any[] = XLSX.utils.sheet_to_json(worksheet);
+
+      if (!rows || rows.length === 0) {
+        return reply.code(400).send({ error: "Excel file is empty or formatted incorrectly." });
+      }
+
+      const recordsToCreate = rows
+        .filter((row) => row.date && row.tithi && row.muhurat)
+        .map((row) => ({
+          date: new Date(row.date),
+          tithi: String(row.tithi),
+          muhurat: String(row.muhurat),
+          details: row.details ? String(row.details) : null,
+        }));
+
+      if (recordsToCreate.length === 0) {
+        return reply.code(400).send({ error: "No valid rows found. Ensure columns are named: date, tithi, muhurat, details" });
+      }
+
+      // Bulk create records in database
+      const result = await prisma.muhurat.createMany({
+        data: recordsToCreate,
+        skipDuplicates: true,
+      });
+
+      return reply.send({
+        message: `Successfully imported ${result.count} Muhurat entries!`,
+        count: result.count,
+      });
+    } catch (error) {
+      console.error("Bulk upload error:", error);
+      return reply.code(500).send({ error: "Failed to process Excel file." });
+    }
+  });
 }

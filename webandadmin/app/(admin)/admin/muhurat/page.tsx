@@ -18,7 +18,43 @@ export default function AdminMuhuratPage() {
   const [details, setDetails] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [excelFile, setExcelFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+
   const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
+
+  const handleExcelUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!excelFile) {
+      alert("Please select an Excel file (.xlsx or .xls)");
+      return;
+    }
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", excelFile);
+
+    try {
+      const res = await fetch(`${API_URL}/muhurat/bulk-upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message || "Bulk upload successful!");
+        setExcelFile(null);
+        // Refresh your list here if you have a fetch function
+      } else {
+        alert(data.error || "Failed to upload Excel file");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error uploading file.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const fetchMuhurats = () => {
     fetch(`${API_URL}/muhurat`)
@@ -77,6 +113,34 @@ export default function AdminMuhuratPage() {
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
       <h1 className="text-2xl font-bold text-slate-900">Manage Today's & Upcoming Muhurat</h1>
+
+      {/* Excel Bulk Upload Card */}
+      <div className="bg-amber-50/50 border border-amber-200 p-6 rounded-2xl shadow-xs">
+        <h2 className="text-lg font-bold text-amber-900 mb-2">📁 Bulk Upload Muhurats (Excel)</h2>
+        <p className="text-xs text-amber-800 mb-4">
+          Upload an <code>.xlsx</code> or <code>.csv</code> file. Column headers must be:{" "}
+          <span className="font-mono bg-amber-100 px-1.5 py-0.5 rounded text-amber-900 font-bold">
+            date, tithi, muhurat, details
+          </span>
+        </p>
+
+        <form onSubmit={handleExcelUpload} className="flex flex-col sm:flex-row items-center gap-4">
+          <input
+            type="file"
+            accept=".xlsx, .xls, .csv"
+            onChange={(e) => setExcelFile(e.target.files?.[0] || null)}
+            className="block w-full text-sm text-stone-600 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-600 file:text-white hover:file:bg-amber-700 transition"
+          />
+
+          <button
+            type="submit"
+            disabled={uploading || !excelFile}
+            className="w-full sm:w-auto px-6 py-2.5 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-xs transition shrink-0"
+          >
+            {uploading ? "Uploading..." : "Import Excel"}
+          </button>
+        </form>
+      </div>
 
       {/* Entry Form */}
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
