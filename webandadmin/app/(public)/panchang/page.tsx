@@ -7,8 +7,8 @@ interface PanchangData {
   day: string;
   sunrise: string;
   sunset: string;
-  tithi: { details: {tithi_name: string}};
-  nakshatra: { details: {nak_name: string}};
+  tithi: { details: {tithi_name: string}, end_time: {hour: sting, minute: string, second: sting}};
+  nakshatra: { details: {nak_name: string}, end_time: {hour: sting, minute: string, second: sting}};
   yoga: { details: {yog_name: string}};
   karana: { details: {karan_name: string} };
   hindu_maah: { purnimanta: string };
