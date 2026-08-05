@@ -100,7 +100,34 @@ export async function panchangRoutes(server: FastifyInstance) {
     }
   });
 
-  // 4. DELETE: Remove Entry
+  // 4. PUT: Update Existing Entry by ID
+  server.put<{ Params: { id: string } }>("/:id", async (request, reply) => {
+    if (!request.body) {
+      return reply.code(400).send({ error: "Request body is missing." });
+    }
+
+    const body = request.body as any;
+    
+    if (!body.date || !body.data) {
+      return reply.code(400).send({ error: "Missing 'date' or 'data'." });
+    }
+
+    try {
+      const panchang = await prisma.panchang.update({
+        where: { id: request.params.id },
+        data: {
+          date: new Date(body.date),
+          data: body.data
+        }
+      });
+      return reply.send({ message: "Panchang updated successfully!", panchang });
+    } catch (error) {
+      console.error("Update error:", error);
+      return reply.code(500).send({ error: "Failed to update Panchang data." });
+    }
+  });
+
+  // 5. DELETE: Remove Entry
   server.delete<{ Params: { id: string } }>("/:id", async (request, reply) => {
     try {
       await prisma.panchang.delete({ where: { id: request.params.id } });
