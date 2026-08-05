@@ -40,5 +40,16 @@
         "benefit3": "Instant Booking Confirmation",
         "bookNow": "Book Puja Now",
         "needHelp": "Need help? Contact our support team for custom arrangements."
+      },
+      "home":{
+         "heroTitle": "Authentic Vedic Rituals & Astrological Guidance",
+        "heroSubtitle": "Expert Pandit and Jyotishacharya services for Vivah, Griha Pravesh, and Havan across Indore and Dewas.",
+        "bookPuja": "Book a Puja",
+        "checkMuhurat": "Check Today's Muhurat",
+        "servicesTitle": "Primary Services",
+        "fullName": "Full Name",
+        "phone": "Phone Number",
+        "serviceRequired": "Service Required",
+        "submit": "Submit Request",
       }
   }

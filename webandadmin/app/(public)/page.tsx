@@ -129,7 +129,7 @@ export default function HomePage() {
             <div className="flex items-center gap-4 text-slate-800 font-medium">
               <Phone className="text-orange-600" />
               <span>
-                {language === "hi" ? "सीधा संपर्क" : "Direct Inquiry"}: +91 98765 43210
+                {language === "hi" ? "सीधा संपर्क" : "Direct Inquiry"}: +91 919340553012
               </span>
             </div>
           </div>

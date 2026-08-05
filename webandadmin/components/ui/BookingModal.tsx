@@ -18,12 +18,13 @@ interface BookingModalProps {
 }
 
 export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: BookingModalProps) {
-  const { language, t } = useLanguage();
+  const { language } = useLanguage();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
+  const [bookingDate, setBookingDate] = useState(""); // Date picker state
 
   // Category selection states (used when pujaId is not present)
   const [categories, setCategories] = useState<Category[]>([]);
@@ -36,6 +37,9 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
 
   const gurujiPhone = "+919340553012";
   const gurujiName = language === "hi" ? "आचार्य ऋषि नगर" : "Acharya Rishi nagar";
+
+  // Get today's date in YYYY-MM-DD format to prevent past date selection
+  const todayDate = new Date().toISOString().split("T")[0];
 
   // Fetch categories when opened without a pre-selected pujaId
   useEffect(() => {
@@ -59,8 +63,9 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
 
   if (!isOpen) return null;
 
+  const formattedDate = bookingDate ? ` for Date: ${bookingDate}` : "";
   const whatsappMessage = encodeURIComponent(
-    `Pranam Guruji, I want to inquire about booking: ${pujaTitle || "a Puja Service"}`
+    `Pranam Guruji, I want to inquire about booking: ${pujaTitle || "a Puja Service"}${formattedDate}`
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -76,6 +81,7 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
         phone,
         email,
         address,
+        bookingDate, // Included in payload
       };
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/bookings`, {
@@ -176,6 +182,21 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
               </div>
             )}
 
+            {/* Date Picker Input */}
+            <div>
+              <label className="block text-xs font-bold text-stone-700 uppercase mb-1">
+                {language === "hi" ? "पूजा की तिथि *" : "Puja Date *"}
+              </label>
+              <input
+                type="date"
+                required
+                min={todayDate}
+                value={bookingDate}
+                onChange={(e) => setBookingDate(e.target.value)}
+                className="w-full px-3.5 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500 outline-hidden bg-stone-50/50 text-stone-800"
+              />
+            </div>
+
             {/* User Form Inputs */}
             <div>
               <label className="block text-xs font-bold text-stone-700 uppercase mb-1">
@@ -237,7 +258,13 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
               disabled={loading}
               className="w-full py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition"
             >
-              {loading ? (language === "hi" ? "भेजा जा रहा है..." : "Submitting...") : language === "hi" ? "बुकिंग की पुष्टि करें" : "Confirm Booking"}
+              {loading
+                ? language === "hi"
+                  ? "भेजा जा रहा है..."
+                  : "Submitting..."
+                : language === "hi"
+                ? "बुकिंग की पुष्टि करें"
+                : "Confirm Booking"}
             </button>
 
             {/* Direct Contact Options */}
