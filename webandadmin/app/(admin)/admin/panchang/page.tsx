@@ -101,11 +101,11 @@ export default function AdminPanchangManager() {
     setLoading(true);
 
     const nestedJsonData = {
-      day: manualDate,
+      day: new Date(manualDate).toLocaleDateString('en-US', { weekday: 'long' }),
       sunrise: formData.sunrise,
       sunset: formData.sunset,
-      tithi: { details: { tithi_name: formData.tithi_name }, end_time: formData.tithi_end },
-      nakshatra: { details: { nak_name: formData.nakshatra_name }, end_time: formData.nakshatra_end },
+      tithi: { details: { tithi_name: formData.tithi_name }, end_time: parseTime(formData.tithi_end) },
+      nakshatra: { details: { nak_name: formData.nakshatra_name }, end_time: parseTime(formData.nakshatra_end) },
       yog: { details: { yog_name: formData.yog_name } },
       karan: { details: { karan_name: formData.karan_name } },
       hindu_maah: { purnimanta: formData.hindu_maah },

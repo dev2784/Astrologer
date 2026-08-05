@@ -1,77 +1,112 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../../db";
-import * as XLSX from "xlsx"; 
-
+import * as XLSX from "xlsx";
 
 export async function panchangRoutes(server: FastifyInstance) {
-  // ADMIN: Manual Single Upload/Update
-  server.post("/bulk-upload", async (request, reply) => {
-    const { date, data } = request.body as { date: string; data: any };
-
-    if (!date || !data) {
-      return reply.code(400).send({ error: "Date and Panchang data are required." });
-    }
-
-    try {
-      const panchang = await prisma.panchang.upsert({
-        where: { date: new Date(date) },
-        update: { data },
-        create: {
-          date: new Date(date),
-          data
-        }
-      });
-
-      return reply.code(201).send({ message: "Panchang saved successfully!", panchang });
-    } catch (error) {
-      console.error("Manual Panchang Error:", error);
-      return reply.code(500).send({ error: "Failed to save Panchang data." });
-    }
-  });
-
-  // 1. GET: Fetch Panchang (List for Admin, or Single Date for Public UI)
+  
+  // 1. GET: Fetch Panchang List or Single Date
   server.get("/", async (request, reply) => {
     const { date } = request.query as { date?: string };
-
     try {
       if (date) {
-        // Fetch single date for public UI
-        const panchang = await prisma.panchang.findUnique({
-          where: { date: new Date(date) },
-        });
-
-        if (!panchang) {
-          return reply.code(404).send({ error: "No Panchang data found for this date." });
-        }
+        const panchang = await prisma.panchang.findUnique({ where: { date: new Date(date) } });
+        if (!panchang) return reply.code(404).send({ error: "No Panchang data found for this date." });
         return reply.send({ data: panchang.data });
       }
-
-      // If no date passed, fetch ALL data for Admin List view (Ordered by newest date)
-      const list = await prisma.panchang.findMany({
-        orderBy: { date: "desc" },
-      });
+      const list = await prisma.panchang.findMany({ orderBy: { date: "desc" } });
       return reply.send({ list });
-
     } catch (error) {
-      console.error(error);
       return reply.code(500).send({ error: "Database error" });
     }
   });
 
-  // 2. DELETE: Remove a Panchang Entry
-  server.delete<{ Params: { id: string } }>("/:id", async (request, reply) => {
-    const { id } = request.params;
+  // 2. POST: Bulk Upload Excel
+  server.post("/bulk-upload", async (request, reply) => {
+    try {
+      const data = await request.file();
+      if (!data) return reply.code(400).send({ error: "No Excel file found in request." });
 
-    if (!id) return reply.code(400).send({ error: "Panchang ID is required." });
+      const buffer = await data.toBuffer();
+      const workbook = XLSX.read(buffer, { type: "buffer" });
+      const sheetName = workbook.SheetNames[0];
+      const rows: any[] = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+      if (!rows || rows.length === 0) return reply.code(400).send({ error: "Excel file is empty." });
+
+      let successCount = 0;
+      const parseTime = (timeStr: string) => {
+        if (!timeStr) return { hour: 0, minute: 0, second: 0 };
+        const parts = String(timeStr).split(":");
+        return { hour: parseInt(parts[0] || "0"), minute: parseInt(parts[1] || "0"), second: parseInt(parts[2] || "0") };
+      };
+
+      for (const row of rows) {
+        if (!row.date) continue;
+
+        const nestedJsonData = {
+          day: new Date(row.date).toLocaleDateString('en-US', { weekday: 'long' }),
+          sunrise: row.sunrise || "", sunset: row.sunset || "",
+          tithi: { details: { tithi_name: row.tithi_name || "" }, end_time: parseTime(row.tithi_end) },
+          nakshatra: { details: { nak_name: row.nakshatra_name || "" }, end_time: parseTime(row.nakshatra_end) },
+          yog: { details: { yog_name: row.yog_name || "" } },
+          karan: { details: { karan_name: row.karan_name || "" } },
+          hindu_maah: { purnimanta: row.hindu_maah || "" },
+          paksha: row.paksha || "", ritu: row.ritu || "",
+          sun_sign: row.sun_sign || "", moon_sign: row.moon_sign || "", ayana: row.ayana || "",
+          vikram_samvat: parseInt(row.vikram_samvat) || 0, shaka_samvat: parseInt(row.shaka_samvat) || 0,
+          abhijit_muhurta: { start: row.abhijit_start || "", end: row.abhijit_end || "" },
+          rahukaal: { start: row.rahukaal_start || "", end: row.rahukaal_end || "" }
+        };
+
+        await prisma.panchang.upsert({
+          where: { date: new Date(row.date) },
+          update: { data: nestedJsonData },
+          create: { date: new Date(row.date), data: nestedJsonData }
+        });
+        successCount++;
+      }
+      return reply.send({ message: `Successfully imported ${successCount} entries!` });
+    } catch (error) {
+      console.error(error);
+      return reply.code(500).send({ error: "Failed to process Excel file." });
+    }
+  });
+
+  // 3. POST: Manual Form Entry
+  server.post("/", async (request, reply) => {
+    // 🚨 THIS IS THE FIX. If body is missing, it returns a 400 instead of crashing.
+    if (!request.body) {
+      return reply.code(400).send({ 
+        error: "CRITICAL: Request body is missing! You are likely sending an Excel file to the manual route, or your frontend is missing the 'Content-Type: application/json' header." 
+      });
+    }
+
+    const body = request.body as any;
+    
+    // Safely check if date exists in the parsed body
+    if (!body.date || !body.data) {
+      return reply.code(400).send({ error: "Missing 'date' or 'data' in JSON payload." });
+    }
 
     try {
-      await prisma.panchang.delete({
-        where: { id },
+      const panchang = await prisma.panchang.upsert({
+        where: { date: new Date(body.date) },
+        update: { data: body.data },
+        create: { date: new Date(body.date), data: body.data }
       });
-      return reply.send({ message: "Panchang entry deleted successfully." });
+      return reply.code(201).send({ message: "Saved manually!", panchang });
     } catch (error) {
-      console.error("Delete Panchang error:", error);
-      return reply.code(500).send({ error: "Failed to delete Panchang entry." });
+      return reply.code(500).send({ error: "Failed to save manual data." });
+    }
+  });
+
+  // 4. DELETE: Remove Entry
+  server.delete<{ Params: { id: string } }>("/:id", async (request, reply) => {
+    try {
+      await prisma.panchang.delete({ where: { id: request.params.id } });
+      return reply.send({ message: "Deleted." });
+    } catch (error) {
+      return reply.code(500).send({ error: "Failed to delete." });
     }
   });
 }
