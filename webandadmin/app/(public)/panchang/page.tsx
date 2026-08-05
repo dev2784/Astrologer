@@ -34,6 +34,7 @@ export default function UjjainPanchangView({ selectedDate }: { selectedDate: str
     fetch(`${API_URL}/panchang?date=${selectedDate}`)
       .then(res => res.json())
       .then(data => {
+      	console.log(data)
         if (data.data) setPanchang(data.data);
       })
       .catch(err => console.error("Panchang load error", err))
