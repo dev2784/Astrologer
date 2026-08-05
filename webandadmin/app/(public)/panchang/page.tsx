@@ -77,21 +77,21 @@ export default function UjjainPanchangView({ selectedDate }: { selectedDate: any
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
             <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
               <span className="text-slate-500 block text-xs">Tithi</span>
-              <span className="font-bold text-slate-900">{panchang.tithi.details}</span>
+              <span className="font-bold text-slate-900">{panchang.tithi.details.tithi_name}</span>
               <span className="text-xs text-orange-600 block mt-1">Ends at {panchang.tithi.end_time}</span>
             </div>
             <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
               <span className="text-slate-500 block text-xs">Nakshatra</span>
-              <span className="font-bold text-slate-900">{panchang.nakshatra.details}</span>
+              <span className="font-bold text-slate-900">{panchang.nakshatra.details.nak_name}</span>
               <span className="text-xs text-orange-600 block mt-1">Ends at {panchang.nakshatra.end_time}</span>
             </div>
             <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
               <span className="text-slate-500 block text-xs">Yoga</span>
-              <span className="font-bold text-slate-900">{panchang.yoga.details}</span>
+              <span className="font-bold text-slate-900">{panchang.yog.details.yog_name}</span>
             </div>
             <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
               <span className="text-slate-500 block text-xs">Karana</span>
-              <span className="font-bold text-slate-900">{panchang.karana.details}</span>
+              <span className="font-bold text-slate-900">{panchang.karan.details.karan_name}</span>
             </div>
           </div>
         </div>
