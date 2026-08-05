@@ -225,7 +225,7 @@ export default function AdminBookingsPage() {
                 <tr>
                   <th className="p-4">Customer</th>
                   <th className="p-4">Contact</th>
-                  <th className="p-4">Date</td>
+                  <th className="p-4">Booking Date</th>
                   <th className="p-4">Puja Service</th>
                   <th className="p-4">Address</th>
                   <th className="p-4">Date Requested</th>
