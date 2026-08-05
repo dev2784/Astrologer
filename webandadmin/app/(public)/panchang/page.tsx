@@ -13,10 +13,10 @@ interface PanchangData {
   nakshatra: { 
     details: { nak_name: string }
   };
-  yoga: { 
+  yog: { 
     details: { yog_name: string } 
   };
-  karana: { 
+  karan: { 
     details: { karan_name: string } 
   };
   hindu_maah: { 
