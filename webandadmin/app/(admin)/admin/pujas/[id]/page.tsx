@@ -68,7 +68,10 @@ export default function PujaDetailPage() {
       <div className="space-y-6">
         <div>
           <h3 className="text-lg font-bold text-slate-900 mb-2">About Puja</h3>
-          <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{puja.about || "No details provided."}</p>
+          <div
+                  className="prose prose-stone max-w-none text-stone-700 leading-relaxed space-y-4 [&>p]:break-words [&>p]:max-w-full [&>table]:w-full [&>table]:overflow-x-auto"
+                  dangerouslySetInnerHTML={{ __html: puja.about || "<p>No specific Detail listed.</p>" }}
+                />
         </div>
         <div>
           <h3 className="text-lg font-bold text-slate-900 mb-2">Puja Samagri</h3>
@@ -76,7 +79,10 @@ export default function PujaDetailPage() {
         </div>
         <div>
           <h3 className="text-lg font-bold text-slate-900 mb-2">Benefits</h3>
-          <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{puja.benefits || "No benefits listed."}</p>
+          <div
+                  className="prose prose-stone max-w-none text-stone-700 leading-relaxed space-y-4 [&>p]:break-words [&>p]:max-w-full [&>table]:w-full [&>table]:overflow-x-auto"
+                  dangerouslySetInnerHTML={{ __html: puja.benefits || "<p>No specific benefits listed.</p>" }}
+                />
         </div>
 
         <div>
