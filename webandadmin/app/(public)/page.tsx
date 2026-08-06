@@ -9,18 +9,16 @@ import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import BookingModal from "@/components/ui/BookingModal";
 
-// Mock Latest Pujas Data
-const LATEST_PUJAS = [
-  { id: 1, titleEn: "Vivah Puja", titleHi: "विवाह पूजा", icon: <Users />, color: "text-pink-600", bg: "bg-pink-100" },
-  { id: 2, titleEn: "Rudrabhishek", titleHi: "रुद्राभिषेक", icon: <Flame />, color: "text-orange-600", bg: "bg-orange-100" },
-  { id: 3, titleEn: "Navagraha Shanti", titleHi: "नवग्रह शांति", icon: <Star />, color: "text-indigo-600", bg: "bg-indigo-100" },
-  { id: 4, titleEn: "Vastu Shanti", titleHi: "वास्तु शांति", icon: <BookOpen />, color: "text-emerald-600", bg: "bg-emerald-100" },
-  { id: 5, titleEn: "Griha Pravesh", titleHi: "गृह प्रवेश", icon: <Users />, color: "text-teal-600", bg: "bg-teal-100" },
-  { id: 6, titleEn: "Maha Mrityunjaya", titleHi: "महामृत्युंजय", icon: <Flame />, color: "text-red-600", bg: "bg-red-100" },
-  { id: 7, titleEn: "Satyanarayan Katha", titleHi: "सत्यनारायण कथा", icon: <BookOpen />, color: "text-amber-600", bg: "bg-amber-100" },
-  { id: 8, titleEn: "Namkaran", titleHi: "नामकरण संस्कार", icon: <Users />, color: "text-blue-600", bg: "bg-blue-100" },
-  { id: 9, titleEn: "Mundan", titleHi: "मुंडन संस्कार", icon: <Star />, color: "text-purple-600", bg: "bg-purple-100" },
-  { id: 10, titleEn: "Kaal Sarp Dosh", titleHi: "काल सर्प दोष निवारण", icon: <Flame />, color: "text-slate-600", bg: "bg-slate-200" },
+// Rotating styles for dynamic pujas
+const PUJA_UI_STYLES = [
+  { icon: <Flame size={28} />, color: "text-orange-600", bg: "bg-orange-100" },
+  { icon: <Users size={28} />, color: "text-pink-600", bg: "bg-pink-100" },
+  { icon: <Star size={28} />, color: "text-indigo-600", bg: "bg-indigo-100" },
+  { icon: <BookOpen size={28} />, color: "text-emerald-600", bg: "bg-emerald-100" },
+  { icon: <Users size={28} />, color: "text-teal-600", bg: "bg-teal-100" },
+  { icon: <Flame size={28} />, color: "text-red-600", bg: "bg-red-100" },
+  { icon: <BookOpen size={28} />, color: "text-amber-600", bg: "bg-amber-100" },
+  { icon: <Star size={28} />, color: "text-purple-600", bg: "bg-purple-100" },
 ];
 
 export default function HomePage() {
@@ -35,6 +33,33 @@ export default function HomePage() {
   const [submitStatus, setSubmitStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
+
+
+  // Add this near your other state variables
+  const [latestPujas, setLatestPujas] = useState<any[]>([]);
+  const [loadingPujas, setLoadingPujas] = useState(true);
+
+  // Update your existing useEffect (or add a new one)
+  useEffect(() => {
+    // 1. Fetch Panchang (Your existing code)
+    const today = new Date().toISOString().split("T")[0];
+    fetch(`${API_URL}/panchang?date=${today}`)
+      .then(res => res.json())
+      .then(data => setPanchang(data.data || null))
+      .catch(err => console.error(err));
+
+    // 2. Fetch Dynamic Pujas
+    fetch(`${API_URL}/pujas`) // Adjust this endpoint if your route is named differently (e.g., /services)
+      .then(res => res.json())
+      .then(data => {
+        // Assuming your backend returns { pujas: [...] } or an array directly
+        const fetchedPujas = data.pujas || data || [];
+        // Grab the first 10
+        setLatestPujas(fetchedPujas.slice(0, 10));
+      })
+      .catch(err => console.error("Failed to fetch pujas:", err))
+      .finally(() => setLoadingPujas(false));
+  }, [API_URL]);
 
   // Fetch Today's Panchang
   useEffect(() => {
@@ -131,25 +156,48 @@ export default function HomePage() {
         
         {/* Horizontal Scroll Container */}
         <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-10 pt-4 px-4 custom-scrollbar">
-          {LATEST_PUJAS.map((puja) => (
-            <div 
-              key={puja.id} 
-              className="min-w-[280px] md:min-w-[320px] snap-center shrink-0 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-orange-200 transition-all duration-300 hover:-translate-y-2 group cursor-pointer"
-            >
-              <div className={`w-16 h-16 ${puja.bg} ${puja.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                {puja.icon}
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">
-                {language === "hi" ? puja.titleHi : puja.titleEn}
-              </h3>
-              <p className="text-slate-500 text-sm mb-6 line-clamp-2">
-                {language === "hi" ? "संपूर्ण विधि-विधान और वैदिक मंत्रोच्चार के साथ पूजा संपन्न कराई जाती है।" : "Performed with complete Vedic rituals and authentic mantras by expert Pandits."}
-              </p>
-              <Link href="/services" className="text-orange-600 font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
-                {t("pujaList.viewDetails")} <ChevronRight size={16} />
-              </Link>
-            </div>
-          ))}
+          {loadingPujas ? (
+            // Skeleton Loading State
+            [...Array(4)].map((_, i) => (
+              <div key={i} className="min-w-[280px] md:min-w-[320px] h-48 snap-center shrink-0 bg-slate-200 animate-pulse rounded-2xl"></div>
+            ))
+          ) : latestPujas.length === 0 ? (
+            <p className="text-slate-500 w-full text-center py-10">No services found.</p>
+          ) : (
+            latestPujas.map((puja, index) => {
+              // Pick a repeating style based on the index
+              const style = PUJA_UI_STYLES[index % PUJA_UI_STYLES.length];
+              
+              // Fallback descriptions if your DB doesn't have them
+              const descHi = puja.descriptionHi || "संपूर्ण विधि-विधान और वैदिक मंत्रोच्चार के साथ पूजा संपन्न कराई जाती है।";
+              const descEn = puja.descriptionEn || "Performed with complete Vedic rituals and authentic mantras by expert Pandits.";
+
+              return (
+                <Link 
+                  href={`/pujas/${puja.id}`} // Adjust the URL path based on your exact details page route
+                  key={puja.id} 
+                  className="min-w-[280px] md:min-w-[320px] snap-center shrink-0 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-orange-200 transition-all duration-300 hover:-translate-y-2 group cursor-pointer block"
+                >
+                  <div className={`w-16 h-16 ${style.bg} ${style.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                    {style.icon}
+                  </div>
+                  
+                  <h3 className="text-xl font-bold text-slate-900 mb-2 truncate">
+                    {/* Assuming your DB uses nameHi and nameEn. Adjust if your DB uses different keys like titleHi/titleEn */}
+                    {language === "hi" && puja.nameHi ? puja.nameHi : puja.nameEn || "Puja Name"}
+                  </h3>
+                  
+                  <p className="text-slate-500 text-sm mb-6 line-clamp-2">
+                    {language === "hi" ? descHi : descEn}
+                  </p>
+                  
+                  <div className="text-orange-600 font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
+                    {t("pujaList.viewDetails")} <ChevronRight size={16} />
+                  </div>
+                </Link>
+              );
+            })
+          )}
         </div>
 
         <div className="text-center mt-4">
