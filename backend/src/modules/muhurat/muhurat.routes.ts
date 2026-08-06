@@ -112,7 +112,7 @@ export async function muhuratRoutes(server: FastifyInstance) {
       }
 
       const recordsToCreate = rows
-        .filter((row) => row.date && row.tithi && row.muhurat)
+        .filter((row) => row.date && row.tithi) // Only date and tithi are strictly required
         .map((row) => ({
           date: new Date(row.date),
           tithi: String(row.tithi),
