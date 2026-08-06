@@ -229,10 +229,15 @@ export default function PublicMuhuratPage() {
                         <span className="text-xs font-bold uppercase tracking-wider text-orange-600 bg-orange-50 px-2.5 py-0.5 rounded-md">
                           {m.tithi}
                         </span>
+                        {
+                          m.muhurat && (
+                            
                         <h3 className="text-lg font-bold text-slate-900 mt-2 flex items-center gap-2">
                           <span>⏱️</span>
                           <span>{m.muhurat}</span>
                         </h3>
+                            )
+                        }
                       </div>
                     </div>
 
