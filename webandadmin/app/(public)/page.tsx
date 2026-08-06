@@ -184,12 +184,13 @@ export default function HomePage() {
                   
                   <h3 className="text-xl font-bold text-slate-900 mb-2 truncate">
                     {/* Assuming your DB uses nameHi and nameEn. Adjust if your DB uses different keys like titleHi/titleEn */}
-                    {language === "hi" && puja.nameHi ? puja.nameHi : puja.nameEn || "Puja Name"}
+                    {language === "hi" && puja.titleHi ? puja.titleHi : puja.titleEn || "Puja Name"}
                   </h3>
                   
-                  <p className="text-slate-500 text-sm mb-6 line-clamp-2">
-                    {language === "hi" ? descHi : descEn}
-                  </p>
+                  <div
+                    className="prose prose-stone max-w-none text-stone-700 leading-relaxed line-clamp-2 overflow-hidden [&>p]:break-words [&>p]:max-w-full"
+                    dangerouslySetInnerHTML={{ __html: puja.benefits || "<p>No specific benefits listed.</p>" }}
+                  />
                   
                   <div className="text-orange-600 font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
                     {t("pujaList.viewDetails")} <ChevronRight size={16} />
