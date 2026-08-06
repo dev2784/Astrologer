@@ -97,7 +97,7 @@ export async function muhuratRoutes(server: FastifyInstance) {
 
       // Read file buffer into XLSX
       const buffer = await data.toBuffer();
-      const workbook = XLSX.read(buffer, { type: "buffer" });
+      const workbook = XLSX.read(buffer, { type: "buffer", cellDates: true });
       
       // Get first worksheet
       const sheetName = workbook.SheetNames[0];
