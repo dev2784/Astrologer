@@ -7,6 +7,7 @@ interface ReviewItem {
   userName: string;
   userCity?: string;
   rating: number;
+  userPhone?: string;
   comment: string;
   isApproved: boolean;
   createdAt: string;
@@ -155,6 +156,28 @@ export default function AdminReviewsPage() {
                     {/* User Info */}
                     <td className="p-4">
                       <div className="font-bold text-slate-900">{r.userName}</div>
+                      {/* Display captured phone number with direct WhatsApp/Call links */}
+                      {r.userPhone ? (
+                        <a 
+                          href={`https://wa.me/${r.userPhone.replace(/[^0-9]/g, '')}`} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="text-xs font-semibold text-emerald-700 hover:underline block mt-0.5"
+                        >
+                          📱 {r.userPhone}
+                        </a>
+                      ) : (
+                        <span className="text-[11px] text-slate-400 block">No phone provided</span>
+                      )}
+
+                      <div className="text-xs text-slate-400">{r.userCity || "City not specified"}</div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">
+                        {new Date(r.createdAt).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </div>
                       <div className="text-xs text-slate-400">{r.userCity || "City not specified"}</div>
                       <div className="text-[10px] text-slate-400 mt-0.5">
                         {new Date(r.createdAt).toLocaleDateString("en-GB", {

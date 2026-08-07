@@ -19,9 +19,10 @@ export default function ReviewSection({ pujaId }: { pujaId: string }) {
   const [avgRating, setAvgRating] = useState<number | string>(0);
   const [loading, setLoading] = useState(true);
 
-  // Form State
+  // Form State with userPhone included
   const [formData, setFormData] = useState({
     userName: "",
+    userPhone: "",
     userCity: "",
     rating: 5,
     comment: "",
@@ -65,13 +66,13 @@ export default function ReviewSection({ pujaId }: { pujaId: string }) {
 
       if (data.success) {
         setSubmitSuccess(true);
-        setFormData({ userName: "", userCity: "", rating: 5, comment: "" });
+        setFormData({ userName: "", userPhone: "", userCity: "", rating: 5, comment: "" });
       } else {
         alert(data.error || "Failed to submit review");
       }
     } catch (err) {
       console.error(err);
-      alert("Error submitting review. Please try again.");
+      alert("Error submitting review.");
     } finally {
       setIsSubmitting(false);
     }
@@ -80,7 +81,7 @@ export default function ReviewSection({ pujaId }: { pujaId: string }) {
   return (
     <div className="bg-white rounded-2xl p-6 md:p-8 border border-stone-200/80 shadow-xs mt-10">
       
-      {/* Header & Score Summary */}
+      {/* Header Summary */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-stone-100">
         <div>
           <h3 className="text-xl sm:text-2xl font-bold font-serif text-stone-900">
@@ -106,9 +107,7 @@ export default function ReviewSection({ pujaId }: { pujaId: string }) {
           <p className="text-stone-400 text-xs sm:text-sm py-4">Loading reviews...</p>
         ) : reviews.length === 0 ? (
           <p className="text-stone-500 text-xs sm:text-sm italic py-4">
-            {language === "hi" 
-              ? "अभी तक कोई समीक्षा नहीं है। पहली समीक्षा लिखें!" 
-              : "No reviews yet. Be the first to share your experience!"}
+            {language === "hi" ? "अभी तक कोई समीक्षा नहीं है। पहली समीक्षा लिखें!" : "No reviews yet. Be the first to share your experience!"}
           </p>
         ) : (
           reviews.map((r) => (
@@ -119,7 +118,6 @@ export default function ReviewSection({ pujaId }: { pujaId: string }) {
                   {r.userCity && <span className="text-xs text-stone-400">{r.userCity}</span>}
                 </div>
                 
-                {/* Star Rating Render */}
                 <div className="flex text-amber-400">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star
@@ -145,7 +143,7 @@ export default function ReviewSection({ pujaId }: { pujaId: string }) {
         )}
       </div>
 
-      {/* Submit Review Form */}
+      {/* Submit Form with Mobile Number Field */}
       <div className="pt-6 border-t border-stone-100">
         <h4 className="text-base sm:text-lg font-bold text-stone-900 mb-4">
           {language === "hi" ? "अपनी समीक्षा लिखें" : "Write a Review"}
@@ -162,13 +160,22 @@ export default function ReviewSection({ pujaId }: { pujaId: string }) {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            {/* Input Grid (3 Fields) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <input
                 type="text"
                 required
                 placeholder={language === "hi" ? "आपका नाम *" : "Your Name *"}
                 value={formData.userName}
                 onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
+                className="w-full px-4 py-2.5 border border-stone-200 rounded-xl bg-stone-50/50 text-xs sm:text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+              <input
+                type="tel"
+                placeholder={language === "hi" ? "मोबाइल नंबर (वैकल्पिक)" : "Mobile Number (Optional)"}
+                value={formData.userPhone}
+                onChange={(e) => setFormData({ ...formData, userPhone: e.target.value })}
                 className="w-full px-4 py-2.5 border border-stone-200 rounded-xl bg-stone-50/50 text-xs sm:text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
               <input
@@ -217,11 +224,7 @@ export default function ReviewSection({ pujaId }: { pujaId: string }) {
               className="bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white font-bold px-6 py-2.5 rounded-xl transition shadow-xs flex items-center gap-2 text-xs sm:text-sm"
             >
               <Send size={15} />
-              {isSubmitting
-                ? "Submitting..."
-                : language === "hi"
-                ? "समीक्षा भेजें"
-                : "Submit Review"}
+              {isSubmitting ? "Submitting..." : language === "hi" ? "समीक्षा भेजें" : "Submit Review"}
             </button>
           </form>
         )}

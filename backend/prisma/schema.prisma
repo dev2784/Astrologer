@@ -131,7 +131,7 @@ model Review {
   // Reviewer Details (Allows guests or logged-in users)
   userName    String
   userCity    String?  // e.g. "Indore", "Delhi"
-
+  userPhone   String?
   // Content & Metrics
   rating      Int      // 1 to 5 stars
   comment     String   @db.Text
