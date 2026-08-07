@@ -56,7 +56,7 @@ export default function ReviewSection({ pujaId }: { pujaId: string }) {
 
     setIsSubmitting(true);
     try {
-      const res = await fetch(`${API_URL}/api/reviews`, {
+      const res = await fetch(`${API_URL}/reviews`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...formData, pujaId }),
