@@ -37,7 +37,7 @@ export default function ReviewSection({ pujaId }: { pujaId: string }) {
 
   const fetchReviews = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/reviews/puja/${pujaId}`);
+      const res = await fetch(`${API_URL}/reviews/puja/${pujaId}`);
       const data = await res.json();
       if (data.success) {
         setReviews(data.reviews);
