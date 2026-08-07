@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import BookingModal from "@/components/ui/BookingModal";
+import ReviewSection from "@/components/ui/ReviewSection";
 
 interface FAQ {
   questionEn: string;
@@ -40,18 +41,39 @@ export default function PublicPujaDetailPage() {
   const [activeTab, setActiveTab] = useState<"about" | "samagri" | "benefits" | "faqs">("about");
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
+  // Micro-rating header stats
+  const [ratingStats, setRatingStats] = useState<{ avgRating: number; count: number }>({
+    avgRating: 0,
+    count: 0,
+  });
 
   useEffect(() => {
     if (!id) return;
 
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/pujas/${id}`)
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
+
+    // 1. Fetch Puja Details
+    fetch(`${apiBase}/pujas/${id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.puja) setPuja(data.puja);
       })
       .catch((err) => console.error("Error fetching puja detail:", err))
       .finally(() => setLoading(false));
+
+    // 2. Fetch Review Summary Stats for Micro Badge
+    fetch(`${apiBase}/api/reviews/puja/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setRatingStats({
+            avgRating: Number(data.avgRating) || 0,
+            count: data.count || 0,
+          });
+        }
+      })
+      .catch((err) => console.error("Error fetching review summary:", err));
   }, [id]);
 
   if (loading) {
@@ -80,6 +102,7 @@ export default function PublicPujaDetailPage() {
 
   return (
     <div className="min-h-screen bg-stone-50/50 pb-16">
+      
       {/* Title Header */}
       <section className="bg-white border-b border-stone-200/80 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-2">
@@ -94,12 +117,25 @@ export default function PublicPujaDetailPage() {
               </span>
             )}
           </div>
+
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-stone-900">
             {language === "hi" && puja.titleHi ? puja.titleHi : puja.titleEn}
           </h1>
-          <p className="text-base text-stone-500 font-medium">
-            {language === "hi" ? puja.titleEn : puja.titleHi}
-          </p>
+
+          <div className="flex flex-wrap items-center gap-3 pt-1">
+            <p className="text-base text-stone-500 font-medium">
+              {language === "hi" ? puja.titleEn : puja.titleHi}
+            </p>
+
+            {/* Micro Rating Badge */}
+            {ratingStats.count > 0 && (
+              <div className="flex items-center gap-1.5 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/80">
+                <span className="text-amber-500 text-sm">★</span>
+                <span className="font-bold text-xs text-amber-900">{ratingStats.avgRating}</span>
+                <span className="text-[11px] text-stone-400">({ratingStats.count} {language === "hi" ? "समीक्षाएं" : "reviews"})</span>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
@@ -211,17 +247,31 @@ export default function PublicPujaDetailPage() {
                 </div>
               )}
             </div>
+
+            {/* Devotee Review & Rating Section */}
+            <ReviewSection pujaId={puja.id} />
+
           </div>
 
           {/* Right Column: Sidebar */}
           <div className="lg:col-span-4">
             <div className="sticky top-24 bg-white rounded-2xl p-6 border border-stone-200 shadow-lg space-y-6">
+              
               <div className="space-y-1 pb-4 border-b border-stone-100">
                 <span className="text-xs font-semibold text-stone-400 uppercase tracking-wider">{t("pujaDetail.totalCharges")}</span>
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-black text-orange-600">{puja.charges || "₹1999"}</span>
                   <span className="text-xs text-stone-500 font-medium">{t("pujaDetail.includedNotice")}</span>
                 </div>
+
+                {/* Micro Rating in Sticky Box */}
+                {ratingStats.count > 0 && (
+                  <div className="flex items-center gap-1.5 pt-2">
+                    <span className="text-amber-500 text-xs">★</span>
+                    <span className="font-bold text-xs text-stone-800">{ratingStats.avgRating} / 5</span>
+                    <span className="text-[11px] text-stone-400">({ratingStats.count} {language === "hi" ? "समीक्षाएं" : "reviews"})</span>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-3 text-xs text-stone-600">
@@ -252,13 +302,14 @@ export default function PublicPujaDetailPage() {
               </p>
             </div>
           </div>
-          {/* Place Modal Component at bottom of layout */}
+
+          {/* Booking Modal */}
           <BookingModal
-              isOpen={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
-              pujaId={puja.id}
-              pujaTitle={language === "hi" && puja.titleHi ? puja.titleHi : puja.titleEn}
-            />
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            pujaId={puja.id}
+            pujaTitle={language === "hi" && puja.titleHi ? puja.titleHi : puja.titleEn}
+          />
         </div>
       </main>
     </div>
