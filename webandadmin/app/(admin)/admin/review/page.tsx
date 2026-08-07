@@ -27,7 +27,7 @@ export default function AdminReviewsPage() {
 
   const fetchReviews = (status: "pending" | "approved" | "all") => {
     setLoading(true);
-    fetch(`${API_URL}/api/reviews/admin/all?status=${status}`)
+    fetch(`${API_URL}/reviews/admin/all?status=${status}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.reviews) setReviews(data.reviews);
