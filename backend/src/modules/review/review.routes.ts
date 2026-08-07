@@ -1,4 +1,4 @@
-impimport { FastifyInstance } from 'fastify';
+import { FastifyInstance } from 'fastify';
 import { prisma } from '../../db';
 
 export async function reviewRoutes(server: FastifyInstance) {
