@@ -10,6 +10,8 @@ import { uploadRoutes } from './modules/uploads/upload.routes';
 import { bookingRoutes } from "./modules/bookings/booking.routes";
 import { muhuratRoutes } from "./modules/muhurat/muhurat.routes";
 import { panchangRoutes } from "./modules/panchang/panchang.routes";
+import { reviewRoutes } from './modules/review/review.routes';
+
 import fastifyMultipart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static';
 
@@ -71,6 +73,7 @@ server.register(uploadRoutes, { prefix: '/uploads' });
 server.register(bookingRoutes, { prefix: '/bookings' });
 server.register(muhuratRoutes, { prefix: '/muhurat' });
 server.register(panchangRoutes, { prefix: '/panchang' });
+server.register(reviewRoutes, { prefix: '/reviews' });
 
 // Basic health check route
 server.get('/health', async (request, reply) => {

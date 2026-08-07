@@ -21,6 +21,7 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  reviews   Review[]
 }
 
 model Category {
@@ -69,6 +70,7 @@ model Puja {
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   bookings      Booking[]
+  reviews       Review[]
 }
 
 model PujaFaq {
@@ -114,4 +116,33 @@ model Panchang {
   updatedAt DateTime @updatedAt
 
   @@index([date])
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  
+  // Relations
+  pujaId      String
+  puja        Puja     @relation(fields: [pujaId], references: [id], onDelete: Cascade)
+  
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // Reviewer Details (Allows guests or logged-in users)
+  userName    String
+  userCity    String?  // e.g. "Indore", "Delhi"
+
+  // Content & Metrics
+  rating      Int      // 1 to 5 stars
+  comment     String   @db.Text
+  
+  // Moderation & Status
+  isApproved  Boolean  @default(false) // Must be approved by Admin before showing on Web App
+  isFeatured  Boolean  @default(false) // Pin to Home page or top of Puja page
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([pujaId])
+  @@index([isApproved])
 }
