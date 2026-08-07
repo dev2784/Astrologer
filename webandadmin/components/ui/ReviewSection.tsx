@@ -173,7 +173,7 @@ export default function ReviewSection({ pujaId }: { pujaId: string }) {
               />
               <input
                 type="tel"
-                placeholder={language === "hi" ? "मोबाइल नंबर (वैकल्पिक)" : "Mobile Number (Optional)"}
+                placeholder={language === "hi" ? "मोबाइल नंबर" : "Mobile Number"}
                 value={formData.userPhone}
                 onChange={(e) => setFormData({ ...formData, userPhone: e.target.value })}
                 className="w-full px-4 py-2.5 border border-stone-200 rounded-xl bg-stone-50/50 text-xs sm:text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-orange-500"

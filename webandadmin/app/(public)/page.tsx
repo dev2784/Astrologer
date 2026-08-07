@@ -3,81 +3,81 @@
 import { useState, useEffect } from "react";
 import { 
   Calendar, Phone, Flame, Users, Star, ArrowRight, 
-  MessageCircle, Clock, BookOpen, ChevronRight, Sunrise, Sunset
+  MessageCircle, Clock, BookOpen, ChevronRight, Sunrise, Sunset,
+  CheckCircle2, Image as ImageIcon
 } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import BookingModal from "@/components/ui/BookingModal";
 
-// Rotating styles for dynamic pujas
-const PUJA_UI_STYLES = [
-  { icon: <Flame size={28} />, color: "text-orange-600", bg: "bg-orange-100" },
-  { icon: <Users size={28} />, color: "text-pink-600", bg: "bg-pink-100" },
-  { icon: <Star size={28} />, color: "text-indigo-600", bg: "bg-indigo-100" },
-  { icon: <BookOpen size={28} />, color: "text-emerald-600", bg: "bg-emerald-100" },
-  { icon: <Users size={28} />, color: "text-teal-600", bg: "bg-teal-100" },
-  { icon: <Flame size={28} />, color: "text-red-600", bg: "bg-red-100" },
-  { icon: <BookOpen size={28} />, color: "text-amber-600", bg: "bg-amber-100" },
-  { icon: <Star size={28} />, color: "text-purple-600", bg: "bg-purple-100" },
-];
+interface FeaturedReview {
+  id: string;
+  userName: string;
+  userCity?: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
 
 export default function HomePage() {
   const { language, t } = useLanguage();
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [selectedPujaTitle, setSelectedPujaTitle] = useState("");
   
   // Panchang State
   const [panchang, setPanchang] = useState<any>(null);
   
+  // Dynamic Pujas & Reviews State
+  const [latestPujas, setLatestPujas] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<FeaturedReview[]>([]);
+  const [loadingPujas, setLoadingPujas] = useState(true);
+
   // Contact Form State
   const [formData, setFormData] = useState({ name: "", phone: "", service: "Vivah / Marriage" });
   const [submitStatus, setSubmitStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
+  const currentWHNumber = "919340553012";
 
-
-  // Add this near your other state variables
-  const [latestPujas, setLatestPujas] = useState<any[]>([]);
-  const [loadingPujas, setLoadingPujas] = useState(true);
-
-  // Update your existing useEffect (or add a new one)
   useEffect(() => {
-    // 1. Fetch Panchang (Your existing code)
     const today = new Date().toISOString().split("T")[0];
+    
+    // 1. Fetch Today's Panchang
     fetch(`${API_URL}/panchang?date=${today}`)
       .then(res => res.json())
       .then(data => setPanchang(data.data || null))
-      .catch(err => console.error(err));
+      .catch(err => console.error("Panchang error:", err));
 
-    // 2. Fetch Dynamic Pujas
-    fetch(`${API_URL}/pujas`) // Adjust this endpoint if your route is named differently (e.g., /services)
+    // 2. Fetch Latest Pujas
+    fetch(`${API_URL}/pujas`)
       .then(res => res.json())
       .then(data => {
-        // Assuming your backend returns { pujas: [...] } or an array directly
         const fetchedPujas = data.pujas || data || [];
-        // Grab the first 10
         setLatestPujas(fetchedPujas.slice(0, 10));
       })
       .catch(err => console.error("Failed to fetch pujas:", err))
       .finally(() => setLoadingPujas(false));
-  }, [API_URL]);
 
-  // Fetch Today's Panchang
-  useEffect(() => {
-    const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-    fetch(`${API_URL}/panchang?date=${today}`)
+    // 3. Fetch Featured Approved Reviews
+    fetch(`${API_URL}/api/reviews/admin/all?status=approved`)
       .then(res => res.json())
-      .then(data => setPanchang(data.data || null))
-      .catch(err => console.error(err));
+      .then(data => {
+        if (data.reviews) setReviews(data.reviews.slice(0, 10));
+      })
+      .catch(err => console.error("Failed to fetch reviews:", err));
   }, [API_URL]);
 
-  // Handle Contact Submit
+  const handleOpenBooking = (pujaName: string) => {
+    setSelectedPujaTitle(pujaName);
+    setIsBookingModalOpen(true);
+  };
+
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.phone) return alert("Please fill all fields.");
     
     setSubmitStatus("loading");
     try {
-      // Replace with your actual email sending API route
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -103,8 +103,6 @@ export default function HomePage() {
     return "bg-slate-50 text-slate-700 border-slate-200";
   };
 
-  const currentWHNumber = "919340553012";
-
   return (
     <div className="min-h-screen bg-slate-50 font-sans overflow-x-hidden">
       
@@ -113,10 +111,7 @@ export default function HomePage() {
         className="relative bg-fixed bg-center bg-cover py-32 px-4 sm:px-6 lg:px-8 flex items-center justify-center min-h-[85vh]"
         style={{ backgroundImage: "url('./pbanner.png')" }}
       >
-        {/* Dark Overlay */}
         <div className="absolute inset-0 bg-black/60 z-0"></div>
-        
-        {/* Content */}
         <div className="relative z-10 max-w-5xl mx-auto text-center animate-fade-in-up">
           <span className="inline-block py-1 px-3 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30 font-semibold text-sm mb-6 uppercase tracking-widest backdrop-blur-sm">
             {language === "hi" ? "प्रामाणिक वैदिक अनुष्ठान" : "Authentic Vedic Rituals"}
@@ -145,72 +140,297 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. LATEST PUJAS SCROLLER */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-[1400px] mx-auto overflow-hidden">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900">
-            {language === "hi" ? "हमारी प्रमुख सेवाएं" : "Our Primary Services"}
-          </h2>
-          <div className="w-24 h-1.5 bg-orange-500 mx-auto mt-4 rounded-full"></div>
-        </div>
-        
-        {/* Horizontal Scroll Container */}
-        <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-10 pt-4 px-4 custom-scrollbar">
-          {loadingPujas ? (
-            // Skeleton Loading State
-            [...Array(4)].map((_, i) => (
-              <div key={i} className="min-w-[280px] md:min-w-[320px] h-48 snap-center shrink-0 bg-slate-200 animate-pulse rounded-2xl"></div>
-            ))
-          ) : latestPujas.length === 0 ? (
-            <p className="text-slate-500 w-full text-center py-10">No services found.</p>
-          ) : (
-            latestPujas.map((puja, index) => {
-              // Pick a repeating style based on the index
-              const style = PUJA_UI_STYLES[index % PUJA_UI_STYLES.length];
-              
-              // Fallback descriptions if your DB doesn't have them
-              const descHi = puja.descriptionHi || "संपूर्ण विधि-विधान और वैदिक मंत्रोच्चार के साथ पूजा संपन्न कराई जाती है।";
-              const descEn = puja.descriptionEn || "Performed with complete Vedic rituals and authentic mantras by expert Pandits.";
+      {/* ================================================================= */}
+      {/* 2. STATIC PUJA SECTIONS (ALTERNATING LAYOUT) */}
+      {/* ================================================================= */}
 
-              return (
-                <Link 
-                  href={`/pujas/${puja.id}`} // Adjust the URL path based on your exact details page route
-                  key={puja.id} 
-                  className="min-w-[280px] md:min-w-[320px] snap-center shrink-0 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-orange-200 transition-all duration-300 hover:-translate-y-2 group cursor-pointer block"
-                >
-                  <div className={`w-16 h-16 ${style.bg} ${style.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                    {style.icon}
-                  </div>
-                  
-                  <h3 className="text-xl font-bold text-slate-900 mb-2 truncate">
-                    {/* Assuming your DB uses nameHi and nameEn. Adjust if your DB uses different keys like titleHi/titleEn */}
-                    {language === "hi" && puja.titleHi ? puja.titleHi : puja.titleEn || "Puja Name"}
-                  </h3>
-                  
-                  <div 
-                    className="text-slate-500 text-sm mb-6 line-clamp-2 overflow-hidden break-words whitespace-normal [&_*]:inline"
-                    dangerouslySetInnerHTML={{ 
-                      __html: language === "hi" ? descHi : descEn 
-                    }} 
-                  />
-                  
-                  <div className="text-orange-600 font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
-                    {t("pujaList.viewDetails")} <ChevronRight size={16} />
-                  </div>
-                </Link>
-              );
-            })
-          )}
-        </div>
-
-        <div className="text-center mt-4">
-          <Link href="/services" className="inline-block px-8 py-3 rounded-full border-2 border-slate-900 text-slate-900 font-bold hover:bg-slate-900 hover:text-white transition-colors duration-300">
-            {language === "hi" ? "सभी सेवाएं देखें" : "View All Services"}
-          </Link>
+      {/* 2.1 VASTU PUJAN (Left Image | Right Details) */}
+      <section className="py-20 bg-white border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="relative h-80 sm:h-96 rounded-3xl overflow-hidden shadow-lg border border-slate-200">
+              <img 
+                src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80" 
+                alt="Vastu Shanti Puja" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="space-y-6">
+              <span className="text-orange-600 font-bold tracking-wider uppercase text-xs sm:text-sm">
+                {language === "hi" ? "वास्तु शांति अनुष्ठान" : "Vastu Shanti Rituals"}
+              </span>
+              <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900">
+                {language === "hi" ? "वास्तु दोष निवारण एवं गृह शांति" : "Vastu Dosha Nivaran & Shanti"}
+              </h2>
+              <p className="text-slate-600 text-base md:text-lg leading-relaxed">
+                {language === "hi"
+                  ? "नये घर या व्यावसायिक स्थल में सुख, समृद्धि और शांति के लिए संपूर्ण वैदिक रीति-रिवाज से वास्तु पूजन एवं हवन संपन्न कराया जाता है।"
+                  : "Remove negative energies and bring prosperity to your new home or office with authentic Vastu Shanti Puja performed by Vedic Gurus."}
+              </p>
+              <div className="space-y-2 text-sm text-slate-700">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={18} className="text-orange-600" />
+                  <span>{language === "hi" ? "दोष निवारण एवं सकारात्मक ऊर्जा स्थापना" : "Negates directional & structural Vastu defects"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={18} className="text-orange-600" />
+                  <span>{language === "hi" ? "नवग्रह एवं वास्तु देवता पूजन" : "Comprehensive Navgrah & Vastu Devta Havan"}</span>
+                </div>
+              </div>
+              <button
+                onClick={() => handleOpenBooking("Vastu Shanti Puja")}
+                className="px-8 py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition shadow-md flex items-center gap-2 text-sm"
+              >
+                {language === "hi" ? "वास्तु पूजन बुक करें" : "Book Vastu Puja"} <ArrowRight size={18} />
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* 3. PANCHANG & CHOGHADIYA SECTION */}
+      {/* 2.2 PUJAN / GENERAL HAVAN (Left Details | Right Image) */}
+      <section className="py-20 bg-slate-50 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6 order-2 md:order-1">
+              <span className="text-orange-600 font-bold tracking-wider uppercase text-xs sm:text-sm">
+                {language === "hi" ? "वैदिक पूजन एवं हवन" : "Vedic Pujan & Havan"}
+              </span>
+              <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900">
+                {language === "hi" ? "विशेष पूजन एवं सर्वकल्याण यज्ञ" : "Special Pujan & Universal Havan"}
+              </h2>
+              <p className="text-slate-600 text-base md:text-lg leading-relaxed">
+                {language === "hi"
+                  ? "सत्यनारायण कथा, महामृत्युंजय जाप, गणेश पूजन और दुर्गा पाठ का शुद्ध मंत्रोच्चार के साथ आयोजन।"
+                  : "Experience complete spiritual upliftment through authentic Vedic Pujas including Satyanarayan Katha, Mahamrityunjay Jaap, and Chandi Paath."}
+              </p>
+              <div className="space-y-2 text-sm text-slate-700">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={18} className="text-orange-600" />
+                  <span>{language === "hi" ? "शुद्ध सामग्री एवं विद्वान पंडितों द्वारा" : "100% Pure Samagri provided"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={18} className="text-orange-600" />
+                  <span>{language === "hi" ? "व्यक्तिगत एवं सामूहिक अनुष्ठान सुविधा" : "In-person at home or online options"}</span>
+                </div>
+              </div>
+              <button
+                onClick={() => handleOpenBooking("Vedic Pujan / Havan")}
+                className="px-8 py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition shadow-md flex items-center gap-2 text-sm"
+              >
+                {language === "hi" ? "पूजन बुक करें" : "Book Pujan"} <ArrowRight size={18} />
+              </button>
+            </div>
+            <div className="relative h-80 sm:h-96 rounded-3xl overflow-hidden shadow-lg border border-slate-200 order-1 md:order-2">
+              <img 
+                src="https://images.unsplash.com/photo-1609342122563-a43ac8917a3a?auto=format&fit=crop&w=1000&q=80" 
+                alt="Vedic Pujan" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 2.3 MANGAL PUJAN (Left Image | Right Details) */}
+      <section className="py-20 bg-white border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="relative h-80 sm:h-96 rounded-3xl overflow-hidden shadow-lg border border-slate-200">
+              <img 
+                src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1000&q=80" 
+                alt="Mangal Dosh Shanti" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="space-y-6">
+              <span className="text-orange-600 font-bold tracking-wider uppercase text-xs sm:text-sm">
+                {language === "hi" ? "उज्जैन विशेष अनुष्ठान" : "Ujjain Special Ritual"}
+              </span>
+              <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900">
+                {language === "hi" ? "मंगल दोष निवारण पूजन" : "Mangal Dosh Shanti Puja"}
+              </h2>
+              <p className="text-slate-600 text-base md:text-lg leading-relaxed">
+                {language === "hi"
+                  ? "विवाह में आ रही बाधाओं तथा मंगल ग्रह के अशुभ प्रभाव को समाप्त करने के लिए मंगलनाथ मंदिर उज्जैन परंपरा अनुसार विशेष भात पूजा।"
+                  : "Resolve marital delays and astrological Mangal Dosha imbalances with traditional Bhaat Puja and Jaap performed strictly per scriptures."}
+              </p>
+              <div className="space-y-2 text-sm text-slate-700">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={18} className="text-orange-600" />
+                  <span>{language === "hi" ? "मंगल भात पूजा एवं विशेष अभिषेक" : "Authentic Bhaat Puja & Abhishek"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={18} className="text-orange-600" />
+                  <span>{language === "hi" ? "वैवाहिक जीवन में शांति और शीघ्र विवाह योग्य योग" : "Eases delays in marriage"}</span>
+                </div>
+              </div>
+              <button
+                onClick={() => handleOpenBooking("Mangal Dosh Shanti Puja")}
+                className="px-8 py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition shadow-md flex items-center gap-2 text-sm"
+              >
+                {language === "hi" ? "मंगल पूजा बुक करें" : "Book Mangal Puja"} <ArrowRight size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 2.4 KALSARP PUJAN (Left Details | Right Image) */}
+      <section className="py-20 bg-slate-50 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6 order-2 md:order-1">
+              <span className="text-orange-600 font-bold tracking-wider uppercase text-xs sm:text-sm">
+                {language === "hi" ? "राहु-केतु शांति" : "Rahu-Ketu Shanti"}
+              </span>
+              <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900">
+                {language === "hi" ? "कालसर्प दोष निवारण पूजा" : "Kalsarp Dosh Nivaran Puja"}
+              </h2>
+              <p className="text-slate-600 text-base md:text-lg leading-relaxed">
+                {language === "hi"
+                  ? "जीवन में अचानक आने वाली रुकावटों, मानसिक तनाव और करियर बाधाओं से मुक्ति पाने के लिए विशेष नाग-नागिन प्रतिमा पूजन और राहु-केतु मंत्र जाप।"
+                  : "Overcome sudden life obstacles, mental anxiety, and professional blockages with authentic Kalsarp Dosh Shanti Puja."}
+              </p>
+              <div className="space-y-2 text-sm text-slate-700">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={18} className="text-orange-600" />
+                  <span>{language === "hi" ? "12 प्रकार के कालसर्प दोषों का वैज्ञानिक समाधान" : "Remedies all 12 types of Kalsarp Yoga"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={18} className="text-orange-600" />
+                  <span>{language === "hi" ? "उज्जैन तीर्थ पर विशेष संकल्प पूजन" : "Performed at sacred river banks / Ujjain Kshetra"}</span>
+                </div>
+              </div>
+              <button
+                onClick={() => handleOpenBooking("Kalsarp Dosh Nivaran Puja")}
+                className="px-8 py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition shadow-md flex items-center gap-2 text-sm"
+              >
+                {language === "hi" ? "कालसर्प पूजा बुक करें" : "Book Kalsarp Puja"} <ArrowRight size={18} />
+              </button>
+            </div>
+            <div className="relative h-80 sm:h-96 rounded-3xl overflow-hidden shadow-lg border border-slate-200 order-1 md:order-2">
+              <img 
+                src="https://images.unsplash.com/photo-1620067925093-801122ac1408?auto=format&fit=crop&w=1000&q=80" 
+                alt="Kalsarp Puja" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 2.5 VIVAH / MARRIAGE (Left Image | Right Details) */}
+      <section className="py-20 bg-white border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="relative h-80 sm:h-96 rounded-3xl overflow-hidden shadow-lg border border-slate-200">
+              <img 
+                src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1000&q=80" 
+                alt="Vivah Sanskar" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="space-y-6">
+              <span className="text-orange-600 font-bold tracking-wider uppercase text-xs sm:text-sm">
+                {language === "hi" ? "पाणिग्रहण संस्कार" : "Pani Grahan Sanskar"}
+              </span>
+              <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900">
+                {language === "hi" ? "विवाह एवं मांगलिक कार्य" : "Vedic Vivah & Marriage Rituals"}
+              </h2>
+              <p className="text-slate-600 text-base md:text-lg leading-relaxed">
+                {language === "hi"
+                  ? "सप्तपदी, कन्यादान, जयमाला और विवाह के सभी 16 संस्कारों को विद्वान आचार्यों के निर्देशन में शुद्ध वैदिक मंत्रोच्चार के साथ संपन्न करें।"
+                  : "Complete Vedic wedding ceremonies including Saptapadi, Kanyadaan, and Havan guided strictly according to Sanatan scriptures."}
+              </p>
+              <div className="space-y-2 text-sm text-slate-700">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={18} className="text-orange-600" />
+                  <span>{language === "hi" ? "शुभ मुहूर्त निर्धारण एवं संपूर्ण विधि-विधान" : "Auspicious Muhurat calculation included"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={18} className="text-orange-600" />
+                  <span>{language === "hi" ? "अनुभवी वैदिक पंडितों की पूरी टीम" : "Full team of experienced Pandits provided"}</span>
+                </div>
+              </div>
+              <button
+                onClick={() => handleOpenBooking("Vedic Vivah Ceremony")}
+                className="px-8 py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition shadow-md flex items-center gap-2 text-sm"
+              >
+                {language === "hi" ? "विवाह हेतु बुकिंग करें" : "Book Marriage Service"} <ArrowRight size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================= */}
+      {/* 3. ABOUT PANDIT JI SECTION (With Direct WhatsApp CTA) */}
+      {/* ================================================================= */}
+      <section className="py-20 bg-slate-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row gap-12 items-center bg-white p-8 md:p-12 rounded-3xl shadow-lg border border-slate-200">
+            <div className="w-full md:w-2/5 flex justify-center relative">
+              <div className="w-64 h-64 md:w-80 md:h-80 bg-orange-200 rounded-full border-8 border-orange-50 overflow-hidden shadow-xl relative">
+                <img 
+                  src="./pandit-logo.png" 
+                  alt="Pandit Ji" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="absolute -bottom-4 right-1/4 bg-orange-600 text-white p-3 rounded-full shadow-lg">
+                <Star className="w-6 h-6 fill-current" />
+              </div>
+            </div>
+
+            <div className="w-full md:w-3/5 text-center md:text-left space-y-6">
+              <span className="text-orange-600 font-bold tracking-wider uppercase text-sm">
+                {language === "hi" ? "हमारे बारे में" : "About Us"}
+              </span>
+              <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900">
+                Acharya Rishi Nagar Ji
+              </h2>
+              <div className="w-16 h-1 bg-orange-500 mx-auto md:mx-0"></div>
+              <p className="text-slate-600 text-lg leading-relaxed">
+                {language === "hi" 
+                  ? "उज्जैन के प्रतिष्ठित गुरुकुल से शिक्षित, आचार्य जी को वैदिक अनुष्ठान, ज्योतिष, वास्तु शास्त्र और कर्मकांड में 20 से अधिक वर्षों का गहन अनुभव है। हमारा उद्देश्य प्राचीन वैदिक परंपराओं को पूर्ण शुद्धता और प्रामाणिकता के साथ आपके जीवन में लाना है।"
+                  : "Educated from the prestigious Gurukuls of Ujjain, Acharya Ji holds over 20 years of profound experience in Vedic rituals, Astrology, Vastu Shastra, and Karmakand. Our mission is to bring ancient Vedic traditions into your life with absolute purity and authenticity."}
+              </p>
+
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+                <div className="text-center md:text-left">
+                  <h4 className="text-3xl font-bold text-orange-600">20+</h4>
+                  <p className="text-sm text-slate-500 font-medium">Years Experience</p>
+                </div>
+                <div className="text-center md:text-left">
+                  <h4 className="text-3xl font-bold text-orange-600">5000+</h4>
+                  <p className="text-sm text-slate-500 font-medium">Pujas Performed</p>
+                </div>
+              </div>
+
+              {/* Direct WhatsApp Connect Button */}
+              <div className="pt-2">
+                <a
+                  href={`https://wa.me/${currentWHNumber}?text=Hari%20Om%20Acharya%20Ji!%20I%20want%20to%20consult%20regarding%20a%20Puja.`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition text-sm"
+                >
+                  <MessageCircle size={20} />
+                  <span>
+                    {language === "hi" ? "आचार्य जी से सीधे व्हाट्सएप पर बात करें" : "Connect with Acharya Ji directly on WhatsApp"}
+                  </span>
+                </a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================= */}
+      {/* 4. PANCHANG & CHOGHADIYA SECTION */}
+      {/* ================================================================= */}
       <section className="py-20 bg-orange-50 border-y border-orange-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -299,7 +519,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. TODAY'S MUHURAT */}
+      {/* ================================================================= */}
+      {/* 5. TODAY'S MUHURAT */}
+      {/* ================================================================= */}
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold font-serif text-slate-900 mb-8">
@@ -333,55 +555,106 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. ABOUT PANDIT JI SECTION */}
-      <section className="py-20 bg-slate-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row gap-12 items-center bg-white p-8 md:p-12 rounded-3xl shadow-lg border border-slate-200">
-            {/* Image Placeholder */}
-            <div className="w-full md:w-2/5 flex justify-center relative">
-              {/* Add your Pandit ji image url in src below */}
-              <div className="w-64 h-64 md:w-80 md:h-80 bg-orange-200 rounded-full border-8 border-orange-50 overflow-hidden shadow-xl relative">
-                <img 
-                  src="./pandit-logo.png" 
-                  alt="Pandit Ji" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="absolute -bottom-4 right-1/4 bg-orange-600 text-white p-3 rounded-full shadow-lg">
-                <Star className="w-6 h-6 fill-current" />
-              </div>
-            </div>
+      {/* ================================================================= */}
+      {/* 6. GALLERY SECTION (Static / Placeholder Dummy Images) */}
+      {/* ================================================================= */}
+      <section className="py-20 bg-slate-50 border-t border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="text-orange-600 font-bold tracking-wider uppercase text-xs sm:text-sm">
+              {language === "hi" ? "अनुष्ठान झलकियां" : "Sacred Memories"}
+            </span>
+            <h2 className="text-3xl font-bold font-serif text-slate-900 mt-1">
+              {language === "hi" ? "पूजा एवं अनुष्ठान गैलरी" : "Puja & Anushthan Gallery"}
+            </h2>
+            <div className="w-20 h-1 bg-orange-500 mx-auto mt-3 rounded-full"></div>
+          </div>
 
-            {/* Text Content */}
-            <div className="w-full md:w-3/5 text-center md:text-left space-y-6">
-              <span className="text-orange-600 font-bold tracking-wider uppercase text-sm">
-                {language === "hi" ? "हमारे बारे में" : "About Us"}
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900">
-                Acharya Rishi Nagar Ji
-              </h2>
-              <div className="w-16 h-1 bg-orange-500 mx-auto md:mx-0"></div>
-              <p className="text-slate-600 text-lg leading-relaxed">
-                {language === "hi" 
-                  ? "उज्जैन के प्रतिष्ठित गुरुकुल से शिक्षित, आचार्य जी को वैदिक अनुष्ठान, ज्योतिष, वास्तु शास्त्र और कर्मकांड में 20 से अधिक वर्षों का गहन अनुभव है। हमारा उद्देश्य प्राचीन वैदिक परंपराओं को पूर्ण शुद्धता और प्रामाणिकता के साथ आपके जीवन में लाना है।"
-                  : "Educated from the prestigious Gurukuls of Ujjain , Acharya Ji holds over 20 years of profound experience in Vedic rituals, Astrology, Vastu Shastra, and Karmakand. Our mission is to bring ancient Vedic traditions into your life with absolute purity and authenticity."}
-              </p>
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
-                <div className="text-center md:text-left">
-                  <h4 className="text-3xl font-bold text-orange-600">10+</h4>
-                  <p className="text-sm text-slate-500 font-medium">Years Experience</p>
-                </div>
-                <div className="text-center md:text-left">
-                  <h4 className="text-3xl font-bold text-orange-600">500+</h4>
-                  <p className="text-sm text-slate-500 font-medium">Pujas Performed</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              "https://images.unsplash.com/photo-1609342122563-a43ac8917a3a?auto=format&fit=crop&w=600&q=80",
+              "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=600&q=80",
+              "https://images.unsplash.com/photo-1620067925093-801122ac1408?auto=format&fit=crop&w=600&q=80",
+              "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=600&q=80",
+            ].map((imgUrl, idx) => (
+              <div key={idx} className="relative h-48 md:h-64 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition group">
+                <img 
+                  src={imgUrl} 
+                  alt={`Gallery Image ${idx + 1}`} 
+                  className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                />
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white">
+                  <ImageIcon size={28} />
                 </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* 6. TRUST & LEAD CAPTURE SECTION (Contact) */}
+      {/* ================================================================= */}
+      {/* 7. LATEST REVIEWS SCROLLER SECTION */}
+      {/* ================================================================= */}
+      <section className="py-20 bg-white border-t border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="text-orange-600 font-bold tracking-wider uppercase text-xs sm:text-sm">
+              {language === "hi" ? "श्रद्धालुओं के अनुभव" : "Devotee Experiences"}
+            </span>
+            <h2 className="text-3xl font-bold font-serif text-slate-900 mt-1">
+              {language === "hi" ? "हमारे यजमानों की समीक्षाएं" : "Customer Reviews & Feedback"}
+            </h2>
+            <div className="w-20 h-1 bg-orange-500 mx-auto mt-3 rounded-full"></div>
+          </div>
+
+          {reviews.length === 0 ? (
+            <p className="text-slate-400 text-center text-sm py-8">
+              {language === "hi" ? "समीक्षाएं लोड हो रही हैं..." : "Loading reviews..."}
+            </p>
+          ) : (
+            <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-8 pt-2 custom-scrollbar">
+              {reviews.map((rev) => (
+                <div
+                  key={rev.id}
+                  className="min-w-[280px] md:min-w-[340px] max-w-[360px] snap-center shrink-0 bg-stone-50/80 p-6 rounded-2xl border border-stone-200 shadow-xs flex flex-col justify-between"
+                >
+                  <div className="space-y-3">
+                    <div className="flex text-amber-400 gap-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          size={16}
+                          className={i < rev.rating ? "fill-amber-400 text-amber-400" : "text-slate-200"}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-slate-700 text-sm leading-relaxed line-clamp-4">
+                      "{rev.comment}"
+                    </p>
+                  </div>
+
+                  <div className="pt-4 border-t border-stone-200/60 mt-4 flex justify-between items-end">
+                    <div>
+                      <h4 className="font-bold text-slate-900 text-sm">{rev.userName}</h4>
+                      <p className="text-xs text-slate-400">{rev.userCity || "Verified Devotee"}</p>
+                    </div>
+                    <span className="text-[10px] text-slate-400">
+                      {new Date(rev.createdAt).toLocaleDateString("en-GB", {
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ================================================================= */}
+      {/* 8. TRUST & LEAD CAPTURE SECTION (Contact) */}
+      {/* ================================================================= */}
       <section id="contact" className="bg-slate-900 py-20 px-4 sm:px-6 lg:px-8 text-white">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-12 items-center">
           
@@ -491,7 +764,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Internal CSS for horizontal scrollbar hiding */}
+      {/* Internal CSS for horizontal scrollbar styling */}
       <style dangerouslySetInnerHTML={{__html: `
         .custom-scrollbar::-webkit-scrollbar {
           height: 6px;
@@ -513,6 +786,7 @@ export default function HomePage() {
       <BookingModal
         isOpen={isBookingModalOpen}
         onClose={() => setIsBookingModalOpen(false)}
+        pujaTitle={selectedPujaTitle}
       />
     </div>
   );

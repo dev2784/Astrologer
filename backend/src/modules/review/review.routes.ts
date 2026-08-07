@@ -46,8 +46,8 @@ export async function reviewRoutes(server: FastifyInstance) {
 
     const { pujaId, userName, userPhone, userCity, rating, comment, userId } = body;
 
-    if (!pujaId || !userName || !rating || !comment) {
-      return reply.code(400).send({ error: 'Missing required fields: pujaId, userName, rating, and comment.' });
+    if (!pujaId || !userName || !userPhone || !rating || !comment) {
+      return reply.code(400).send({ error: 'Missing required fields: pujaId, userName, userPhone, rating, and comment.' });
     }
 
     try {
