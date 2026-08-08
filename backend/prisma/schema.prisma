@@ -146,3 +146,15 @@ model Review {
   @@index([pujaId])
   @@index([isApproved])
 }
+
+model Gallery {
+  id        String   @id @default(uuid())
+  titleEn   String
+  titleHi   String?
+  imageUrl  String
+  isFeatured Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isFeatured])
+}

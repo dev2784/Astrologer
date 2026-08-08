@@ -30,7 +30,8 @@ export default function HomePage() {
   // Dynamic Pujas & Reviews State
   const [latestPujas, setLatestPujas] = useState<any[]>([]);
   const [reviews, setReviews] = useState<FeaturedReview[]>([]);
-  const [loadingPujas, setLoadingPujas] = useState(true);
+  const [loadingPujas, setLoadingPujas] = useState(true);  
+  const [galleryItems, setGalleryItems] = useState<any[]>([]);
 
   // Contact Form State
   const [formData, setFormData] = useState({ name: "", phone: "", service: "Vivah / Marriage" });
@@ -46,6 +47,17 @@ export default function HomePage() {
     .replace(/[^a-z0-9\s-]/g, "") // Remove special characters
     .replace(/\s+/g, "-");        // Replace spaces with hyphens
   };
+
+
+  useEffect(() => {
+    // Fetch Gallery Items
+    fetch(`${API_URL}/gallery`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) setGalleryItems(data.items);
+      })
+      .catch(err => console.error("Gallery error:", err));
+  }, [API_URL]);
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
@@ -583,25 +595,29 @@ export default function HomePage() {
             <div className="w-20 h-1 bg-orange-500 mx-auto mt-3 rounded-full"></div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              "https://images.unsplash.com/photo-1609342122563-a43ac8917a3a?auto=format&fit=crop&w=600&q=80",
-              "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=600&q=80",
-              "https://images.unsplash.com/photo-1620067925093-801122ac1408?auto=format&fit=crop&w=600&q=80",
-              "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=600&q=80",
-            ].map((imgUrl, idx) => (
-              <div key={idx} className="relative h-48 md:h-64 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition group">
-                <img 
-                  src={imgUrl} 
-                  alt={`Gallery Image ${idx + 1}`} 
-                  className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                />
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white">
-                  <ImageIcon size={28} />
+          {galleryItems.length === 0 ? (
+            <p className="text-slate-400 text-center text-sm py-8">
+              {language === "hi" ? "गैलरी लोड हो रही है..." : "Loading gallery images..."}
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {galleryItems.map((item) => (
+                <div key={item.id} className="relative h-48 md:h-64 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition group">
+                  <img 
+                    src={item.imageUrl} 
+                    alt={item.titleEn} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                  />
+                  {/* Dark Overlay with Title */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex flex-col justify-end p-4 text-white">
+                    <h4 className="font-bold text-sm sm:text-base">
+                      {language === "hi" && item.titleHi ? item.titleHi : item.titleEn}
+                    </h4>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
