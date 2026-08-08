@@ -75,7 +75,7 @@ server.register(bookingRoutes, { prefix: '/bookings' });
 server.register(muhuratRoutes, { prefix: '/muhurat' });
 server.register(panchangRoutes, { prefix: '/panchang' });
 server.register(reviewRoutes, { prefix: '/reviews' });
-server.register(galleryRoutes, { prefix: '/api/gallery' });
+server.register(galleryRoutes, { prefix: '/gallery' });
 
 // Basic health check route
 server.get('/health', async (request, reply) => {
