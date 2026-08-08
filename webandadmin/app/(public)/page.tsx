@@ -4,11 +4,19 @@ import { useState, useEffect } from "react";
 import { 
   Calendar, Phone, Flame, Users, Star, ArrowRight, 
   MessageCircle, Clock, BookOpen, ChevronRight, Sunrise, Sunset,
-  CheckCircle2, Image as ImageIcon
+  CheckCircle2, Image as ImageIcon, X, ChevronLeft, ChevronRight
 } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import BookingModal from "@/components/ui/BookingModal";
+
+
+interface GalleryItem {
+  id: string;
+  titleEn: string;
+  titleHi?: string;
+  imageUrl: string;
+}
 
 interface FeaturedReview {
   id: string;
@@ -23,6 +31,9 @@ export default function HomePage() {
   const { language, t } = useLanguage();
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [selectedPujaTitle, setSelectedPujaTitle] = useState("");
+
+  // Lightbox State
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   
   // Panchang State
   const [panchang, setPanchang] = useState<any>(null);
@@ -121,6 +132,29 @@ export default function HomePage() {
     if (type === "shubh") return "bg-green-50 text-green-700 border-green-200";
     if (type === "ashubh") return "bg-red-50 text-red-700 border-red-200";
     return "bg-slate-50 text-slate-700 border-slate-200";
+  };
+
+  // Handle Keyboard Navigation (Esc to close, Left/Right arrows to navigate)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (lightboxIndex === null) return;
+      if (e.key === "Escape") setLightboxIndex(null);
+      if (e.key === "ArrowLeft") handlePrev();
+      if (e.key === "ArrowRight") handleNext();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [lightboxIndex, galleryItems]);
+
+  const handlePrev = () => {
+    if (lightboxIndex === null) return;
+    setLightboxIndex((prev) => (prev === 0 ? galleryItems.length - 1 : (prev as number) - 1));
+  };
+
+  const handleNext = () => {
+    if (lightboxIndex === null) return;
+    setLightboxIndex((prev) => (prev === galleryItems.length - 1 ? 0 : (prev as number) + 1));
   };
 
   return (
@@ -601,18 +635,23 @@ export default function HomePage() {
             </p>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {galleryItems.map((item) => (
-                <div key={item.id} className="relative h-48 md:h-64 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition group">
+              {galleryItems.map((item, idx) => (
+                <div 
+                  key={item.id} 
+                  onClick={() => setLightboxIndex(idx)}
+                  className="relative h-48 md:h-64 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition group cursor-pointer"
+                >
                   <img 
                     src={item.imageUrl} 
                     alt={item.titleEn} 
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                   />
-                  {/* Dark Overlay with Title */}
+                  {/* Hover Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex flex-col justify-end p-4 text-white">
                     <h4 className="font-bold text-sm sm:text-base">
                       {language === "hi" && item.titleHi ? item.titleHi : item.titleEn}
                     </h4>
+                    <span className="text-[11px] text-orange-300 font-medium">Click to view full image</span>
                   </div>
                 </div>
               ))}
@@ -620,6 +659,66 @@ export default function HomePage() {
           )}
         </div>
       </section>
+
+      {/* ================================================================= */}
+      {/* LIGHTBOX / FULLSCREEN IMAGE VIEWER MODAL */}
+      {/* ================================================================= */}
+      {lightboxIndex !== null && galleryItems[lightboxIndex] && (
+        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4">
+          
+          {/* Close Button */}
+          <button
+            onClick={() => setLightboxIndex(null)}
+            className="absolute top-6 right-6 text-white/80 hover:text-white p-2 rounded-full bg-white/10 hover:bg-white/20 transition z-50"
+            title="Close (Esc)"
+          >
+            <X size={28} />
+          </button>
+
+          {/* Previous Arrow */}
+          {galleryItems.length > 1 && (
+            <button
+              onClick={handlePrev}
+              className="absolute left-4 sm:left-8 text-white/80 hover:text-white p-3 rounded-full bg-white/10 hover:bg-white/20 transition z-50"
+              title="Previous"
+            >
+              <ChevronLeft size={32} />
+            </button>
+          )}
+
+          {/* Image & Title Container */}
+          <div className="max-w-5xl max-h-[85vh] flex flex-col items-center justify-center space-y-4">
+            <img
+              src={galleryItems[lightboxIndex].imageUrl}
+              alt={galleryItems[lightboxIndex].titleEn}
+              className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl animate-fade-in"
+            />
+            
+            <div className="text-center space-y-1">
+              <h3 className="text-lg sm:text-xl font-bold text-white">
+                {language === "hi" && galleryItems[lightboxIndex].titleHi 
+                  ? galleryItems[lightboxIndex].titleHi 
+                  : galleryItems[lightboxIndex].titleEn}
+              </h3>
+              <p className="text-xs text-slate-400">
+                {lightboxIndex + 1} of {galleryItems.length}
+              </p>
+            </div>
+          </div>
+
+          {/* Next Arrow */}
+          {galleryItems.length > 1 && (
+            <button
+              onClick={handleNext}
+              className="absolute right-4 sm:right-8 text-white/80 hover:text-white p-3 rounded-full bg-white/10 hover:bg-white/20 transition z-50"
+              title="Next"
+            >
+              <ChevronRight size={32} />
+            </button>
+          )}
+
+        </div>
+      )}
 
       {/* ================================================================= */}
       {/* 7. LATEST REVIEWS SCROLLER SECTION */}

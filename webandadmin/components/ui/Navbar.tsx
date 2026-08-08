@@ -252,11 +252,11 @@ export default function Navbar() {
             </div>
 
             <Link
-              href="/about"
+              href="/gallery"
               onClick={closeMobileMenu}
               className="block py-2 text-base font-semibold text-stone-800 hover:text-orange-600"
             >
-              {t("nav.about")}
+              {language === "hi" ? "गैलरी" : "Gallery"}
             </Link>
 
             {/* Mobile Full-width CTA */}
