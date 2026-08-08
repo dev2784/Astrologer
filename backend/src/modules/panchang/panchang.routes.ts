@@ -74,14 +74,68 @@ export async function panchangRoutes(server: FastifyInstance) {
         return { hour: parseInt(parts[0] || "0"), minute: parseInt(parts[1] || "0"), second: parseInt(parts[2] || "0") };
       };
 
-      const parseChoghadiya = (rawStr: string) => {
-        if (!rawStr) return [];
-        return rawStr.split(";").map(slot => {
-          const [name, start, end, type] = slot.split("|");
-          return { name: name || "", start: extractTime(start), end: extractTime(end), type: type || "neutral" };
-        });
+            // Auto-detect type if client omits explicit 'Shubh' or 'Ashubh' tag
+      const getChoghadiyaType = (name: string, explicitType?: string): string => {
+        if (explicitType) {
+          const clean = explicitType.trim().toLowerCase();
+          if (clean.includes("ashubh")) return "ashubh";
+          if (clean.includes("shubh")) return "shubh";
+        }
+
+        // Fallback to traditional Vedic rules based on Choghadiya name
+        const n = name.trim().toLowerCase();
+        if (n.includes("शुभ") || n.includes("shubh") || 
+            n.includes("अमृत") || n.includes("amrit") || 
+            n.includes("लाभ") || n.includes("labh") || 
+            n.includes("चर") || n.includes("char")) {
+          return "shubh";
+        }
+        if (n.includes("रोग") || n.includes("rog") || 
+            n.includes("काल") || n.includes("kaal") || 
+            n.includes("उद्वेग") || n.includes("udveg")) {
+          return "ashubh";
+        }
+        return "neutral";
       };
 
+      const parseChoghadiya = (rawStr: any) => {
+        if (!rawStr) return [];
+        const text = String(rawStr).trim();
+        if (!text) return [];
+
+        const results: { name: string; start: string; end: string; type: string }[] = [];
+
+        // Split entries by semicolon, comma, or newline if present
+        const slots = text.includes(";") ? text.split(";") : text.split(/[\n,]+/);
+
+        for (const rawSlot of slots) {
+          const slot = rawSlot.trim();
+          if (!slot) continue;
+
+          // Pattern 1: Handles pipe-separated legacy format ("Shubh | 10:07 | 11:15 | Shubh")
+          if (slot.includes("|")) {
+            const parts = slot.split("|").map(p => p.trim());
+            const name = parts[0] || "";
+            const start = extractTime(parts[1] || "");
+            const end = extractTime(parts[2] || "");
+            const type = getChoghadiyaType(name, parts[3]);
+            if (name) results.push({ name, start, end, type });
+            continue;
+          }
+
+          // Pattern 2: Handles simple space-separated format ("Shubh 10:07 11:15" or "अमृत 06:08:37 07:43:14")
+          const match = slot.match(/^([^\d]+)\s+(\d{1,2}:\d{2}(?::\d{2})?)\s+(\d{1,2}:\d{2}(?::\d{2})?)(?:\s+(.+))?$/);
+          if (match) {
+            const name = match[1].trim();
+            const start = extractTime(match[2].trim());
+            const end = extractTime(match[3].trim());
+            const type = getChoghadiyaType(name, match[4]);
+            results.push({ name, start, end, type });
+          }
+        }
+
+        return results;
+      };
       for (const row of rows) {
         const validDate = parseSafeDate(row.date);
         if (!validDate) continue;

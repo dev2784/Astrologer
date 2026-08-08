@@ -39,6 +39,14 @@ export default function HomePage() {
   const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
   const currentWHNumber = "919340553012";
 
+  const createSlug = (title: string) => {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters
+    .replace(/\s+/g, "-");        // Replace spaces with hyphens
+  };
+
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
     
@@ -177,12 +185,13 @@ export default function HomePage() {
                   <span>{language === "hi" ? "नवग्रह एवं वास्तु देवता पूजन" : "Comprehensive Navgrah & Vastu Devta Havan"}</span>
                 </div>
               </div>
-              <button
-                onClick={() => handleOpenBooking("Vastu Shanti Puja")}
-                className="px-8 py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition shadow-md flex items-center gap-2 text-sm"
+              <Link
+                href={`/pujas/${createSlug("Vastu pujan")}`} // Resolves to /pujas/bhat-puja
+                className="px-8 py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition shadow-md flex items-center gap-2 text-sm inline-flex"
               >
-                {language === "hi" ? "वास्तु पूजन बुक करें" : "Book Vastu Puja"} <ArrowRight size={18} />
-              </button>
+                {language === "hi" ? "वास्तु पूजन बुक करें" : "Book Vastu Puja"}
+                <ArrowRight size={18} />
+              </Link>
             </div>
           </div>
         </div>
@@ -213,13 +222,14 @@ export default function HomePage() {
                   <CheckCircle2 size={18} className="text-orange-600" />
                   <span>{language === "hi" ? "व्यक्तिगत एवं सामूहिक अनुष्ठान सुविधा" : "In-person at home or online options"}</span>
                 </div>
-              </div>
-              <button
-                onClick={() => handleOpenBooking("Vedic Pujan / Havan")}
-                className="px-8 py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition shadow-md flex items-center gap-2 text-sm"
+              </div>            
+              <Link
+                href={`/pujas/${createSlug("Grahan dosh pujan")}`} // Resolves to /pujas/bhat-puja
+                className="px-8 py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition shadow-md flex items-center gap-2 text-sm inline-flex"
               >
-                {language === "hi" ? "पूजन बुक करें" : "Book Pujan"} <ArrowRight size={18} />
-              </button>
+                {language === "hi" ? "पूजन बुक करें" : "Book Pujan"}
+                <ArrowRight size={18} />
+              </Link>
             </div>
             <div className="relative h-80 sm:h-96 rounded-3xl overflow-hidden shadow-lg border border-slate-200 order-1 md:order-2">
               <img 
@@ -265,12 +275,13 @@ export default function HomePage() {
                   <span>{language === "hi" ? "वैवाहिक जीवन में शांति और शीघ्र विवाह योग्य योग" : "Eases delays in marriage"}</span>
                 </div>
               </div>
-              <button
-                onClick={() => handleOpenBooking("Mangal Dosh Shanti Puja")}
-                className="px-8 py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition shadow-md flex items-center gap-2 text-sm"
+              <Link
+                href={`/pujas/${createSlug("Mangal bhat pujan")}`} // Resolves to /pujas/bhat-puja
+                className="px-8 py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition shadow-md flex items-center gap-2 text-sm inline-flex"
               >
-                {language === "hi" ? "मंगल पूजा बुक करें" : "Book Mangal Puja"} <ArrowRight size={18} />
-              </button>
+                {language === "hi" ? "मंगल पूजा बुक करें" : "Book Mangal Puja"}
+                <ArrowRight size={18} />
+              </Link>
             </div>
           </div>
         </div>
@@ -302,12 +313,13 @@ export default function HomePage() {
                   <span>{language === "hi" ? "उज्जैन तीर्थ पर विशेष संकल्प पूजन" : "Performed at sacred river banks / Ujjain Kshetra"}</span>
                 </div>
               </div>
-              <button
-                onClick={() => handleOpenBooking("Kalsarp Dosh Nivaran Puja")}
-                className="px-8 py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition shadow-md flex items-center gap-2 text-sm"
+              <Link
+                href={`/pujas/${createSlug("Kalsharp pujan")}`} // Resolves to /pujas/bhat-puja
+                className="px-8 py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition shadow-md flex items-center gap-2 text-sm inline-flex"
               >
-                {language === "hi" ? "कालसर्प पूजा बुक करें" : "Book Kalsarp Puja"} <ArrowRight size={18} />
-              </button>
+                {language === "hi" ? "कालसर्प पूजा बुक करें" : "Book Kalsarp Puja"}
+                <ArrowRight size={18} />
+              </Link>
             </div>
             <div className="relative h-80 sm:h-96 rounded-3xl overflow-hidden shadow-lg border border-slate-200 order-1 md:order-2">
               <img 
@@ -353,12 +365,13 @@ export default function HomePage() {
                   <span>{language === "hi" ? "अनुभवी वैदिक पंडितों की पूरी टीम" : "Full team of experienced Pandits provided"}</span>
                 </div>
               </div>
-              <button
-                onClick={() => handleOpenBooking("Vedic Vivah Ceremony")}
-                className="px-8 py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition shadow-md flex items-center gap-2 text-sm"
+              <Link
+                href={`/pujas/${createSlug("Shadi,vivah sanskar")}`} // Resolves to /pujas/bhat-puja
+                className="px-8 py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition shadow-md flex items-center gap-2 text-sm inline-flex"
               >
-                {language === "hi" ? "विवाह हेतु बुकिंग करें" : "Book Marriage Service"} <ArrowRight size={18} />
-              </button>
+                {language === "hi" ? "विवाह हेतु बुकिंग करें" : "Book Marriage Service"}
+                <ArrowRight size={18} />
+              </Link>
             </div>
           </div>
         </div>

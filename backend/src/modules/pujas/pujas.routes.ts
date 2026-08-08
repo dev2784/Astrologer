@@ -150,4 +150,21 @@ export async function pujaRoutes(server: FastifyInstance) {
       return reply.code(400).send({ error: 'Failed to delete puja.' });
     }
   });
+
+  // 6. GET Puja by Slug
+  server.get('/slug/:slug', async (request, reply) => {
+    const { slug } = request.params as { slug: string };
+
+    try {
+      const puja = await prisma.puja.findUnique({
+        where: { slug },
+        include: { category: true, subcategory: true, faqs: true },
+      });
+
+      if (!puja) return reply.code(404).send({ error: 'Puja not found' });
+      return reply.send({ puja });
+    } catch (error) {
+      return reply.code(500).send({ error: 'Internal Server Error' });
+    }
+});
 }
