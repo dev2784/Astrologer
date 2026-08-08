@@ -70,7 +70,7 @@ export default function AdminAboutPage() {
         const uploadData = new FormData();
         uploadData.append("file", file);
 
-        const uploadRes = await fetch(`${API_URL}/upload`, {
+        const uploadRes = await fetch(`${API_URL}/uploads`, {
           method: "POST",
           body: uploadData,
         });
