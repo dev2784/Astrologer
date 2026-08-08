@@ -28,7 +28,7 @@ export default function AdminAboutPage() {
 
   const fetchAboutDetails = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/about`);
+      const res = await fetch(`${API_URL}/about`);
       const data = await res.json();
       if (data.success && data.about) {
         setFormData({
@@ -82,7 +82,7 @@ export default function AdminAboutPage() {
       }
 
       // 2. Save Updated Details
-      const res = await fetch(`${API_URL}/api/about`, {
+      const res = await fetch(`${API_URL}/about`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

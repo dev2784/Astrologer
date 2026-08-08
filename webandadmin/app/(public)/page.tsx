@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { 
   Calendar, Phone, Flame, Users, Star, ArrowRight, 
   MessageCircle, Clock, BookOpen, ChevronRight, Sunrise, Sunset,
-  CheckCircle2, Image as ImageIcon, X, ChevronLeft, ChevronRight
+  CheckCircle2, Image as ImageIcon, X, ChevronLeft
 } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
@@ -92,7 +92,7 @@ export default function HomePage() {
 
   useEffect(() => {
   // Fetch Dynamic About Data
-  fetch(`${API_URL}/api/about`)
+  fetch(`${API_URL}/about`)
     .then((res) => res.json())
     .then((data) => {
       if (data.success && data.about) setAboutData(data.about);
