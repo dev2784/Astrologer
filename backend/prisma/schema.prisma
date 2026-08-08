@@ -158,3 +158,15 @@ model Gallery {
 
   @@index([isFeatured])
 }
+
+model AboutSection {
+  id              String   @id @default("default_about")
+  name            String   @default("Acharya Rishi Nagar Ji")
+  image           String?
+  descriptionEn   String   @db.Text
+  descriptionHi   String?  @db.Text
+  yearsExp        Int      @default(20)
+  pujasDone       Int      @default(5000)
+  whatsappNo      String   @default("919340553012")
+  updatedAt       DateTime @updatedAt
+}

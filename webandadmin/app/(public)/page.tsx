@@ -27,6 +27,16 @@ interface FeaturedReview {
   createdAt: string;
 }
 
+interface about {
+  name: string;
+  image: string;
+  yearsExp: number;
+  pujasDone: number;
+  whatsappNo: string;
+  descriptionEn: string;
+  descriptionHi: string;
+}
+
 export default function HomePage() {
   const { language, t } = useLanguage();
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -34,6 +44,16 @@ export default function HomePage() {
 
   // Lightbox State
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  const [aboutData, setAboutData] = useState<about>({
+  name: "Acharya Rishi Nagar Ji",
+  image: "./pandit-logo.png",
+  yearsExp: 20,
+  pujasDone: 5000,
+  whatsappNo: "919340553012",
+  descriptionEn: "Educated from the prestigious Gurukuls of Ujjain, Acharya Ji holds over 20 years of profound experience in Vedic rituals...",
+  descriptionHi: "उज्जैन के प्रतिष्ठित गुरुकुल से शिक्षित, आचार्य जी को वैदिक अनुष्ठान...",
+});
   
   // Panchang State
   const [panchang, setPanchang] = useState<any>(null);
@@ -69,6 +89,16 @@ export default function HomePage() {
       })
       .catch(err => console.error("Gallery error:", err));
   }, [API_URL]);
+
+  useEffect(() => {
+  // Fetch Dynamic About Data
+  fetch(`${API_URL}/api/about`)
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success && data.about) setAboutData(data.about);
+    })
+    .catch((err) => console.error("About fetch error:", err));
+}, [API_URL]);
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
@@ -427,65 +457,69 @@ export default function HomePage() {
       {/* 3. ABOUT PANDIT JI SECTION (With Direct WhatsApp CTA) */}
       {/* ================================================================= */}
       <section className="py-20 bg-slate-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row gap-12 items-center bg-white p-8 md:p-12 rounded-3xl shadow-lg border border-slate-200">
-            <div className="w-full md:w-2/5 flex justify-center relative">
-              <div className="w-64 h-64 md:w-80 md:h-80 bg-orange-200 rounded-full border-8 border-orange-50 overflow-hidden shadow-xl relative">
-                <img 
-                  src="./pandit-logo.png" 
-                  alt="Pandit Ji" 
-                  className="w-full h-full object-fill"
-                />
-              </div>
-              <div className="absolute -bottom-4 right-1/4 bg-orange-600 text-white p-3 rounded-full shadow-lg">
-                <Star className="w-6 h-6 fill-current" />
-              </div>
-            </div>
+  <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col md:flex-row gap-12 items-center bg-white p-8 md:p-12 rounded-3xl shadow-lg border border-slate-200">
+      
+      {/* Profile Image */}
+      <div className="w-full md:w-2/5 flex justify-center relative">
+        <div className="w-64 h-64 md:w-80 md:h-80 bg-orange-200 rounded-full border-8 border-orange-50 overflow-hidden shadow-xl relative">
+          <img 
+            src={aboutData.image || "./pandit-logo.png"} 
+            alt={aboutData.name} 
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="absolute -bottom-4 right-1/4 bg-orange-600 text-white p-3 rounded-full shadow-lg">
+          <Star className="w-6 h-6 fill-current" />
+        </div>
+      </div>
 
-            <div className="w-full md:w-3/5 text-center md:text-left space-y-6">
-              <span className="text-orange-600 font-bold tracking-wider uppercase text-sm">
-                {language === "hi" ? "हमारे बारे में" : "About Us"}
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900">
-                Acharya Rishi Nagar Ji
-              </h2>
-              <div className="w-16 h-1 bg-orange-500 mx-auto md:mx-0"></div>
-              <p className="text-slate-600 text-lg leading-relaxed">
-                {language === "hi" 
-                  ? "उज्जैन के प्रतिष्ठित गुरुकुल से शिक्षित, आचार्य जी को वैदिक अनुष्ठान, ज्योतिष, वास्तु शास्त्र और कर्मकांड में 20 से अधिक वर्षों का गहन अनुभव है। हमारा उद्देश्य प्राचीन वैदिक परंपराओं को पूर्ण शुद्धता और प्रामाणिकता के साथ आपके जीवन में लाना है।"
-                  : "Educated from the prestigious Gurukuls of Ujjain, Acharya Ji holds over 20 years of profound experience in Vedic rituals, Astrology, Vastu Shastra, and Karmakand. Our mission is to bring ancient Vedic traditions into your life with absolute purity and authenticity."}
-              </p>
+      {/* Profile Details */}
+      <div className="w-full md:w-3/5 text-center md:text-left space-y-6">
+        <span className="text-orange-600 font-bold tracking-wider uppercase text-sm">
+          {language === "hi" ? "हमारे बारे में" : "About Us"}
+        </span>
+        <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900">
+          {aboutData.name}
+        </h2>
+        <div className="w-16 h-1 bg-orange-500 mx-auto md:mx-0"></div>
+        <p className="text-slate-600 text-lg leading-relaxed">
+          {language === "hi" && aboutData.descriptionHi 
+            ? aboutData.descriptionHi 
+            : aboutData.descriptionEn}
+        </p>
 
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
-                <div className="text-center md:text-left">
-                  <h4 className="text-3xl font-bold text-orange-600">20+</h4>
-                  <p className="text-sm text-slate-500 font-medium">Years Experience</p>
-                </div>
-                <div className="text-center md:text-left">
-                  <h4 className="text-3xl font-bold text-orange-600">5000+</h4>
-                  <p className="text-sm text-slate-500 font-medium">Pujas Performed</p>
-                </div>
-              </div>
-
-              {/* Direct WhatsApp Connect Button */}
-              <div className="pt-2">
-                <a
-                  href={`https://wa.me/${currentWHNumber}?text=Hari%20Om%20Acharya%20Ji!%20I%20want%20to%20consult%20regarding%20a%20Puja.`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition text-sm"
-                >
-                  <MessageCircle size={20} />
-                  <span>
-                    {language === "hi" ? "आचार्य जी से सीधे व्हाट्सएप पर बात करें" : "Connect with Acharya Ji directly on WhatsApp"}
-                  </span>
-                </a>
-              </div>
-
-            </div>
+        {/* Dynamic Stats */}
+        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+          <div className="text-center md:text-left">
+            <h4 className="text-3xl font-bold text-orange-600">{aboutData.yearsExp}+</h4>
+            <p className="text-sm text-slate-500 font-medium">Years Experience</p>
+          </div>
+          <div className="text-center md:text-left">
+            <h4 className="text-3xl font-bold text-orange-600">{aboutData.pujasDone}+</h4>
+            <p className="text-sm text-slate-500 font-medium">Pujas Performed</p>
           </div>
         </div>
-      </section>
+
+        {/* Dynamic WhatsApp Button */}
+        <div className="pt-2">
+          <a
+            href={`https://wa.me/${aboutData.whatsappNo || "919340553012"}?text=Hari%20Om%20Acharya%20Ji!%20I%20want%20to%20consult%20regarding%20a%20Puja.`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition text-sm"
+          >
+            <MessageCircle size={20} />
+            <span>
+              {language === "hi" ? "आचार्य जी से सीधे व्हाट्सएप पर बात करें" : "Connect with Acharya Ji directly on WhatsApp"}
+            </span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* ================================================================= */}
       {/* 4. PANCHANG & CHOGHADIYA SECTION */}
