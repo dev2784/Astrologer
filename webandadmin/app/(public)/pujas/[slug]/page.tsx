@@ -62,8 +62,13 @@ export default function PublicPujaDetailPage() {
       .catch((err) => console.error("Error fetching puja detail:", err))
       .finally(() => setLoading(false));
 
+    
+  }, [slug]);
+
+  useEffect(() => {
+    if (!puja.id) return;
     // 2. Fetch Review Summary Stats for Micro Badge
-    fetch(`${apiBase}/api/reviews/puja/${id}`)
+    fetch(`${apiBase}/api/reviews/puja/${puja.id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
@@ -74,7 +79,7 @@ export default function PublicPujaDetailPage() {
         }
       })
       .catch((err) => console.error("Error fetching review summary:", err));
-  }, [slug]);
+  },[puja.id])
 
   if (loading) {
     return (
