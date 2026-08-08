@@ -160,7 +160,7 @@ export default function HomePage() {
               <img 
                 src="/vastu.png" 
                 alt="Vastu Shanti Puja" 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-fill"
               />
             </div>
             <div className="space-y-6">
@@ -235,7 +235,7 @@ export default function HomePage() {
               <img 
                 src="./yagya.png" 
                 alt="Vedic Pujan" 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-fill"
               />
             </div>
           </div>
@@ -250,7 +250,7 @@ export default function HomePage() {
               <img 
                 src="./mangal.png" 
                 alt="Mangal Dosh Shanti" 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-fill"
               />
             </div>
             <div className="space-y-6">
@@ -323,9 +323,9 @@ export default function HomePage() {
             </div>
             <div className="relative h-80 sm:h-96 rounded-3xl overflow-hidden shadow-lg border border-slate-200 order-1 md:order-2">
               <img 
-                src="./kalsarp" 
+                src="./kalsarp.png" 
                 alt="Kalsarp Puja" 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-fill"
               />
             </div>
           </div>
@@ -340,7 +340,7 @@ export default function HomePage() {
               <img 
                 src="./vivah.png" 
                 alt="Vivah Sanskar" 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-fill"
               />
             </div>
             <div className="space-y-6">
@@ -388,7 +388,7 @@ export default function HomePage() {
                 <img 
                   src="./pandit-logo.png" 
                   alt="Pandit Ji" 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-fill"
                 />
               </div>
               <div className="absolute -bottom-4 right-1/4 bg-orange-600 text-white p-3 rounded-full shadow-lg">
