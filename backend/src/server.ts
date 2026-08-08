@@ -11,7 +11,7 @@ import { bookingRoutes } from "./modules/bookings/booking.routes";
 import { muhuratRoutes } from "./modules/muhurat/muhurat.routes";
 import { panchangRoutes } from "./modules/panchang/panchang.routes";
 import { reviewRoutes } from './modules/review/review.routes';
-import { galleryRoutes } from './routes/gallery.routes';
+import { galleryRoutes } from './modules/gallery/gallery.routes';
 
 import fastifyMultipart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static';
