@@ -141,6 +141,14 @@ export default function Navbar() {
             <Link href="/panchang" className="hover:text-orange-600 transition">
               {t("nav.panchang")}
             </Link>
+
+
+            <Link
+              href="/gallery"
+              className="hover:text-orange-600 transition
+            >
+              {language === "hi" ? "गैलरी" : "Gallery"}
+            </Link>
             <Link href="/contact" className="hover:text-orange-600 transition">
               {t("nav.contact")}
             </Link>
@@ -257,6 +265,16 @@ export default function Navbar() {
               className="block py-2 text-base font-semibold text-stone-800 hover:text-orange-600"
             >
               {language === "hi" ? "गैलरी" : "Gallery"}
+            </Link>
+            <Link href="/muhurat" onClick={closeMobileMenu} className="block py-2 text-base font-semibold text-stone-800 hover:text-orange-600">
+              {t("nav.muhurat")}
+            </Link>
+            <Link href="/panchang" onClick={closeMobileMenu} className="block py-2 text-base font-semibold text-stone-800 hover:text-orange-600">
+              {t("nav.panchang")}
+            </Link>
+            
+            <Link href="/contact" onClick={closeMobileMenu} className="block py-2 text-base font-semibold text-stone-800 hover:text-orange-600">
+              {t("nav.contact")}
             </Link>
 
             {/* Mobile Full-width CTA */}
