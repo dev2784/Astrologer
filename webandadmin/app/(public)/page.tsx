@@ -158,7 +158,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="relative h-80 sm:h-96 rounded-3xl overflow-hidden shadow-lg border border-slate-200">
               <img 
-                src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80" 
+                src="/vastu.png" 
                 alt="Vastu Shanti Puja" 
                 className="w-full h-full object-cover"
               />
@@ -233,7 +233,7 @@ export default function HomePage() {
             </div>
             <div className="relative h-80 sm:h-96 rounded-3xl overflow-hidden shadow-lg border border-slate-200 order-1 md:order-2">
               <img 
-                src="https://images.unsplash.com/photo-1609342122563-a43ac8917a3a?auto=format&fit=crop&w=1000&q=80" 
+                src="./yagya.png" 
                 alt="Vedic Pujan" 
                 className="w-full h-full object-cover"
               />
@@ -248,7 +248,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="relative h-80 sm:h-96 rounded-3xl overflow-hidden shadow-lg border border-slate-200">
               <img 
-                src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1000&q=80" 
+                src="./mangal.png" 
                 alt="Mangal Dosh Shanti" 
                 className="w-full h-full object-cover"
               />
@@ -323,7 +323,7 @@ export default function HomePage() {
             </div>
             <div className="relative h-80 sm:h-96 rounded-3xl overflow-hidden shadow-lg border border-slate-200 order-1 md:order-2">
               <img 
-                src="https://images.unsplash.com/photo-1620067925093-801122ac1408?auto=format&fit=crop&w=1000&q=80" 
+                src="./kalsarp" 
                 alt="Kalsarp Puja" 
                 className="w-full h-full object-cover"
               />
@@ -338,7 +338,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="relative h-80 sm:h-96 rounded-3xl overflow-hidden shadow-lg border border-slate-200">
               <img 
-                src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1000&q=80" 
+                src="./vivah.png" 
                 alt="Vivah Sanskar" 
                 className="w-full h-full object-cover"
               />
