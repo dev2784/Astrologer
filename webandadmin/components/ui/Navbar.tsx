@@ -145,7 +145,7 @@ export default function Navbar() {
 
             <Link
               href="/gallery"
-              className="hover:text-orange-600 transition
+              className="hover:text-orange-600 transition"
             >
               {language === "hi" ? "गैलरी" : "Gallery"}
             </Link>
