@@ -66,7 +66,7 @@ export default function PublicPujaDetailPage() {
   }, [slug]);
 
   useEffect(() => {
-    if (!puja.id) return;
+    if (!puja?.id) return;
     // 2. Fetch Review Summary Stats for Micro Badge
     fetch(`${apiBase}/api/reviews/puja/${puja.id}`)
       .then((res) => res.json())
@@ -79,7 +79,7 @@ export default function PublicPujaDetailPage() {
         }
       })
       .catch((err) => console.error("Error fetching review summary:", err));
-  },[puja.id])
+  },[puja])
 
   if (loading) {
     return (
