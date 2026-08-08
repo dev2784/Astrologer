@@ -30,7 +30,7 @@ export default function AdminGalleryPage() {
 
   const fetchGallery = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/gallery`);
+      const res = await fetch(`${API_URL}/gallery`);
       const data = await res.json();
       if (data.success) setItems(data.items);
     } catch (err) {
@@ -59,7 +59,7 @@ export default function AdminGalleryPage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const uploadRes = await fetch(`${API_URL}/upload`, {
+      const uploadRes = await fetch(`${API_URL}/uploads`, {
         method: "POST",
         body: formData,
       });
@@ -70,7 +70,7 @@ export default function AdminGalleryPage() {
       }
 
       // 2. Save Gallery record to Database
-      const saveRes = await fetch(`${API_URL}/api/gallery`, {
+      const saveRes = await fetch(`${API_URL}/gallery`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -103,7 +103,7 @@ export default function AdminGalleryPage() {
     if (!confirm("Are you sure you want to delete this photo?")) return;
 
     try {
-      const res = await fetch(`${API_URL}/api/gallery/${id}`, { method: "DELETE" });
+      const res = await fetch(`${API_URL}/gallery/${id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
         setItems(items.filter(item => item.id !== id));
