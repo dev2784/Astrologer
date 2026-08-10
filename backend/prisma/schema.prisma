@@ -14,13 +14,16 @@ enum Role {
 }
 
 model User {
-  id       String @id @default(uuid())
-  email    String @unique
-  password String // This will store the hashed password, never plain text
-  role     Role   @default(USER)
-
+  id        String   @id @default(uuid())
+  name      String?
+  email     String?  @unique
+  phone     String?  @unique
+  password  String?
+  googleId  String?  @unique
+  avatar    String?
+  role      Role     @default(USER)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt  
   reviews   Review[]
 }
 
