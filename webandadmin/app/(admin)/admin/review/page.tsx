@@ -46,7 +46,7 @@ export default function AdminReviewsPage() {
     const newStatus = !currentStatus;
 
     try {
-      const res = await fetch(`${API_URL}/api/reviews/admin/${id}/status`, {
+      const res = await fetch(`${API_URL}/reviews/admin/${id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isApproved: newStatus }),
@@ -70,7 +70,7 @@ export default function AdminReviewsPage() {
 
     setActionLoadingId(id);
     try {
-      const res = await fetch(`${API_URL}/api/reviews/admin/${id}`, {
+      const res = await fetch(`${API_URL}/reviews/admin/${id}`, {
         method: "DELETE",
       });
 
