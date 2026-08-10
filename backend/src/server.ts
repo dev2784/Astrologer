@@ -3,7 +3,7 @@ import jwt from '@fastify/jwt';
 import cors, { fastifyCors } from '@fastify/cors'; // 1. Import the CORS plugin
 import { prisma } from './db';
 import { authRoutes } from './modules/auth/auth.routes';
-import { userRoutes } from './modules/users/users.routes';
+import { usersRoutes } from './modules/users/users.routes';
 import { categoryRoutes } from './modules/categories/categories.routes';
 import { pujaRoutes } from './modules/pujas/pujas.routes';
 import { uploadRoutes } from './modules/uploads/upload.routes';
@@ -68,7 +68,7 @@ server.register(fastifyCors, {
 
 server.register(jwt, { secret: 'super_secret_development_string_123' });
 server.register(authRoutes, { prefix: '/auth' });
-server.register(userRoutes, { prefix: '/users' });
+server.register(usersRoutes, { prefix: '/users' });
 server.register(categoryRoutes, { prefix: '/categories' });
 server.register(pujaRoutes, { prefix: '/pujas' });
 server.register(uploadRoutes, { prefix: '/uploads' });
