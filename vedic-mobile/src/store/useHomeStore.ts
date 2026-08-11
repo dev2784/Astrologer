@@ -1,12 +1,17 @@
 import { create } from 'zustand';
 import { api } from '../utils/api';
 
-interface HomeState {
-  todayPanchang: any | null;
+export interface HomeState {
+  todayPanchang: any;
   todayMuhurats: any[];
   featuredPujas: any[];
+  
+  // Updated to match your exact web API payloads
+  gallery: Array<{ id: string; titleEn: string; titleHi?: string; imageUrl: string }>;
+  reviews: Array<{ id: string; userName: string; userCity?: string; rating: number; comment: string; createdAt: string }>;
+  aboutInfo: { name: string; image: string; yearsExp: number; pujasDone: number; whatsappNo: string; descriptionEn: string; descriptionHi: string } | null;
+  
   isLoading: boolean;
-  error: string | null;
   fetchHomeData: () => Promise<void>;
 }
 
@@ -14,43 +19,38 @@ export const useHomeStore = create<HomeState>((set) => ({
   todayPanchang: null,
   todayMuhurats: [],
   featuredPujas: [],
-  isLoading: false,
-  error: null,
+  gallery: [],
+  reviews: [],
+  aboutInfo: null,
+  isLoading: true,
 
   fetchHomeData: async () => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true });
     try {
-      // Get today's date in YYYY-MM-DD
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = String(now.getMonth() + 1).padStart(2, "0");
-      const day = String(now.getDate()).padStart(2, "0");
-      const todayStr = `${year}-${month}-${day}`;
+      const today = new Date().toISOString().split("T")[0];
 
-      // Parallel API calls for fast home loading
-      const [panchangRes, muhuratRes] = await Promise.allSettled([
-        api.get(`/panchang?date=${todayStr}`),
-        api.get(`/muhurat?date=${todayStr}`)
+      // Fire all API requests at the same time using Promise.allSettled to prevent one failure from breaking the whole screen
+      const [panchangRes, pujasRes, galleryRes, aboutRes, reviewsRes] = await Promise.allSettled([
+        api.get(`/panchang?date=${today}`),
+        api.get(`/pujas`),
+        api.get(`/gallery`),
+        api.get(`/about`),
+        api.get(`/reviews/admin/all?status=approved`) 
       ]);
 
-      const panchangData = panchangRes.status === 'fulfilled' ? panchangRes.value.data?.data : null;
-      const muhuratData = muhuratRes.status === 'fulfilled' ? (muhuratRes.value.data?.muhurats || []) : [];
-
-      // Sample featured pujas (Replace with your API route when available)
-      const mockPujas = [
-        { id: '1', title: 'Mangal Dosh Nivaran Puja', location: 'Mangalnath Mandir, Ujjain', tag: 'Most Popular' },
-        { id: '2', title: 'Kalsarp Dosh Shanti', location: 'Ram Ghat, Ujjain', tag: 'High Demand' },
-        { id: '3', title: 'Maha Mrityunjay Jaap', location: 'Mahakaleshwar Temple, Ujjain', tag: 'Auspicious' },
-      ];
-
       set({
-        todayPanchang: panchangData,
-        todayMuhurats: muhuratData,
-        featuredPujas: mockPujas,
+        // Extract data safely, falling back to empty/null if an endpoint fails
+        todayPanchang: panchangRes.status === 'fulfilled' ? panchangRes.value.data?.data || null : null,
+        featuredPujas: pujasRes.status === 'fulfilled' ? (pujasRes.value.data?.pujas || pujasRes.value.data || []).slice(0, 10) : [],
+        gallery: galleryRes.status === 'fulfilled' && galleryRes.value.data.success ? galleryRes.value.data.items : [],
+        aboutInfo: aboutRes.status === 'fulfilled' && aboutRes.value.data.success ? aboutRes.value.data.about : null,
+        reviews: reviewsRes.status === 'fulfilled' && reviewsRes.value.data.reviews ? reviewsRes.value.data.reviews.slice(0, 10) : [],
         isLoading: false,
       });
-    } catch (err: any) {
-      set({ error: err.message || 'Failed to load home data', isLoading: false });
+
+    } catch (error) {
+      console.error("Failed to fetch home data:", error);
+      set({ isLoading: false });
     }
   },
 }));

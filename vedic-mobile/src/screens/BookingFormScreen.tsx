@@ -9,6 +9,8 @@ import { api } from '../utils/api';
 import { HomeStackParamList } from '../navigation/types';
 import { useAuthStore } from '../store/useAuthStore';
 
+
+
 type BookingFormRouteProp = RouteProp<HomeStackParamList, 'BookingForm'>;
 type NavigationProp = NativeStackNavigationProp<HomeStackParamList, 'BookingForm'>;
 
@@ -19,7 +21,7 @@ export default function BookingFormScreen() {
   const { pujaId, categoryId, subcategoryId } = route.params;
 
   // 1. Pull user authentication state
-  const { userToken, userData } = useAuthStore();
+  const { userToken, userData, setRedirect } = useAuthStore();
 
   // 2. Form State (Only Address and Date remain)
   const [address, setAddress] = useState('');
@@ -87,7 +89,16 @@ export default function BookingFormScreen() {
         
         <TouchableOpacity 
           className="bg-orange-600 w-full py-4 rounded-xl flex-row items-center justify-center shadow-sm"
-          onPress={() => navigation.navigate('Account' as any)} // Redirects to the Account tab which holds AuthScreen
+          onPress={() => {
+            // SAVE THE RETURN PATH BEFORE LEAVING
+            setRedirect({
+              tab: 'Pujas', // The name of the Tab in AppNavigator
+              screen: 'BookingForm', // The name of the Screen inside PujaFlowStack
+              params: route.params, // Passes pujaId, categoryId, etc.
+            });
+            // Send them to the login tab
+            navigation.navigate('Account' as any);
+          }}
         >
           <LogIn size={20} color="#ffffff" />
           <Text className="text-white font-bold text-lg ml-2">Go to Login</Text>

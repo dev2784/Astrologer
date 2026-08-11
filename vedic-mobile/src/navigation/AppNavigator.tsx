@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Home, Calendar, CalendarClock, Flame, User } from 'lucide-react-native';
+import { Home, Calendar, CalendarClock, Flame, User, Mail } from 'lucide-react-native';
 
 import { HomeStackParamList } from './types';
 import { useAuthStore } from '../store/useAuthStore'; 
@@ -16,23 +16,33 @@ import BookingFormScreen from '../screens/BookingFormScreen';
 import MuhuratScreen from '../screens/MuhuratScreen';
 import PujasScreen from '../screens/PujasScreen';
 import AuthScreen from '../screens/AuthScreen'; 
+import ProfileScreen from '../screens/ProfileScreen';
+import ContactScreen from '../screens/ContactScreen';
+import WriteReviewScreen from '../screens/WriteReviewScreen';
 
-// --- Mock Profile Screen (Create this file later) ---
-const ProfileScreen = () => {
-  const { userData, logout } = useAuthStore();
-  return (
-    <View className="flex-1 items-center justify-center bg-stone-50">
-      <Text className="text-xl font-bold mb-4">Welcome, {userData?.name || 'User'}</Text>
-      <TouchableOpacity onPress={logout} className="bg-red-600 px-6 py-3 rounded-xl">
-        <Text className="text-white font-bold">Logout</Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
 
 const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
 const ProfileStack = createNativeStackNavigator();
+
+const HomeFlow = createNativeStackNavigator();
+
+function HomeFlowStack() {
+  return (
+    <HomeFlow.Navigator screenOptions={{ headerShown: true }}>
+      <HomeFlow.Screen 
+        name="HomeMain" 
+        component={HomeScreen} 
+        options={{ headerShown: false }} // Keep Home headerless
+      />
+      <HomeFlow.Screen 
+        name="WriteReview" 
+        component={WriteReviewScreen} 
+        options={{ title: 'Write Review', headerBackTitleVisible: false }} 
+      />
+    </HomeFlow.Navigator>
+  );
+}
 
 // 1. Existing Puja Flow
 function PujaFlowStack() {
@@ -43,6 +53,7 @@ function PujaFlowStack() {
       <HomeStack.Screen name="PujaList" component={PujaListScreen} options={({ route }) => ({ title: route.params?.title || 'Pujas' })} />
       <HomeStack.Screen name="BookingForm" component={BookingFormScreen} options={{ title: 'Book Puja' }} />
       <HomeStack.Screen name="PujaDetails" component={PujaDetailsScreen} options={{ title: 'Details', headerBackTitleVisible: false }} />
+    
     </HomeStack.Navigator>
   );
 }
@@ -75,7 +86,7 @@ function TabNavigator() {
     >
       <Tab.Screen 
         name="HomeTab" 
-        component={HomeScreen} 
+        component={HomeFlowStack}
         options={{ tabBarLabel: 'Home', tabBarIcon: ({ color, size }) => <Home color={color} size={size} /> }} 
       />
       <Tab.Screen 
@@ -93,7 +104,11 @@ function TabNavigator() {
         component={MuhuratScreen} 
         options={{ title: 'Muhurat', tabBarIcon: ({ color, size }) => <CalendarClock color={color} size={size} /> }} 
       />
-      {/* Replaced Contact with Account Tab */}
+      <Tab.Screen 
+        name="Contact" 
+        component={ContactScreen} 
+        options={{ title: 'Contact', tabBarIcon: ({ color, size }) => <Mail color={color} size={size} /> }} 
+      />
       <Tab.Screen 
         name="Account" 
         component={ProfileFlowStack} 

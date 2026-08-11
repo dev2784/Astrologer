@@ -16,7 +16,7 @@ export default function AuthPage() {
 
     try {
       // Fixed endpoint: Ensure it matches Fastify's /api/auth prefix
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/login`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
