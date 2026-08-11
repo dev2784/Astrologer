@@ -42,8 +42,8 @@ export default function MuhuratScreen() {
   };
 
   return (
-    <View className="flex-1 bg-stone-50">
-      <View className="bg-white pt-14 pb-4 px-5 flex-row justify-between items-center border-b border-slate-100 shadow-sm z-10">
+    <View className="flex-1 bg-amber-100">
+      <View className="bg-amber-300 pt-14 pb-4 px-5 flex-row justify-between items-center border-b border-slate-100 shadow-sm z-10">
         <View>
           <Text className="text-2xl font-extrabold text-slate-900 tracking-tight">Shubh Muhurat</Text>
           <Text className="text-xs text-orange-600 font-semibold tracking-wider uppercase mt-0.5">Auspicious Dates</Text>

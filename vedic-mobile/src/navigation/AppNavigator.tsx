@@ -47,7 +47,30 @@ function HomeFlowStack() {
 // 1. Existing Puja Flow
 function PujaFlowStack() {
   return (
-    <HomeStack.Navigator screenOptions={{ headerShown: true }}>
+    <HomeStack.Navigator screenOptions={{ 
+    headerShown: true,
+    
+    // 1. HEADER BACKGROUND COLOR
+    headerStyle: {
+      backgroundColor: '#ffc864', // Example: Orange background
+    },
+    
+    // 2. HEADER TEXT & BACK BUTTON COLOR
+    headerTintColor: '#ffffff', // Example: White text and back arrows
+    
+    // 3. HEADER TITLE FONT STYLING (Optional, for specific text tweaks)
+    headerTitleStyle: {
+      fontWeight: 'bold',
+      fontSize: 18,
+    },
+
+    // 4. SCREEN BACKGROUND COLOR (The actual page content below the header)
+    // Note: If you are using @react-navigation/native-stack use 'contentStyle'
+    // If you are using @react-navigation/stack use 'cardStyle'
+    contentStyle: {
+      backgroundColor: '#ffc864', // Example: Stone-50 background
+    }
+  }}>
       <HomeStack.Screen name="Categories" component={PujasScreen} options={{ title: 'Book a Puja' }} />
       <HomeStack.Screen name="Subcategories" component={SubcategoriesScreen} options={{ title: 'Select Option' }} />
       <HomeStack.Screen name="PujaList" component={PujaListScreen} options={({ route }) => ({ title: route.params?.title || 'Pujas' })} />
@@ -79,9 +102,9 @@ function TabNavigator() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#ea580c',
-        tabBarInactiveTintColor: '#64748b',
-        tabBarStyle: { paddingBottom: 5, height: 60 },
+        tabBarActiveTintColor: '#ffffff',
+        tabBarInactiveTintColor: '#f7f7f7',
+        tabBarStyle: { paddingBottom: 5, height: 60, backgroundColor: 'orange'},
       }}
     >
       <Tab.Screen 

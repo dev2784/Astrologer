@@ -120,7 +120,7 @@ export default function HomePage() {
       .finally(() => setLoadingPujas(false));
 
     // 3. Fetch Featured Approved Reviews
-    fetch(`${API_URL}/api/reviews/admin/all?status=approved`)
+    fetch(`${API_URL}/reviews/admin/all?status=approved`)
       .then(res => res.json())
       .then(data => {
         if (data.reviews) setReviews(data.reviews.slice(0, 10));

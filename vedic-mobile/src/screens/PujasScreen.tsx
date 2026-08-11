@@ -41,7 +41,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <View className="flex-1 bg-stone-50 px-4 pt-4">
+    <View className="flex-1 bg-amber-100 px-4 pt-4">
       <Text className="text-2xl font-bold text-slate-800 mb-4">What are you looking for?</Text>
       
       <FlatList

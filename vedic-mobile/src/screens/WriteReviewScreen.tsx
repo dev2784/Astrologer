@@ -50,7 +50,7 @@ export default function WriteReviewScreen() {
   // 3. HARD GUARD: If user is not logged in, block the form entirely
   if (!userToken || !userData) {
     return (
-      <View className="flex-1 bg-stone-50 items-center justify-center px-6">
+      <View className="flex-1 bg-amber-500 items-center justify-center px-6">
         <Text className="text-2xl font-black text-slate-900 mb-2 text-center">Login Required</Text>
         <Text className="text-slate-500 text-center mb-8">
           You must be logged in to share your experience.

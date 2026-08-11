@@ -29,11 +29,11 @@ export default function ProfileScreen({ navigation }: any) {
   const userInitials = userData?.name ? userData.name.charAt(0).toUpperCase() : 'U';
 
   return (
-    <ScrollView className="flex-1 bg-stone-50" showsVerticalScrollIndicator={false}>
+    <ScrollView className="flex-1 bg-amber-100" showsVerticalScrollIndicator={false}>
       
       {/* Header */}
-      <View className="px-5 pt-16 pb-6 bg-white border-b border-slate-100 shadow-sm">
-        <Text className="text-3xl font-black text-slate-900 tracking-tight">My Account</Text>
+      <View className="px-5 pt-16 pb-6 bg-amber-300 border-b border-slate-100 shadow-sm">
+        <Text className="text-3xl font-black text-white tracking-tight">My Account</Text>
       </View>
 
       <View className="px-4 pt-6 pb-12">

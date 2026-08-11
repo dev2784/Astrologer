@@ -59,19 +59,19 @@ export default function ContactScreen() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-slate-50" showsVerticalScrollIndicator={false}>
+    <ScrollView className="flex-1 bg-amber-100" showsVerticalScrollIndicator={false}>
       
       {/* 1. MAP BANNER (Tap to open native maps) */}
       <TouchableOpacity 
         activeOpacity={0.8}
         onPress={openMap}
-        className="w-full h-48 bg-slate-800 justify-center items-center"
+        className="w-full h-48 bg-amber-300 justify-center items-center"
       >
         <MapPin size={40} color="#ffffff" className="mb-2 opacity-80" />
         <Text className="text-3xl font-bold text-white tracking-widest text-center px-4">
           {language === "hi" ? "संपर्क करें" : "Contact Us"}
         </Text>
-        <Text className="text-slate-300 mt-2 font-medium">Tap to open Maps</Text>
+        <Text className="text-slate-800 mt-2 font-medium">Tap to open Maps</Text>
       </TouchableOpacity>
 
       {/* 2. CONTACT INFO SECTION */}

@@ -18,7 +18,17 @@ export const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('API Error Detected:', error?.response?.data || error.message);
+    // 1. If it's a 404 (Not Found), let the component handle the empty state silently
+    if (error.response && error.response.status === 404) {
+      return Promise.reject(error); 
+    }
+
+    // 2. Stop showing raw JSON. Extract the actual message cleanly.
+    const errorMessage = error.response?.data?.error || "Network Error";
+    
+    // Only show the alert if it's not a background fetch (optional)
+    // Alert.alert("Error", errorMessage); 
+
     return Promise.reject(error);
   }
 );

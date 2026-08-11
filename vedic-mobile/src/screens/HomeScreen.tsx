@@ -51,7 +51,7 @@ export default function HomeScreen({ navigation }: any) {
     <View className="flex-1 bg-stone-50">
       
       {/* 1. Header with Hacked Image Mask */}
-      <View className="bg-white pt-14 pb-4 px-5 flex-row justify-between items-center border-b border-slate-100 shadow-sm z-10">
+      <View className="bg-amber-500 pt-14 pb-4 px-5 flex-row justify-between items-center border-b border-slate-100 shadow-sm z-10">
         <View className="flex-1 justify-center">
           <View style={{ width: 45, height: 45, overflow: 'hidden', borderRadius: 25 }}>
             <Image 
@@ -179,7 +179,7 @@ export default function HomeScreen({ navigation }: any) {
                     <Text className="text-orange-700 font-bold text-[10px] uppercase">{puja.tag || 'विशेष पूजा'}</Text>
                   </View>
 
-                  <Text className="text-base font-bold text-slate-800 mb-1" numberOfLines={1}>{puja.title}</Text>
+                  <Text className="text-base font-bold text-slate-800 mb-1" numberOfLines={1}>{puja.titleHi}</Text>
                   
                   <View className="flex-row items-center mb-4">
                     <MapPin size={12} color="#64748b" />

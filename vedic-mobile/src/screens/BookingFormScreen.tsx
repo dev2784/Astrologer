@@ -109,7 +109,7 @@ export default function BookingFormScreen() {
 
   // 4. Authorized View: Only Address and Date
   return (
-    <ScrollView className="flex-1 bg-stone-50 px-4 pt-4" showsVerticalScrollIndicator={false}>
+    <ScrollView className="flex-1 bg-amber-500 px-4 pt-4" showsVerticalScrollIndicator={false}>
       <Text className="text-2xl font-bold text-slate-800 mb-2">Complete Booking</Text>
       
       {/* Show the user who they are booking as, since we removed the inputs */}
