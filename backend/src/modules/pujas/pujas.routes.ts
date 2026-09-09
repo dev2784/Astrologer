@@ -169,7 +169,7 @@ export async function pujaRoutes(server: FastifyInstance) {
 });
   // 2. Get pujas by subctegoryId
   server.get('/:subcategoryId', async (request, reply) => {
-    const { subcategoryId } = request.params as { id: string };
+    const { subcategoryId } = request.params as { subcategory: string };
     try {
       const puja = await prisma.puja.findMany({
         where: { subcategoryId },
