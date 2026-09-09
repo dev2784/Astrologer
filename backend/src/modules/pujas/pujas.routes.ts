@@ -167,4 +167,18 @@ export async function pujaRoutes(server: FastifyInstance) {
       return reply.code(500).send({ error: 'Internal Server Error' });
     }
 });
+  // 2. Get pujas by subctegoryId
+  server.get('/:subcategoryId', async (request, reply) => {
+    const { subcategoryId } = request.params as { id: string };
+    try {
+      const puja = await prisma.puja.findMany({
+        where: { subcategoryId },
+        include: { category: true, subcategory: true, faqs: true },
+      });
+      if (!puja) return reply.code(404).send({ error: 'Puja not found' });
+      return reply.send({ puja });
+    } catch (error) {
+      return reply.code(500).send({ error: 'Internal Server Error' });
+    }
+  });
 }
