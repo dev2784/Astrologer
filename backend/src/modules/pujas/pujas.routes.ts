@@ -154,10 +154,10 @@ export async function pujaRoutes(server: FastifyInstance) {
   // 6. GET Puja by Slug
   server.get('/slug/:slug', async (request, reply) => {
     const { slug } = request.params as { slug: string };
-
+    let updatedSlug = slug.toLowerCase();
     try {
       const puja = await prisma.puja.findUnique({
-        where: { slug.toLowerCase() },
+        where: { slug = updatedSlug },
         include: { category: true, subcategory: true, faqs: true },
       });
 
