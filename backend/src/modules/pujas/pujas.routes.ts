@@ -46,12 +46,21 @@ export async function pujaRoutes(server: FastifyInstance) {
   // 2. Get Single Puja by ID
   server.get('/:id', async (request, reply) => {
     const { id } = request.params as { id: string };
+
     try {
       const puja = await prisma.puja.findUnique({
         where: { id },
-        include: { category: true, subcategory: true, faqs: true },
+        include: {
+          category: true,
+          subcategory: true,
+          faqs: true,
+        },
       });
-      if (!puja) return reply.code(404).send({ error: 'Puja not found' });
+
+      if (!puja) {
+        return reply.code(404).send({ error: 'Puja not found' });
+      }
+
       return reply.send({ puja });
     } catch (error) {
       return reply.code(500).send({ error: 'Internal Server Error' });
@@ -167,18 +176,35 @@ export async function pujaRoutes(server: FastifyInstance) {
       return reply.code(500).send({ error: 'Internal Server Error' });
     }
 });
-  // 2. Get pujas by subctegoryId
-  server.get('/:subcategoryId', async (request, reply) => {
-    const { subcategoryId } = request.params as { subcategoryId: string };
-    try {
-      const puja = await prisma.puja.findMany({
-        where: { subcategoryId },
-        include: { category: true, subcategory: true, faqs: true },
+  // 7. Get pujas by subcategoryId
+server.get('/subcategory/:subcategoryId', async (request, reply) => {
+  const { subcategoryId } = request.params as {
+    subcategoryId: string;
+  };
+
+  try {
+    const pujas = await prisma.puja.findMany({
+      where: { subcategoryId },
+      include: {
+        category: true,
+        subcategory: true,
+        faqs: true,
+      },
+    });
+
+    if (pujas.length === 0) {
+      return reply.code(404).send({
+        error: 'No pujas found for this subcategory',
       });
-      if (!puja) return reply.code(404).send({ error: 'Puja not found' });
-      return reply.send({ puja });
-    } catch (error) {
-      return reply.code(500).send({ error: 'Internal Server Error' });
     }
-  });
+
+    return reply.send({ pujas });
+  } catch (error) {
+    console.error('Fetch pujas by subcategory error:', error);
+
+    return reply.code(500).send({
+      error: 'Internal Server Error',
+    });
+  }
+});
 }
