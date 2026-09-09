@@ -53,9 +53,9 @@ export default function PublicPujaDetailPage() {
 
   useEffect(() => {
     if (!slug) return;
-
+    let updatedSlug: string = slug.toLowerCase();
     // 1. Fetch Puja Details
-    fetch(`${apiBase}/pujas/slug/${slug.toLowerCase()}`)
+    fetch(`${apiBase}/pujas/slug/${updatedSlug}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.puja) setPuja(data.puja);
