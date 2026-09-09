@@ -157,7 +157,7 @@ export async function pujaRoutes(server: FastifyInstance) {
     let updatedSlug = slug.toLowerCase();
     try {
       const puja = await prisma.puja.findUnique({
-        where: { slug = updatedSlug },
+        where: { slug:updatedSlug },
         include: { category: true, subcategory: true, faqs: true },
       });
 
