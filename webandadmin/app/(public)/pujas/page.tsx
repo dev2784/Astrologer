@@ -79,7 +79,7 @@ function PublicPujasContent() {
                 className="group bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
               >
                 {/* Thumbnail Header */}
-                <Link href={`/pujas/${puja.titleEn}`} className="relative h-48 w-full bg-slate-100 overflow-hidden block">
+                <Link href={`/pujas/${puja.slug}`} className="relative h-48 w-full bg-slate-100 overflow-hidden block">
                   <img
                     src={puja.imageUrl || "https://images.unsplash.com/photo-1609342122563-a43ac8917a3a?auto=format&fit=crop&q=80&w=600"}
                     alt={puja.titleEn}
