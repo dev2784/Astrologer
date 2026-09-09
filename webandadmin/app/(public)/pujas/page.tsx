@@ -9,6 +9,7 @@ type Puja = {
   id: string;
   titleEn: string;
   titleHi: string;
+  slug: string;
   imageUrl?: string | null;
   estimatedTime?: string | null;
   category?: { nameEn: string; nameHi?: string } | null;
