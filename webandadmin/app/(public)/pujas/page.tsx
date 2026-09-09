@@ -32,7 +32,7 @@ function PublicPujasContent() {
     let url = `${API_URL}/pujas`;
 
     if (subcategoryId) {
-      url += `/subcategoryId=${subcategoryId}`;
+      url += `/${subcategoryId}`;
     }
 
     fetch(url)
