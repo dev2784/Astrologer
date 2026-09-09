@@ -51,11 +51,13 @@ export default function PublicPujaDetailPage() {
 
   const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
 
-  useEffect(() => {
-    if (!slug) return;
-    let updatedSlug: string = slug.toLowerCase();
-    // 1. Fetch Puja Details
-    fetch(`${apiBase}/pujas/slug/${updatedSlug}`)
+ useEffect(() => {
+  if (!slug || typeof slug !== "string") return;
+
+  const updatedSlug = slug.toLowerCase();
+
+  // 1. Fetch Puja Details
+  fetch(`${apiBase}/pujas/slug/${updatedSlug}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.puja) setPuja(data.puja);
