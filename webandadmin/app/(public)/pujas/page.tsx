@@ -99,7 +99,7 @@ function PublicPujasContent() {
                 {/* Content Body */}
                 <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                   <div className="space-y-2">
-                    <Link href={`/pujas/${puja.titleEn}`}>
+                    <Link href={`/pujas/${puja.slug}`}>
                       <h2 className="text-lg font-bold text-slate-900 group-hover:text-orange-600 transition line-clamp-1">
                         {language === "hi" && puja.titleHi ? puja.titleHi : puja.titleEn}
                       </h2>
@@ -125,7 +125,7 @@ function PublicPujasContent() {
                       {t("pujaList.yajmanLabel")}: <strong className="text-slate-800">{puja.noOfYajman}</strong>
                     </span>
                     <Link
-                      href={`/pujas/${puja.titleEn}`}
+                      href={`/pujas/${puja.slug}`}
                       className="inline-flex items-center gap-1 text-sm font-bold text-orange-600 hover:text-orange-700 transition"
                     >
                       {t("pujaList.viewDetails")} <span>→</span>
