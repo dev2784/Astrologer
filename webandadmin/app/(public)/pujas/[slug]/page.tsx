@@ -55,7 +55,7 @@ export default function PublicPujaDetailPage() {
     if (!slug) return;
 
     // 1. Fetch Puja Details
-    fetch(`${apiBase}/pujas/slug/${slug}`)
+    fetch(`${apiBase}/pujas/slug/${slug.toLowerCase()}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.puja) setPuja(data.puja);
