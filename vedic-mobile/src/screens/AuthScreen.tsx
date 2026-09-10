@@ -40,6 +40,10 @@ export default function AuthScreen({ navigation }: any) {
     return;
   }
 
+  if (isRegister && formData.password.length < 8) {
+    Alert.alert('Password too short', 'Use at least 8 characters.');
+    return;
+  }
   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   setLoading(true);
 

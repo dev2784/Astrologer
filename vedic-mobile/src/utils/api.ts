@@ -1,11 +1,7 @@
 import axios from 'axios';
 
-// Replace the XX with your actual computer's IP address when you want to test locally
-const LOCAL_URL = 'http://192.168.1.XX:8080'; 
-const PROD_URL = 'https://vedik-app.onrender.com';
-
-// We are forcing the PROD URL right now to guarantee a connection
-const BASE_URL = PROD_URL;
+// Override for local/staging builds; existing production builds keep their endpoint.
+const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'https://vedik-app.onrender.com';
 
 export const api = axios.create({
   baseURL: BASE_URL,

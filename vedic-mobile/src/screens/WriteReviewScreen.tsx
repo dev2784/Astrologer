@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { LogIn, Star } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -14,11 +14,48 @@ export default function WriteReviewScreen() {
   const { userToken, userData, setRedirect } = useAuthStore();
 
   // 2. Form State
+  const [pujas, setPujas] = useState<{ id: string; titleEn: string }[]>([]);
+  const [pujaId, setPujaId] = useState('');
+  const [loadingPujas, setLoadingPujas] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [retry, setRetry] = useState(0);
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      setLoadingPujas(true);
+      setLoadError(false);
+      try {
+        const all: { id: string; titleEn: string }[] = [];
+        let hasMore = true;
+        while (hasMore) {
+          const { data } = await api.get('/pujas', { params: { skip: all.length, take: 100 } });
+          if (!active) return;
+          all.push(...data.pujas);
+          hasMore = data.hasMore && data.pujas.length > 0;
+        }
+        if (active) setPujas(all);
+      } catch {
+        if (active) setLoadError(true);
+      } finally {
+        if (active) setLoadingPujas(false);
+      }
+    };
+    void load();
+    return () => { active = false; };
+  }, [retry]);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
+    if (!pujaId) {
+      Alert.alert('Select Puja', 'Choose the Puja you want to review.');
+      return;
+    }
+    if (!userData?.phone) {
+      Alert.alert('Phone required', 'Please log in with an account that has a phone number.');
+      return;
+    }
     if (!comment.trim()) {
       Alert.alert('Missing Field', 'Please write a comment for your review.');
       return;
@@ -28,7 +65,9 @@ export default function WriteReviewScreen() {
 
     try {
       // Adjust this endpoint to match your actual Fastify review creation route
-      await api.post('/api/reviews', {
+      await api.post('/reviews', {
+        pujaId,
+        userPhone: userData.phone,
         rating,
         comment: comment.trim(),
         userName: userData?.name, // Pulled securely from Auth state
@@ -85,6 +124,14 @@ export default function WriteReviewScreen() {
       </Text>
 
       <View className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-6">
+        <Text className="font-bold text-slate-700 mb-3">Which Puja did you attend?</Text>
+        {loadingPujas ? <ActivityIndicator /> : loadError ? (
+          <TouchableOpacity onPress={() => setRetry(value => value + 1)}><Text>Could not load Pujas. Tap to retry.</Text></TouchableOpacity>
+        ) : pujas.length === 0 ? <Text>No Pujas available to review.</Text> : pujas.map(puja => (
+          <TouchableOpacity key={puja.id} onPress={() => setPujaId(puja.id)} className="py-3 border-b border-stone-100">
+            <Text style={{ color: pujaId === puja.id ? '#ea580c' : '#334155', fontWeight: pujaId === puja.id ? 'bold' : 'normal' }}>{pujaId === puja.id ? '✓ ' : ''}{puja.titleEn}</Text>
+          </TouchableOpacity>
+        ))}
         <Text className="text-sm font-bold text-slate-700 mb-4 text-center">Tap to Rate</Text>
         
         {/* Interactive Star Rating */}

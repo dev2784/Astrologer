@@ -2,6 +2,16 @@ import { FastifyInstance } from 'fastify';
 import { prisma } from '../../db';
 
 export async function reviewRoutes(server: FastifyInstance) {
+  // Home pages use this public projection, never the private moderation API.
+  server.get('/featured', async (_request, reply) => {
+    const reviews = await prisma.review.findMany({
+      where: { isApproved: true },
+      orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
+      take: 10,
+      select: { id: true, userName: true, userCity: true, rating: true, comment: true, createdAt: true },
+    });
+    return reply.send({ success: true, reviews });
+  });
 
   // 1. GET Approved Reviews for Public (PHONE NUMBER OMITTED)
   server.get('/puja/:pujaId', async (request, reply) => {
@@ -50,6 +60,9 @@ export async function reviewRoutes(server: FastifyInstance) {
       return reply.code(400).send({ error: 'Missing required fields: pujaId, userName, userPhone, rating, and comment.' });
     }
 
+    if (!Number.isInteger(Number(rating)) || Number(rating) < 1 || Number(rating) > 5) {
+      return reply.code(400).send({ error: 'Rating must be an integer between 1 and 5.' });
+    }
     try {
       const review = await prisma.review.create({
         data: {
@@ -59,7 +72,7 @@ export async function reviewRoutes(server: FastifyInstance) {
           userCity: userCity || null,
           rating: Number(rating),
           comment,
-          userId: userId || null,
+          userId: null,
           isApproved: false,
         },
       });

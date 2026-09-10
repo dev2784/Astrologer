@@ -1,6 +1,8 @@
 "use client";
+import useSWR from "swr";
+import { adminFetch, adminJsonFetcher } from "@/lib/admin-api";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface ReviewItem {
   id: string;
@@ -19,41 +21,30 @@ interface ReviewItem {
 }
 
 export default function AdminReviewsPage() {
-  const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [statusFilter, setStatusFilter] = useState<"pending" | "approved" | "all">("pending");
-  const [loading, setLoading] = useState(true);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
 
   const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
 
-  const fetchReviews = (status: "pending" | "approved" | "all") => {
-    setLoading(true);
-    fetch(`${API_URL}/reviews/admin/all?status=${status}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.reviews) setReviews(data.reviews);
-      })
-      .catch((err) => console.error("Error fetching reviews:", err))
-      .finally(() => setLoading(false));
-  };
-
-  useEffect(() => {
-    fetchReviews(statusFilter);
-  }, [statusFilter]);
+  const { data, isLoading: loading, mutate } = useSWR<{ reviews: ReviewItem[] }>(
+    `${API_URL}/reviews/admin/all?status=${statusFilter}`, adminJsonFetcher, { shouldRetryOnError: false },
+  );
+  const reviews = data?.reviews || [];
+  const fetchReviews = () => { void mutate(); };
 
   const handleToggleStatus = async (id: string, currentStatus: boolean) => {
     setActionLoadingId(id);
     const newStatus = !currentStatus;
 
     try {
-      const res = await fetch(`${API_URL}/reviews/admin/${id}/status`, {
+      const res = await adminFetch(`${API_URL}/reviews/admin/${id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isApproved: newStatus }),
       });
 
       if (res.ok) {
-        fetchReviews(statusFilter);
+        fetchReviews();
       } else {
         alert("Failed to update review status");
       }
@@ -70,12 +61,12 @@ export default function AdminReviewsPage() {
 
     setActionLoadingId(id);
     try {
-      const res = await fetch(`${API_URL}/reviews/admin/${id}`, {
+      const res = await adminFetch(`${API_URL}/reviews/admin/${id}`, {
         method: "DELETE",
       });
 
       if (res.ok) {
-        fetchReviews(statusFilter);
+        fetchReviews();
       } else {
         alert("Failed to delete review");
       }
@@ -134,7 +125,7 @@ export default function AdminReviewsPage() {
           </div>
         ) : reviews.length === 0 ? (
           <div className="p-12 text-center text-sm font-medium text-slate-400">
-            No reviews found under the "{statusFilter}" filter.
+            No reviews found under the &quot;{statusFilter}&quot; filter.
           </div>
         ) : (
           <div className="overflow-x-auto">

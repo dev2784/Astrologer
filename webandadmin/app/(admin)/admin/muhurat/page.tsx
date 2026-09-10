@@ -1,4 +1,5 @@
 "use client";
+import { adminFetch } from "@/lib/admin-api";
 
 import { useState, useEffect } from "react";
 
@@ -25,7 +26,7 @@ export default function AdminMuhuratPage() {
 
 
   const fetchMuhurats = () => {
-    fetch(`${API_URL}/muhurat`)
+    adminFetch(`${API_URL}/muhurat`)
       .then((res) => res.json())
       .then((data) => {
         if (data.muhurats) setMuhurats(data.muhurats);
@@ -49,7 +50,7 @@ export default function AdminMuhuratPage() {
     formData.append("file", excelFile);
 
     try {
-      const res = await fetch(`${API_URL}/muhurat/bulk-upload`, {
+      const res = await adminFetch(`${API_URL}/muhurat/bulk-upload`, {
         method: "POST",
         body: formData,
       });
@@ -76,7 +77,7 @@ export default function AdminMuhuratPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/muhurat`, {
+      const res = await adminFetch(`${API_URL}/muhurat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ date, tithi, muhurat, details }),
@@ -103,7 +104,7 @@ export default function AdminMuhuratPage() {
     if (!confirm("Are you sure you want to delete this Muhurat entry?")) return;
 
     try {
-      const res = await fetch(`${API_URL}/admin/muhurat/${id}`, {
+      const res = await adminFetch(`${API_URL}/muhurat/${id}`, {
         method: "DELETE",
       });
       if (res.ok) fetchMuhurats();
@@ -114,7 +115,7 @@ export default function AdminMuhuratPage() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
-      <h1 className="text-2xl font-bold text-slate-900">Manage Today's & Upcoming Muhurat</h1>
+      <h1 className="text-2xl font-bold text-slate-900">Manage Today&apos;s &amp; Upcoming Muhurat</h1>
 
       {/* Excel Bulk Upload Card */}
       <div className="bg-amber-50/50 border border-amber-200 p-6 rounded-2xl shadow-xs">

@@ -1,11 +1,15 @@
 "use client";
+import useSWR from "swr";
+import { adminFetch, adminJsonFetcher } from "@/lib/admin-api";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+
+import type { PanchangData } from "@/lib/content-types";
 
 interface PanchangEntry {
   id: string;
   date: string;
-  data: any;
+  data: PanchangData;
 }
 
 interface ChoghadiyaSlot {
@@ -19,29 +23,20 @@ export default function AdminPanchangManager() {
   const [activeTab, setActiveTab] = useState<"list" | "excel" | "manual">("list");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [panchangList, setPanchangList] = useState<PanchangEntry[]>([]);
   const [editId, setEditId] = useState<string | null>(null);
 
   const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
 
-  const fetchList = async () => {
-    try {
-      const res = await fetch(`${API_URL}/panchang`);
-      const resData = await res.json();
-      if (resData.list) setPanchangList(resData.list);
-    } catch (err) {
-      console.error("Failed to fetch Panchang list:", err);
-    }
-  };
-
-  useEffect(() => {
-    if (activeTab === "list") fetchList();
-  }, [activeTab]);
+  const { data, mutate } = useSWR<{ list: PanchangEntry[] }>(
+    activeTab === 'list' ? `${API_URL}/panchang` : null, adminJsonFetcher, { shouldRetryOnError: false },
+  );
+  const panchangList = data?.list || [];
+  const fetchList = () => { void mutate(); };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this entry?")) return;
     try {
-      const res = await fetch(`${API_URL}/panchang/${id}`, { method: "DELETE" });
+      const res = await adminFetch(`${API_URL}/panchang/${id}`, { method: "DELETE" });
       if (res.ok) fetchList();
       else alert("Failed to delete entry.");
     } catch (err) {
@@ -91,7 +86,7 @@ export default function AdminPanchangManager() {
     }
   };
 
-  const formatTimeToString = (timeObj: any) => {
+  const formatTimeToString = (timeObj?: { hour: number; minute: number; second: number }) => {
     if (!timeObj) return "";
     return `${String(timeObj.hour || 0).padStart(2, "0")}:${String(timeObj.minute || 0).padStart(2, "0")}:${String(timeObj.second || 0).padStart(2, "0")}`;
   };
@@ -127,7 +122,7 @@ export default function AdminPanchangManager() {
     payload.append("file", file);
 
     try {
-      const res = await fetch(`${API_URL}/panchang/bulk-upload`, { method: "POST", body: payload });
+      const res = await adminFetch(`${API_URL}/panchang/bulk-upload`, { method: "POST", body: payload });
       const resData = await res.json();
       alert(resData.message || resData.error);
       if (res.ok) { setFile(null); setActiveTab("list"); }
@@ -168,7 +163,7 @@ export default function AdminPanchangManager() {
 
     try {
       const url = editId ? `${API_URL}/panchang/${editId}` : `${API_URL}/panchang`;
-      const res = await fetch(url, {
+      const res = await adminFetch(url, {
         method: editId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ date: manualDate, data: nestedJsonData }),
@@ -226,7 +221,7 @@ export default function AdminPanchangManager() {
             />
             <select 
               value={slot.type} required
-              onChange={(e) => updateChoghadiya(isDay, index, "type", e.target.value as any)}
+              onChange={(e) => updateChoghadiya(isDay, index, "type", e.target.value as ChoghadiyaSlot["type"])}
               className="w-28 border p-2 rounded text-sm outline-none focus:ring-1 focus:ring-orange-500 bg-white"
             >
               <option value="" disabled>Type</option>

@@ -1,20 +1,23 @@
 import { FastifyInstance } from 'fastify';
 import { prisma } from '../../db';
+import { cleanRichText, cleanPuja } from '../../rich-text';
 
 export async function pujaRoutes(server: FastifyInstance) {
   
   // 1. Get Pujas with search, batch loading (load more), and sorting
   server.get('/', async (request, reply) => {
-    const { search = '', skip = '0', take = '10' } = request.query as {
+    const { search = '', skip = '0', take = '10', subcategoryId } = request.query as {
       search?: string;
+      subcategoryId?: string;
       skip?: string;
       take?: string;
     };
 
-    const skipNum = parseInt(skip, 10) || 0;
-    const takeNum = parseInt(take, 10) || 10;
+    const skipNum = Math.max(0, parseInt(skip, 10) || 0);
+    const takeNum = Math.min(100, Math.max(1, parseInt(take, 10) || 10));
 
     const whereClause: any = {};
+    if (subcategoryId) whereClause.subcategoryId = subcategoryId;
     if (search && search.trim().length >= 3) {
       const term = search.trim();
       whereClause.OR = [
@@ -36,7 +39,7 @@ export async function pujaRoutes(server: FastifyInstance) {
         prisma.puja.count({ where: whereClause }),
       ]);
 
-      return reply.send({ pujas, total, hasMore: skipNum + pujas.length < total });
+      return reply.send({ pujas: pujas.map(cleanPuja), total, hasMore: skipNum + pujas.length < total });
     } catch (error) {
       console.error('Fetch pujas error:', error);
       return reply.code(500).send({ error: 'Internal Server Error' });
@@ -61,7 +64,7 @@ export async function pujaRoutes(server: FastifyInstance) {
         return reply.code(404).send({ error: 'Puja not found' });
       }
 
-      return reply.send({ puja });
+      return reply.send({ puja: cleanPuja(puja) });
     } catch (error) {
       return reply.code(500).send({ error: 'Internal Server Error' });
     }
@@ -85,9 +88,9 @@ export async function pujaRoutes(server: FastifyInstance) {
           noOfYajman: body.noOfYajman,
           estimatedTime: body.estimatedTime,
           charges: body.charges, // <--- Include charges
-          samagri: body.samagri,
-          about: body.about,
-          benefits: body.benefits,
+          samagri: cleanRichText(body.samagri),
+          about: cleanRichText(body.about),
+          benefits: cleanRichText(body.benefits),
           faqs: {
             create: (body.faqs || []).map((faq: any) => ({
               questionEn: faq.questionEn,
@@ -112,7 +115,7 @@ export async function pujaRoutes(server: FastifyInstance) {
     const body = request.body as any;
 
     try {
-      await prisma.pujaFaq.deleteMany({ where: { pujaId: id } });
+      // FAQ replacement is nested in the update: all changes commit or roll back together.
 
       const puja = await prisma.puja.update({
         where: { id },
@@ -127,10 +130,11 @@ export async function pujaRoutes(server: FastifyInstance) {
           noOfYajman: body.noOfYajman,
           estimatedTime: body.estimatedTime,
           charges: body.charges, // <--- Include charges
-          samagri: body.samagri,
-          about: body.about,
-          benefits: body.benefits,
+          samagri: cleanRichText(body.samagri),
+          about: cleanRichText(body.about),
+          benefits: cleanRichText(body.benefits),
           faqs: {
+            deleteMany: {},
             create: (body.faqs || []).map((faq: any) => ({
               questionEn: faq.questionEn,
               answerEn: faq.answerEn,
@@ -171,7 +175,7 @@ export async function pujaRoutes(server: FastifyInstance) {
       });
 
       if (!puja) return reply.code(404).send({ error: 'Puja not found' });
-      return reply.send({ puja });
+      return reply.send({ puja: cleanPuja(puja) });
     } catch (error) {
       return reply.code(500).send({ error: 'Internal Server Error' });
     }
@@ -198,7 +202,7 @@ server.get('/subcategory/:subcategoryId', async (request, reply) => {
       });
     }
 
-    return reply.send({ pujas });
+    return reply.send({ pujas: pujas.map(cleanPuja) });
   } catch (error) {
     console.error('Fetch pujas by subcategory error:', error);
 

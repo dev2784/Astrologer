@@ -1,4 +1,5 @@
 "use client";
+import { adminFetch } from "@/lib/admin-api";
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -28,7 +29,7 @@ export default function PujaDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/pujas/${id}`)
+    adminFetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/pujas/${id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.puja) setPuja(data.puja);

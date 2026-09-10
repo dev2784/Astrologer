@@ -28,7 +28,7 @@ function PublicPujasContent() {
   useEffect(() => {
     // Fix: Resolve NEXT_PUBLIC_API_BASE_URL via template string
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
-    let url = `${API_URL}/pujas`;
+    const url = `${API_URL}/pujas`;
 
     fetch(url)
       .then((res) => res.json())

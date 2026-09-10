@@ -37,7 +37,7 @@ export default function AuthPage() {
       localStorage.setItem("token", data.token);
 
       // Add the token to a browser cookie so the Next.js server can read it
-      document.cookie = `token=${data.token}; path=/; max-age=86400; SameSite=Strict`;
+      document.cookie = `token=${data.token}; path=/; max-age=86400; SameSite=Strict${window.location.protocol === "https:" ? "; Secure" : ""}`;
       
       // Redirect to the admin dashboard
       window.location.href = "/admin/dashboard";

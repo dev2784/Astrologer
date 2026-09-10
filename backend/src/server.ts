@@ -1,7 +1,9 @@
+import 'dotenv/config';
 import Fastify from 'fastify';
 import jwt from '@fastify/jwt';
 import cors, { fastifyCors } from '@fastify/cors'; // 1. Import the CORS plugin
 import { prisma } from './db';
+import { registerAuthorization } from './security';
 import { authRoutes } from './modules/auth/auth.routes';
 import { usersRoutes } from './modules/users/users.routes';
 import { categoryRoutes } from './modules/categories/categories.routes';
@@ -66,7 +68,12 @@ server.register(fastifyCors, {
   credentials: true,
 });
 
-server.register(jwt, { secret: 'super_secret_development_string_123' });
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret || jwtSecret.length < 32) {
+  throw new Error('JWT_SECRET must be configured with at least 32 random characters.');
+}
+server.register(jwt, { secret: jwtSecret, sign: { expiresIn: '1d' } });
+registerAuthorization(server, (id) => prisma.user.findUnique({ where: { id }, select: { role: true } }));
 server.register(authRoutes, { prefix: '/auth' });
 server.register(usersRoutes, { prefix: '/users' });
 server.register(categoryRoutes, { prefix: '/categories' });
@@ -86,7 +93,9 @@ server.get('/health', async (request, reply) => {
 
 // Test database route to fetch users
 server.get('/users', async (request, reply) => {
-  const users = await prisma.user.findMany();
+  const users = await prisma.user.findMany({
+    select: { id: true, name: true, email: true, phone: true, role: true, createdAt: true },
+  });
   return { data: users };
 });
 

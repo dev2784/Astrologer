@@ -1,4 +1,5 @@
 "use client";
+import { adminFetch } from "@/lib/admin-api";
 
 import { useState, useEffect } from "react";
 
@@ -32,7 +33,7 @@ export default function AdminBookingsPage() {
   // Fetch all bookings
   const fetchBookings = () => {
     setLoading(true);
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/bookings`)
+    adminFetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/bookings`)
       .then((res) => res.json())
       .then((data) => {
         if (data.bookings) setBookings(data.bookings);
@@ -58,7 +59,7 @@ export default function AdminBookingsPage() {
     console.log("Sending PATCH for ID:", id);
   
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/bookings/${id}/status`, {
+      const res = await adminFetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/bookings/${id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }), // Body ONLY carries status

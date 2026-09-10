@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import useSWR from 'swr';
+import { jsonFetcher } from '@/lib/json-fetcher';
 import { useLanguage } from "@/context/LanguageContext";
 
 interface MuhuratItem {
@@ -20,8 +22,6 @@ export default function PublicMuhuratPage() {
   // Calendar view Month/Year navigation state
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   
-  const [muhurats, setMuhurats] = useState<MuhuratItem[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
 
@@ -34,18 +34,10 @@ export default function PublicMuhuratPage() {
   };
 
   // Fetch Muhurats whenever selectedDate changes
-  useEffect(() => {
-    setLoading(true);
-    const dateStr = formatDateString(selectedDate);
-
-    fetch(`${API_URL}/muhurat?date=${dateStr}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.muhurats) setMuhurats(data.muhurats);
-      })
-      .catch((err) => console.error("Error loading Muhurats:", err))
-      .finally(() => setLoading(false));
-  }, [selectedDate, API_URL]);
+  const { data, isLoading: loading } = useSWR<{ muhurats?: MuhuratItem[] }>(
+    `${API_URL}/muhurat?date=${formatDateString(selectedDate)}`, jsonFetcher,
+  );
+  const muhurats = data?.muhurats || [];
 
   // Calendar Grid Generation Logic
   const year = currentMonth.getFullYear();

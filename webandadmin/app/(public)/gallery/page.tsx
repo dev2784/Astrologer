@@ -25,7 +25,6 @@ export default function PublicGalleryPage() {
 
   // Fetch Gallery Items
   useEffect(() => {
-    setLoading(true);
     fetch(`${API_URL}/gallery`)
       .then((res) => res.json())
       .then((data) => {
@@ -40,8 +39,8 @@ export default function PublicGalleryPage() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (lightboxIndex === null) return;
       if (e.key === "Escape") setLightboxIndex(null);
-      if (e.key === "ArrowLeft") handlePrev();
-      if (e.key === "ArrowRight") handleNext();
+      if (e.key === "ArrowLeft") setLightboxIndex(prev => prev === null ? null : (prev + galleryItems.length - 1) % galleryItems.length);
+      if (e.key === "ArrowRight") setLightboxIndex(prev => prev === null ? null : (prev + 1) % galleryItems.length);
     };
 
     window.addEventListener("keydown", handleKeyDown);

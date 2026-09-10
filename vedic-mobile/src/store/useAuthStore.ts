@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { api } from '../utils/api';
 
 interface AuthState {
   userToken: string | null;
@@ -32,6 +33,21 @@ export const useAuthStore = create<AuthState>((set) => ({
       const user = await AsyncStorage.getItem('userData');
       if (token && user) {
         set({ userToken: token, userData: JSON.parse(user), isLoading: false });
+        try {
+          const response = await api.get('/users/me', { headers: { Authorization: 'Bearer ' + token } });
+          // A concurrent logout/login must not be overwritten by this request.
+          if (await AsyncStorage.getItem('userToken') === token) {
+            await AsyncStorage.setItem('userData', JSON.stringify(response.data.user));
+            set({ userData: response.data.user });
+          }
+        } catch (error: unknown) {
+          const status = (error as { response?: { status?: number } }).response?.status;
+          if (status === 401 && await AsyncStorage.getItem('userToken') === token) {
+            await AsyncStorage.multiRemove(['userToken', 'userData']);
+            set({ userToken: null, userData: null, redirectData: null });
+          }
+          // Temporary network failures retain the cached offline session.
+        }
       } else {
         set({ isLoading: false });
       }
@@ -49,6 +65,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: async () => {
     await AsyncStorage.removeItem('userToken');
     await AsyncStorage.removeItem('userData');
-    set({ userToken: null, userData: null });
+    set({ userToken: null, userData: null, redirectData: null });
   },
 }));

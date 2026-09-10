@@ -5,7 +5,7 @@ import { api } from '../utils/api';
 
 export default function ContactScreen() {
   // TODO: Replace this with your actual mobile language store (Zustand or Context)
-  const language = "en"; // "en" or "hi"
+  const [language] = useState<'en' | 'hi'>("en"); // "en" or "hi"
 
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "" });
   const [submitStatus, setSubmitStatus] = useState<"idle" | "loading" | "success" | "error">("idle");

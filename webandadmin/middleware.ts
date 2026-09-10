@@ -1,32 +1,29 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
-  // 1. Extract the token from the incoming request cookies
+export async function middleware(request: NextRequest) {
   const token = request.cookies.get('token')?.value;
-  const { pathname } = request.nextUrl;
-
-  // 2. Define the exact path to your login page
-  const isLoginPage = pathname === '/admin';
-
-  // 3. Scenario A: User is NOT logged in but trying to access secure routes
-  if (!token && !isLoginPage) {
-    const loginUrl = new URL('/admin', request.url);
-    return NextResponse.redirect(loginUrl);
+  const isLoginPage = request.nextUrl.pathname === '/admin';
+  let isAdmin = false;
+  if (token) {
+    try {
+      const base = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8080';
+      const response = await fetch(base + '/users/me', {
+        headers: { Authorization: 'Bearer ' + token },
+        cache: 'no-store',
+        signal: AbortSignal.timeout(10000),
+      });
+      if (response.ok) isAdmin = (await response.json()).user?.role === 'ADMIN';
+    } catch {
+      // Backend unavailable: fail closed and leave the login page accessible.
+    }
   }
-
-  // 4. Scenario B: User IS logged in but trying to view the login page again
-  if (token && isLoginPage) {
-    const dashboardUrl = new URL('/admin/dashboard', request.url);
-    return NextResponse.redirect(dashboardUrl);
+  if (isAdmin && isLoginPage) return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+  if (!isAdmin) {
+    const response = isLoginPage ? NextResponse.next() : NextResponse.redirect(new URL('/admin', request.url));
+    if (token) response.cookies.delete('token');
+    return response;
   }
-
-  // 5. Otherwise, let the request proceed normally
   return NextResponse.next();
 }
-
-// 6. Define exactly which routes this middleware should run on
-export const config = {
-  // This matcher catches /admin, /admin/dashboard, /admin/users, etc.
-  matcher: ['/admin/:path*'],
-};
+export const config = { matcher: ['/admin/:path*'] };

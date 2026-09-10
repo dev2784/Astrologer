@@ -1,4 +1,5 @@
 "use client";
+import { adminFetch } from "@/lib/admin-api";
 
 import { useState, useEffect } from "react";
 import { Save, Upload, Loader2, Star, CheckCircle2 } from "lucide-react";
@@ -22,32 +23,27 @@ export default function AdminAboutPage() {
 
   const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
 
-  useEffect(() => {
-    fetchAboutDetails();
-  }, []);
 
-  const fetchAboutDetails = async () => {
-    try {
-      const res = await fetch(`${API_URL}/about`);
-      const data = await res.json();
-      if (data.success && data.about) {
-        setFormData({
-          name: data.about.name || "",
-          image: data.about.image || "",
-          yearsExp: data.about.yearsExp || 20,
-          pujasDone: data.about.pujasDone || 5000,
-          whatsappNo: data.about.whatsappNo || "919340553012",
-          descriptionEn: data.about.descriptionEn || "",
-          descriptionHi: data.about.descriptionHi || "",
-        });
-        if (data.about.image) setPreviewUrl(data.about.image);
-      }
-    } catch (err) {
-      console.error("Failed to fetch about details:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+
+  useEffect(() => {
+    let active = true;
+    adminFetch(`${API_URL}/about`)
+      .then(res => { if (!res.ok) throw new Error('Unable to load profile'); return res.json(); })
+      .then(data => {
+        if (active && data.success && data.about) {
+          setFormData({
+            name: data.about.name || '', image: data.about.image || '',
+            yearsExp: data.about.yearsExp ?? 20, pujasDone: data.about.pujasDone ?? 5000,
+            whatsappNo: data.about.whatsappNo || '919340553012',
+            descriptionEn: data.about.descriptionEn || '', descriptionHi: data.about.descriptionHi || '',
+          });
+          setPreviewUrl(data.about.image || '');
+        }
+      })
+      .catch(err => console.error('Failed to fetch about details:', err))
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [API_URL]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -70,7 +66,7 @@ export default function AdminAboutPage() {
         const uploadData = new FormData();
         uploadData.append("file", file);
 
-        const uploadRes = await fetch(`${API_URL}/uploads`, {
+        const uploadRes = await adminFetch(`${API_URL}/uploads`, {
           method: "POST",
           body: uploadData,
         });
@@ -82,7 +78,7 @@ export default function AdminAboutPage() {
       }
 
       // 2. Save Updated Details
-      const res = await fetch(`${API_URL}/about`, {
+      const res = await adminFetch(`${API_URL}/about`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

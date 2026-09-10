@@ -7,9 +7,9 @@ export async function authRoutes(server: FastifyInstance) {
 
   // 1. Unified Register Route (Supports Email and/or Phone)
   server.post('/register', async (request, reply) => {
-    const { name, email, phone, password, role } = request.body as any;
+    const { name, email, phone, password } = request.body as any;
 
-    if (!email && !phone) {
+    if ((!email && !phone) || (email && typeof email !== 'string') || (phone && typeof phone !== 'string')) {
       return reply.code(400).send({ error: 'Either email or phone number is required' });
     }
 
@@ -28,10 +28,13 @@ export async function authRoutes(server: FastifyInstance) {
         return reply.code(400).send({ error: 'User with this email or phone already exists' });
       }
 
-      const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
+      if (typeof password !== 'string' || password.length < 8 || Buffer.byteLength(password, 'utf8') > 72) {
+        return reply.code(400).send({ error: 'Password must be at least 8 characters and at most 72 bytes.' });
+      }
+      const hashedPassword = await bcrypt.hash(password, 10);
 
       // Force role to USER if registering from mobile/public (prevent admin privilege escalation)
-      const assignedRole = role === 'ADMIN' ? 'ADMIN' : 'USER';
+      const assignedRole = 'USER';
 
       const user = await prisma.user.create({
         data: {
@@ -70,6 +73,9 @@ export async function authRoutes(server: FastifyInstance) {
       return reply.code(400).send({ error: 'Email or phone is required' });
     }
 
+    if (typeof password !== 'string' || !password) {
+      return reply.code(400).send({ error: 'Password is required' });
+    }
     // Lookup user by email or phone number
     const user = await prisma.user.findFirst({
       where: {
@@ -99,56 +105,8 @@ export async function authRoutes(server: FastifyInstance) {
     });
   });
 
-  // 3. Google OAuth / Mobile Gmail Login
-  server.post('/google', async (request, reply) => {
-    const { name, email, googleId, avatar } = request.body as any;
-
-    if (!email) {
-      return reply.code(400).send({ error: 'Google email is required' });
-    }
-
-    try {
-      let user = await prisma.user.findFirst({
-        where: {
-          OR: [{ email }, { googleId: googleId || undefined }],
-        },
-      });
-
-      // Automatically register new mobile user as "USER" role
-      if (!user) {
-        user = await prisma.user.create({
-          data: {
-            name: name || null,
-            email,
-            googleId: googleId || null,
-            avatar: avatar || null,
-            role: 'USER', // Strictly locked to USER
-          },
-        });
-      } else if (googleId && !user.googleId) {
-        // Link googleId to existing account if missing
-        user = await prisma.user.update({
-          where: { id: user.id },
-          data: { googleId, avatar: avatar || user.avatar },
-        });
-      }
-
-      const token = server.jwt.sign({ userId: user.id, role: user.role });
-
-      return reply.send({
-        token,
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          role: user.role,
-        },
-      });
-    } catch (e) {
-      console.error(e);
-      return reply.code(500).send({ error: 'Google authentication failed' });
-    }
+  // Google login is not configured in either client yet. Never trust a posted email as identity.
+  server.post('/google', async (_request, reply) => {
+    return reply.code(503).send({ error: 'Google sign-in is not configured. Please use phone/email and password.' });
   });
-
 }

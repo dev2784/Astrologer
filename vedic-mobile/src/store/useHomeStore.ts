@@ -35,7 +35,7 @@ export const useHomeStore = create<HomeState>((set) => ({
         api.get(`/pujas`),
         api.get(`/gallery`),
         api.get(`/about`),
-        api.get(`/reviews/admin/all?status=approved`) 
+        api.get(`/reviews/featured`)
       ]);
 
       set({

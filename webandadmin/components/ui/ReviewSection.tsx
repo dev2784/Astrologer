@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import useSWR from "swr";
+import { jsonFetcher } from "@/lib/json-fetcher";
+import { useState } from "react";
 import { Star, Send, CheckCircle2 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -15,9 +17,6 @@ interface Review {
 
 export default function ReviewSection({ pujaId }: { pujaId: string }) {
   const { language } = useLanguage();
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [avgRating, setAvgRating] = useState<number | string>(0);
-  const [loading, setLoading] = useState(true);
 
   // Form State with userPhone included
   const [formData, setFormData] = useState({
@@ -32,24 +31,13 @@ export default function ReviewSection({ pujaId }: { pujaId: string }) {
 
   const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
 
-  useEffect(() => {
-    if (pujaId) fetchReviews();
-  }, [pujaId]);
 
-  const fetchReviews = async () => {
-    try {
-      const res = await fetch(`${API_URL}/reviews/puja/${pujaId}`);
-      const data = await res.json();
-      if (data.success) {
-        setReviews(data.reviews);
-        setAvgRating(data.avgRating);
-      }
-    } catch (err) {
-      console.error("Failed to load reviews", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+
+  const { data, isLoading: loading } = useSWR<{ reviews: Review[]; avgRating: number }>(
+    pujaId ? `${API_URL}/reviews/puja/${pujaId}` : null, jsonFetcher,
+  );
+  const reviews = data?.reviews || [];
+  const avgRating = data?.avgRating || 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

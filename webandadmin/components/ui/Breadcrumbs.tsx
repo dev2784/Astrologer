@@ -16,8 +16,8 @@ function BreadcrumbsContent() {
   const subcategoryId = searchParams.get("subcategoryId");
 
   const [categories, setCategories] = useState<Category[]>([]);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
+
+
 
   // 1. Fetch Categories ONLY ONCE when the app loads
   useEffect(() => {
@@ -32,33 +32,9 @@ function BreadcrumbsContent() {
       .catch((err) => console.error("Breadcrumb fetch error:", err));
   }, []);
 
-  // 2. React FORCEFULLY to any URL change or Data load
-  useEffect(() => {
-    // If we leave the subcategory page, reset immediately
-    if (!subcategoryId || categories.length === 0) {
-      setActiveCategory(null);
-      setActiveSubcategory(null);
-      return;
-    }
-
-    let foundCat = null;
-    let foundSub = null;
-
-    // Search the cached categories for the current URL's subcategoryId
-    for (const cat of categories) {
-      const matchedSub = cat.subcategories?.find((sub) => sub.id === subcategoryId);
-      if (matchedSub) {
-        foundCat = cat.nameEn;
-        foundSub = matchedSub.nameEn;
-        break;
-      }
-    }
-
-    // Set the new breadcrumb text
-    setActiveCategory(foundCat);
-    setActiveSubcategory(foundSub);
-
-  }, [subcategoryId, pathname, categories]); // Watches URL and data strictly
+  const matchingCategory = categories.find(cat => cat.subcategories?.some(sub => sub.id === subcategoryId));
+  const activeCategory = matchingCategory?.nameEn || null;
+  const activeSubcategory = matchingCategory?.subcategories.find(sub => sub.id === subcategoryId)?.nameEn || null;
 
   return (
     <nav className="bg-stone-100/70 border-b border-stone-200/60 py-2.5 px-4 sm:px-6 lg:px-8 text-xs font-medium text-stone-600">

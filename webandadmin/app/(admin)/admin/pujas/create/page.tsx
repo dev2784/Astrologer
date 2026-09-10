@@ -1,4 +1,5 @@
 "use client";
+import { adminFetch } from "@/lib/admin-api";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -52,7 +53,7 @@ export default function CreatePujaPage() {
   } | null>(null);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/categories`)
+    adminFetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/categories`)
       .then((res) => res.json())
       .then((data) => {
         if (data.categories) setCategories(data.categories);
@@ -78,7 +79,7 @@ export default function CreatePujaPage() {
 
     setUploading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads`, {
+      const res = await adminFetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads`, {
         method: "POST",
         body: formData,
       });
@@ -100,7 +101,7 @@ export default function CreatePujaPage() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/pujas`, {
+      const res = await adminFetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/pujas`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

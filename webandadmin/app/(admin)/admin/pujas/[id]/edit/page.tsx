@@ -1,4 +1,5 @@
 "use client";
+import { adminFetch } from "@/lib/admin-api";
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -61,8 +62,8 @@ export default function EditPujaPage() {
     async function loadInitialData() {
       try {
         const [catRes, pujaRes] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/categories`),
-          fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/pujas/${id}`),
+          adminFetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/categories`),
+          adminFetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/pujas/${id}`),
         ]);
 
         const catData = await catRes.json();
@@ -123,7 +124,7 @@ export default function EditPujaPage() {
 
     setUploadingImage(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/upload`, {
+      const res = await adminFetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads`, {
         method: "POST",
         body: formData,
       });
@@ -157,7 +158,7 @@ export default function EditPujaPage() {
     setAlertData(null);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/pujas/${id}`, {
+      const res = await adminFetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/pujas/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

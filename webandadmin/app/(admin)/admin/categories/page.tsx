@@ -1,4 +1,5 @@
 "use client";
+import { adminFetch } from "@/lib/admin-api";
 
 import { useState, useEffect } from "react";
 import { useCategories } from "@/hooks/useCategories";
@@ -78,7 +79,7 @@ export default function CategoriesPage() {
     
     const method = editingCatId ? "PUT" : "POST";
 
-    const res = await fetch(url, {
+    const res = await adminFetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
@@ -109,7 +110,7 @@ export default function CategoriesPage() {
       title: "Delete Category?",
       message: `Are you sure you want to delete "${name}"? This will permanently delete all associated subcategories.`,
       onConfirm: async () => {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/categories/${id}`, { method: "DELETE" });
+        const res = await adminFetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/categories/${id}`, { method: "DELETE" });
         if (res.ok) refreshCategories();
         closeModal();
       },
@@ -135,7 +136,7 @@ export default function CategoriesPage() {
     
     const method = editingSubId ? "PUT" : "POST";
 
-    const res = await fetch(url, {
+    const res = await adminFetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
@@ -164,7 +165,7 @@ export default function CategoriesPage() {
       title: "Delete Subcategory?",
       message: `Are you sure you want to delete "${name}"?`,
       onConfirm: async () => {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/categories/subcategories/${id}`, { method: "DELETE" });
+        const res = await adminFetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/categories/subcategories/${id}`, { method: "DELETE" });
         if (res.ok) refreshCategories();
         closeModal();
       },

@@ -1,36 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import useSWR from 'swr';
+import { jsonFetcher } from '@/lib/json-fetcher';
 import { useLanguage } from "@/context/LanguageContext";
 
-interface ChoghadiyaSlot {
-  name: string;
-  start: string;
-  end: string;
-  type: "shubh" | "ashubh" | "neutral" | "";
-}
-
-interface PanchangData {
-  day: string;
-  sunrise: string;
-  sunset: string;
-  tithi: { details: { tithi_name: string }; end_time: { hour: number; minute: number; second: number } };
-  nakshatra: { details: { nak_name: string }; end_time: { hour: number; minute: number; second: number } };
-  yog: { details: { yog_name: string } };
-  karan: { details: { karan_name: string } };
-  hindu_maah: { purnimanta: string };
-  paksha: string;
-  ritu: string;
-  ayana: string;
-  vikram_samvat: number;
-  shaka_samvat: number;
-  sun_sign: string;
-  moon_sign: string;
-  abhijit_muhurta?: { start: string; end: string };
-  rahukaal?: { start: string; end: string };
-  choghadiya_day?: ChoghadiyaSlot[];
-  choghadiya_night?: ChoghadiyaSlot[];
-}
+import type { PanchangData } from "@/lib/content-types";
 
 export default function PublicPanchangPage() {
   const { language } = useLanguage();
@@ -38,8 +13,6 @@ export default function PublicPanchangPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   
-  const [panchang, setPanchang] = useState<PanchangData | null>(null);
-  const [loading, setLoading] = useState(true);
 
   const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
 
@@ -62,25 +35,10 @@ export default function PublicPanchangPage() {
     return "bg-slate-50 text-slate-800 border-slate-200";
   };
 
-  useEffect(() => {
-    setLoading(true);
-    const dateStr = formatDateString(selectedDate);
-
-    fetch(`${API_URL}/panchang?date=${dateStr}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.data) {
-          setPanchang(data.data);
-        } else {
-          setPanchang(null);
-        }
-      })
-      .catch((err) => {
-        console.error("Error loading Panchang:", err);
-        setPanchang(null);
-      })
-      .finally(() => setLoading(false));
-  }, [selectedDate, API_URL]);
+  const { data, isLoading: loading } = useSWR<{ data?: PanchangData }>(
+    `${API_URL}/panchang?date=${formatDateString(selectedDate)}`, jsonFetcher,
+  );
+  const panchang = data?.data || null;
 
   // Calendar Logic
   const year = currentMonth.getFullYear();

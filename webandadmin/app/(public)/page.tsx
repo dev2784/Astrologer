@@ -11,6 +11,8 @@ import { useLanguage } from "@/context/LanguageContext";
 import BookingModal from "@/components/ui/BookingModal";
 
 
+import type { PanchangData, PujaSummary, ChoghadiyaSlot } from "@/lib/content-types";
+
 interface GalleryItem {
   id: string;
   titleEn: string;
@@ -56,13 +58,13 @@ export default function HomePage() {
 });
   
   // Panchang State
-  const [panchang, setPanchang] = useState<any>(null);
+  const [panchang, setPanchang] = useState<PanchangData | null>(null);
   
   // Dynamic Pujas & Reviews State
-  const [latestPujas, setLatestPujas] = useState<any[]>([]);
+  const [latestPujas, setLatestPujas] = useState<PujaSummary[]>([]);
   const [reviews, setReviews] = useState<FeaturedReview[]>([]);
   const [loadingPujas, setLoadingPujas] = useState(true);  
-  const [galleryItems, setGalleryItems] = useState<any[]>([]);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
 
   // Contact Form State
   const [formData, setFormData] = useState({ name: "", phone: "", service: "Vivah / Marriage" });
@@ -120,7 +122,7 @@ export default function HomePage() {
       .finally(() => setLoadingPujas(false));
 
     // 3. Fetch Featured Approved Reviews
-    fetch(`${API_URL}/reviews/admin/all?status=approved`)
+    fetch(`${API_URL}/reviews/featured`)
       .then(res => res.json())
       .then(data => {
         if (data.reviews) setReviews(data.reviews.slice(0, 10));
@@ -169,8 +171,8 @@ export default function HomePage() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (lightboxIndex === null) return;
       if (e.key === "Escape") setLightboxIndex(null);
-      if (e.key === "ArrowLeft") handlePrev();
-      if (e.key === "ArrowRight") handleNext();
+      if (e.key === "ArrowLeft") setLightboxIndex(prev => prev === null ? null : (prev + galleryItems.length - 1) % galleryItems.length);
+      if (e.key === "ArrowRight") setLightboxIndex(prev => prev === null ? null : (prev + 1) % galleryItems.length);
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -541,7 +543,7 @@ export default function HomePage() {
                 <Sunrise size={20} /> {language === "hi" ? "दिन का चौघड़िया" : "Day Choghadiya"}
               </h3>
               <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
-                {panchang?.choghadiya_day ? panchang.choghadiya_day.map((slot: any, i: number) => (
+                {panchang?.choghadiya_day ? panchang.choghadiya_day.map((slot: ChoghadiyaSlot, i: number) => (
                   <div key={i} className={`flex justify-between items-center p-3 rounded-lg border text-sm ${getChoghadiyaColor(slot.type)}`}>
                     <span className="font-bold">{slot.name}</span>
                     <span className="text-xs font-mono font-medium">{slot.start} - {slot.end}</span>
@@ -599,7 +601,7 @@ export default function HomePage() {
                 <Sunset size={20} /> {language === "hi" ? "रात का चौघड़िया" : "Night Choghadiya"}
               </h3>
               <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
-                {panchang?.choghadiya_night ? panchang.choghadiya_night.map((slot: any, i: number) => (
+                {panchang?.choghadiya_night ? panchang.choghadiya_night.map((slot: ChoghadiyaSlot, i: number) => (
                   <div key={i} className={`flex justify-between items-center p-3 rounded-lg border text-sm ${getChoghadiyaColor(slot.type)}`}>
                     <span className="font-bold">{slot.name}</span>
                     <span className="text-xs font-mono font-medium">{slot.start} - {slot.end}</span>
@@ -791,7 +793,7 @@ export default function HomePage() {
                       ))}
                     </div>
                     <p className="text-slate-700 text-sm leading-relaxed line-clamp-4">
-                      "{rev.comment}"
+                      &quot;{rev.comment}&quot;
                     </p>
                   </div>
 

@@ -38,7 +38,7 @@ function HomeFlowStack() {
       <HomeFlow.Screen 
         name="WriteReview" 
         component={WriteReviewScreen} 
-        options={{ title: 'Write Review', headerBackTitleVisible: false }} 
+        options={{ title: 'Write Review', headerBackButtonDisplayMode: 'minimal' }}
       />
     </HomeFlow.Navigator>
   );
@@ -75,7 +75,7 @@ function PujaFlowStack() {
       <HomeStack.Screen name="Subcategories" component={SubcategoriesScreen} options={{ title: 'Select Option' }} />
       <HomeStack.Screen name="PujaList" component={PujaListScreen} options={({ route }) => ({ title: route.params?.title || 'Pujas' })} />
       <HomeStack.Screen name="BookingForm" component={BookingFormScreen} options={{ title: 'Book Puja' }} />
-      <HomeStack.Screen name="PujaDetails" component={PujaDetailsScreen} options={{ title: 'Details', headerBackTitleVisible: false }} />
+      <HomeStack.Screen name="PujaDetails" component={PujaDetailsScreen} options={{ title: 'Details', headerBackButtonDisplayMode: 'minimal' }} />
     
     </HomeStack.Navigator>
   );

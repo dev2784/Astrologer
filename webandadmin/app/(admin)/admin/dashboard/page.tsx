@@ -46,7 +46,7 @@ export default async function DashboardPage() {
   ]);
 
   // Security fallback
-  if (!profileData || !profileData.user) {
+  if (!profileData || !profileData.user || profileData.user.role !== 'ADMIN') {
     redirect("/admin");
   }
 

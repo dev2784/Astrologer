@@ -1,6 +1,8 @@
 "use client";
+import useSWR from "swr";
+import { adminFetch, adminJsonFetcher } from "@/lib/admin-api";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Upload, Trash2, Plus, Image as ImageIcon, Loader2 } from "lucide-react";
 
 interface GalleryItem {
@@ -12,8 +14,6 @@ interface GalleryItem {
 }
 
 export default function AdminGalleryPage() {
-  const [items, setItems] = useState<GalleryItem[]>([]);
-  const [loading, setLoading] = useState(true);
   
   // Form State
   const [titleEn, setTitleEn] = useState("");
@@ -24,21 +24,13 @@ export default function AdminGalleryPage() {
 
   const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8080";
 
-  useEffect(() => {
-    fetchGallery();
-  }, []);
 
-  const fetchGallery = async () => {
-    try {
-      const res = await fetch(`${API_URL}/gallery`);
-      const data = await res.json();
-      if (data.success) setItems(data.items);
-    } catch (err) {
-      console.error("Failed to fetch gallery items", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+
+  const { data, isLoading: loading, mutate } = useSWR<{ items: GalleryItem[] }>(
+    `${API_URL}/gallery`, adminJsonFetcher, { shouldRetryOnError: false },
+  );
+  const items = data?.items || [];
+  const fetchGallery = () => { void mutate(); };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -59,7 +51,7 @@ export default function AdminGalleryPage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const uploadRes = await fetch(`${API_URL}/uploads`, {
+      const uploadRes = await adminFetch(`${API_URL}/uploads`, {
         method: "POST",
         body: formData,
       });
@@ -70,7 +62,7 @@ export default function AdminGalleryPage() {
       }
 
       // 2. Save Gallery record to Database
-      const saveRes = await fetch(`${API_URL}/gallery`, {
+      const saveRes = await adminFetch(`${API_URL}/gallery`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -91,9 +83,9 @@ export default function AdminGalleryPage() {
       } else {
         alert("Failed to save gallery entry");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      alert(err.message || "Error adding gallery item");
+      alert(err instanceof Error ? err.message : "Error adding gallery item");
     } finally {
       setUploading(false);
     }
@@ -103,10 +95,10 @@ export default function AdminGalleryPage() {
     if (!confirm("Are you sure you want to delete this photo?")) return;
 
     try {
-      const res = await fetch(`${API_URL}/gallery/${id}`, { method: "DELETE" });
+      const res = await adminFetch(`${API_URL}/gallery/${id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
-        setItems(items.filter(item => item.id !== id));
+        await mutate({ items: items.filter(item => item.id !== id) });
       }
     } catch (err) {
       console.error("Failed to delete item", err);
