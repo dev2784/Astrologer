@@ -2,8 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Home, Calendar, CalendarClock, Flame, User, Mail } from 'lucide-react-native';
-
+import { Home, Calendar, CalendarClock, Flame, User } from 'lucide-react-native';
 import { HomeStackParamList } from './types';
 import { useAuthStore } from '../store/useAuthStore'; 
 
@@ -98,44 +97,117 @@ function ProfileFlowStack() {
 
 // 3. Tab Navigator
 function TabNavigator() {
+  const tabIcon = (
+    Icon: any,
+    focused: boolean,
+    color: string
+  ) => (
+    <View
+      style={{
+        width: 34,
+        height: 34,
+        borderRadius: 17,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: focused ? '#7f1d1d' : 'transparent',
+      }}
+    >
+      <Icon
+        size={focused ? 18 : 19}
+        color={focused ? '#fff7ed' : color}
+        strokeWidth={focused ? 2.4 : 1.8}
+      />
+    </View>
+  );
+
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#ffffff',
-        tabBarInactiveTintColor: '#f7f7f7',
-        tabBarStyle: { paddingBottom: 5, height: 60, backgroundColor: 'orange'},
+
+        tabBarActiveTintColor: '#7f1d1d',
+        tabBarInactiveTintColor: '#78716c',
+
+        tabBarStyle: {
+          height: 72,
+          paddingTop: 7,
+          paddingBottom: 8,
+
+          backgroundColor: '#fffaf2',
+
+          borderTopWidth: 1,
+          borderTopColor: '#eadfce',
+
+          shadowColor: '#3f1d12',
+          shadowOffset: {
+            width: 0,
+            height: -4,
+          },
+          shadowOpacity: 0.08,
+          shadowRadius: 12,
+
+          elevation: 14,
+        },
+
+        tabBarLabelStyle: {
+          fontSize: 10,
+          fontWeight: '600',
+          marginTop: 1,
+        },
+
+        tabBarItemStyle: {
+          paddingVertical: 1,
+        },
       }}
     >
-      <Tab.Screen 
-        name="HomeTab" 
+      <Tab.Screen
+        name="HomeTab"
         component={HomeFlowStack}
-        options={{ tabBarLabel: 'Home', tabBarIcon: ({ color, size }) => <Home color={color} size={size} /> }} 
+        options={{
+          tabBarLabel: 'Home',
+          tabBarIcon: ({ focused, color }) =>
+            tabIcon(Home, focused, color),
+        }}
       />
-      <Tab.Screen 
-        name="Pujas" 
-        component={PujaFlowStack} 
-        options={{ title: 'Pujas', tabBarIcon: ({ color, size }) => <Flame color={color} size={size} /> }} 
+
+      <Tab.Screen
+        name="Pujas"
+        component={PujaFlowStack}
+        options={{
+          title: 'Pujas',
+          tabBarIcon: ({ focused, color }) =>
+            tabIcon(Flame, focused, color),
+        }}
       />
-      <Tab.Screen 
-        name="Panchang" 
-        component={PanchangScreen} 
-        options={{ tabBarIcon: ({ color, size }) => <Calendar color={color} size={size} /> }} 
+
+      <Tab.Screen
+        name="Panchang"
+        component={PanchangScreen}
+        options={{
+          title: 'Panchang',
+          tabBarIcon: ({ focused, color }) =>
+            tabIcon(Calendar, focused, color),
+        }}
       />
-      <Tab.Screen 
-        name="Muhurat" 
-        component={MuhuratScreen} 
-        options={{ title: 'Muhurat', tabBarIcon: ({ color, size }) => <CalendarClock color={color} size={size} /> }} 
+
+      <Tab.Screen
+        name="Muhurat"
+        component={MuhuratScreen}
+        options={{
+          title: 'Muhurat',
+          tabBarIcon: ({ focused, color }) =>
+            tabIcon(CalendarClock, focused, color),
+        }}
       />
-      <Tab.Screen 
-        name="Contact" 
-        component={ContactScreen} 
-        options={{ title: 'Contact', tabBarIcon: ({ color, size }) => <Mail color={color} size={size} /> }} 
-      />
-      <Tab.Screen 
-        name="Account" 
-        component={ProfileFlowStack} 
-        options={{ title: 'Account', tabBarIcon: ({ color, size }) => <User color={color} size={size} /> }} 
+
+      <Tab.Screen
+        name="Account"
+        component={ProfileFlowStack}
+        options={{
+          title: 'Account',
+          tabBarIcon: ({ focused, color }) =>
+            tabIcon(User, focused, color),
+        }}
       />
     </Tab.Navigator>
   );
