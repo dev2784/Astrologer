@@ -29,6 +29,27 @@ function readableSlug(slug: string) {
     .join(" ");
 }
 
+async function getPuja(slug: string): Promise<Puja | null> {
+  try {
+    const response = await fetch(
+      `${API_URL}/pujas/slug/${encodeURIComponent(slug)}`,
+      {
+        next: {
+          revalidate: 3600,
+        },
+      }
+    );
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+
+    return data.puja || null;
+  } catch {
+    return null;
+  }
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -39,69 +60,9 @@ export async function generateMetadata({
 
   const canonical = `/pujas/${cleanSlug}`;
 
-  try {
-    const response = await fetch(
-      `${API_URL}/pujas/slug/${encodeURIComponent(cleanSlug)}`,
-      {
-        next: {
-          revalidate: 3600,
-        },
-      }
-    );
+  const puja = await getPuja(cleanSlug);
 
-    if (!response.ok) {
-      throw new Error("Puja not found");
-    }
-
-    const data = await response.json();
-    const puja: Puja | undefined = data.puja;
-
-    if (!puja) {
-      throw new Error("Puja not found");
-    }
-
-    const title = `${puja.titleEn} in Ujjain`;
-
-    const about = cleanText(puja.about);
-
-    const description = (
-      about ||
-      `Book ${puja.titleEn} in Ujjain. Authentic Vedic puja and anushthan services with Hatkeshwar Jyotish.`
-    ).slice(0, 155);
-
-    return {
-      title,
-
-      description,
-
-      alternates: {
-        canonical,
-      },
-
-      openGraph: {
-        title: `${puja.titleEn} in Ujjain | Hatkeshwar Jyotish`,
-        description,
-        url: `${BASE_URL}${canonical}`,
-        siteName: "Hatkeshwar Jyotish",
-        type: "website",
-        images: puja.imageUrl
-          ? [
-              {
-                url: puja.imageUrl,
-                alt: `${puja.titleEn} in Ujjain`,
-              },
-            ]
-          : undefined,
-      },
-
-      twitter: {
-        card: "summary_large_image",
-        title: `${puja.titleEn} in Ujjain | Hatkeshwar Jyotish`,
-        description,
-        images: puja.imageUrl ? [puja.imageUrl] : undefined,
-      },
-    };
-  } catch {
+  if (!puja) {
     const name = readableSlug(cleanSlug);
 
     return {
@@ -112,12 +73,140 @@ export async function generateMetadata({
       },
     };
   }
+
+  const title = `${puja.titleEn} in Ujjain`;
+
+  const about = cleanText(puja.about);
+
+  const description = (
+    about ||
+    `Book ${puja.titleEn} in Ujjain. Authentic Vedic puja and anushthan services with Hatkeshwar Jyotish.`
+  ).slice(0, 155);
+
+  return {
+    title,
+
+    description,
+
+    alternates: {
+      canonical,
+    },
+
+    openGraph: {
+      title: `${puja.titleEn} in Ujjain | Hatkeshwar Jyotish`,
+      description,
+      url: `${BASE_URL}${canonical}`,
+      siteName: "Hatkeshwar Jyotish",
+      type: "website",
+      images: puja.imageUrl
+        ? [
+            {
+              url: puja.imageUrl,
+              alt: `${puja.titleEn} in Ujjain`,
+            },
+          ]
+        : undefined,
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title: `${puja.titleEn} in Ujjain | Hatkeshwar Jyotish`,
+      description,
+      images: puja.imageUrl ? [puja.imageUrl] : undefined,
+    },
+  };
 }
 
-export default function PujaLayout({
+export default async function PujaLayout({
   children,
+  params,
 }: {
   children: ReactNode;
+  params: Promise<{ slug: string }>;
 }) {
-  return children;
+  const { slug } = await params;
+  const cleanSlug = slug.toLowerCase();
+
+  const puja = await getPuja(cleanSlug);
+
+  if (!puja) {
+    return children;
+  }
+
+  const pageUrl = `${BASE_URL}/pujas/${cleanSlug}`;
+
+  const description =
+    cleanText(puja.about) ||
+    `${puja.titleEn} Puja in Ujjain with Hatkeshwar Jyotish.`;
+
+  const serviceSchema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: `${puja.titleEn} in Ujjain`,
+    description,
+    url: pageUrl,
+
+    ...(puja.imageUrl && {
+      image: puja.imageUrl,
+    }),
+
+    provider: {
+      "@type": "Organization",
+      name: "Hatkeshwar Jyotish",
+      url: BASE_URL,
+    },
+
+    areaServed: {
+      "@type": "City",
+      name: "Ujjain",
+    },
+
+    serviceType: puja.titleEn,
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: BASE_URL,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Pujas",
+        item: `${BASE_URL}/pujas`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: puja.titleEn,
+        item: pageUrl,
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(serviceSchema).replace(/</g, "\\u003c"),
+        }}
+      />
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbSchema).replace(/</g, "\\u003c"),
+        }}
+      />
+
+      {children}
+    </>
+  );
 }
