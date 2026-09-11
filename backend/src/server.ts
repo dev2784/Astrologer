@@ -55,8 +55,9 @@ server.register(fastifyCors, {
       'http://localhost:3001',
       'http://127.0.0.1:3001',
       'https://vedicapp-nine.vercel.app',
+      'https://hatkeshwarjyotish.com',
+      'https://www.hatkeshwarjyotish.com',
     ];
-
     if (allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
       return cb(null, true);
     }

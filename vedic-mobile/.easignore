@@ -1,0 +1,13 @@
+# Ignore backend and database
+backend/
+node_modules/
+
+# Ignore AI agent and IDE artifacts
+.agents/
+.claude/
+.cursor/
+.vscode/
+
+# Ignore standard build outputs
+dist/
+build/
