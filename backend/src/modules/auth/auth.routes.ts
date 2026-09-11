@@ -6,7 +6,17 @@ import { prisma } from '../../db';
 export async function authRoutes(server: FastifyInstance) {
 
   // 1. Unified Register Route (Supports Email and/or Phone)
-  server.post('/register', async (request, reply) => {
+  server.post(
+  '/register',
+  {
+    config: {
+      rateLimit: {
+        max: 5,
+        timeWindow: '10 minutes',
+      },
+    },
+  },
+  async (request, reply) => {
     const { name, email, phone, password } = request.body as any;
 
     if ((!email && !phone) || (email && typeof email !== 'string') || (phone && typeof phone !== 'string')) {
@@ -66,7 +76,17 @@ export async function authRoutes(server: FastifyInstance) {
   });
 
   // 2. Unified Login Route (Supports login via Email OR Phone)
-  server.post('/login', async (request, reply) => {
+  server.post(
+  '/login',
+  {
+    config: {
+      rateLimit: {
+        max: 5,
+        timeWindow: '1 minute',
+      },
+    },
+  },
+  async (request, reply) => {
     const { email, phone, password } = request.body as any;
 
     if (!email && !phone) {

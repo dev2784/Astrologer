@@ -2,6 +2,7 @@ import 'dotenv/config';
 import Fastify from 'fastify';
 import jwt from '@fastify/jwt';
 import cors, { fastifyCors } from '@fastify/cors'; // 1. Import the CORS plugin
+import rateLimit from '@fastify/rate-limit';
 import { prisma } from './db';
 import { registerAuthorization } from './security';
 import { authRoutes } from './modules/auth/auth.routes';
@@ -67,6 +68,12 @@ server.register(fastifyCors, {
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], // <--- Added PATCH
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
+});
+
+server.register(rateLimit, {
+  global: false,
+  max: 100,
+  timeWindow: '1 minute',
 });
 
 const jwtSecret = process.env.JWT_SECRET;
