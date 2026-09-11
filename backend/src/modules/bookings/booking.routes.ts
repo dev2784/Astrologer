@@ -8,7 +8,17 @@ export async function bookingRoutes(server: FastifyInstance) {
     return reply.status(200).send();
   });
   // Create a new booking (Public)
-  server.post("/", async (request, reply) => {
+  server.post(
+  "/",
+  {
+    config: {
+      rateLimit: {
+        max: 5,
+        timeWindow: "10 minutes",
+      },
+    },
+  },
+  async (request, reply) => {
     const { pujaId, name, phone, email, address, bookingDate } = request.body as any;
 
     if (!pujaId || !name || !phone || !address) {
@@ -32,7 +42,8 @@ export async function bookingRoutes(server: FastifyInstance) {
       console.error(error);
       return reply.code(500).send({ error: "Failed to process booking." });
     }
-  });
+   }
+  );
 
   // Get all bookings (Admin)
   server.get("/", async (request, reply) => {

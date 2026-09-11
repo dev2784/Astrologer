@@ -73,7 +73,8 @@ export async function authRoutes(server: FastifyInstance) {
       console.error(e);
       return reply.code(400).send({ error: 'Failed to create user' });
     }
-  });
+  }
+  );
 
   // 2. Unified Login Route (Supports login via Email OR Phone)
   server.post(

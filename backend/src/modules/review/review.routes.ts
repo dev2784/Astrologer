@@ -43,7 +43,17 @@ export async function reviewRoutes(server: FastifyInstance) {
   });
 
   // 2. POST Submit Review (Captures userPhone)
-  server.post('/', async (request, reply) => {
+  server.post(
+  '/',
+  {
+    config: {
+      rateLimit: {
+        max: 3,
+        timeWindow: '30 minutes',
+      },
+    },
+  },
+  async (request, reply) => {
     const body = request.body as {
       pujaId: string;
       userName: string;
@@ -85,7 +95,8 @@ export async function reviewRoutes(server: FastifyInstance) {
     } catch (error) {
       return reply.code(400).send({ error: 'Failed to submit review.' });
     }
-  });
+  }
+  );
 
   // 3. GET Admin Reviews (INCLUDES userPhone for lead contact)
   server.get('/admin/all', async (request, reply) => {
