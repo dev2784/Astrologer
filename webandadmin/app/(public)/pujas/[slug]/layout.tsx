@@ -29,6 +29,50 @@ function readableSlug(slug: string) {
     .join(" ");
 }
 
+function getSeoLocation(place?: string) {
+  const value = (place || "").trim();
+  const lower = value.toLowerCase();
+
+  if (lower.includes("ujjain")) {
+    return {
+      suffix: " in Ujjain",
+      areaServed: {
+        "@type": "City",
+        name: "Ujjain",
+      },
+    };
+  }
+
+  if (
+    lower.includes("india") ||
+    lower.includes("all over") ||
+    lower.includes("pan india")
+  ) {
+    return {
+      suffix: " in India",
+      areaServed: {
+        "@type": "Country",
+        name: "India",
+      },
+    };
+  }
+
+  if (value) {
+    return {
+      suffix: ` in ${value}`,
+      areaServed: {
+        "@type": "Place",
+        name: value,
+      },
+    };
+  }
+
+  return {
+    suffix: "",
+    areaServed: undefined,
+  };
+}
+
 async function getPuja(slug: string): Promise<Puja | null> {
   try {
     const response = await fetch(
@@ -63,25 +107,27 @@ export async function generateMetadata({
   const puja = await getPuja(cleanSlug);
 
   if (!puja) {
-    const name = readableSlug(cleanSlug);
+  const name = readableSlug(cleanSlug);
 
-    return {
-      title: `${name} in Ujjain`,
-      description: `Book ${name} in Ujjain with Hatkeshwar Jyotish. Authentic Vedic puja and anushthan services.`,
-      alternates: {
-        canonical,
-      },
-    };
-  }
+  return {
+    title: name,
+    description: `Book ${name} with Hatkeshwar Jyotish. Authentic Vedic puja and anushthan services.`,
+    alternates: {
+      canonical,
+    },
+  };
+}
 
-  const title = `${puja.titleEn} in Ujjain`;
+const { suffix } = getSeoLocation(puja.placeOfPuja);
 
-  const about = cleanText(puja.about);
+const title = `${puja.titleEn}${suffix}`;
 
-  const description = (
-    about ||
-    `Book ${puja.titleEn} in Ujjain. Authentic Vedic puja and anushthan services with Hatkeshwar Jyotish.`
-  ).slice(0, 155);
+const about = cleanText(puja.about);
+
+const description = (
+  about ||
+  `Book ${puja.titleEn}${suffix}. Authentic Vedic puja and anushthan services with Hatkeshwar Jyotish.`
+).slice(0, 155);
 
   return {
     title,
@@ -102,7 +148,7 @@ export async function generateMetadata({
         ? [
             {
               url: puja.imageUrl,
-              alt: `${puja.titleEn} in Ujjain`,
+              alt: `${puja.titleEn}${suffix}`,
             },
           ]
         : undefined,
@@ -133,17 +179,22 @@ export default async function PujaLayout({
     return children;
   }
 
+  const { suffix, areaServed } = getSeoLocation(puja.placeOfPuja);
+
   const pageUrl = `${BASE_URL}/pujas/${cleanSlug}`;
 
   const description =
     cleanText(puja.about) ||
-    `${puja.titleEn} Puja in Ujjain with Hatkeshwar Jyotish.`;
+    `${puja.titleEn}${suffix} with Hatkeshwar Jyotish.`;
 
   const serviceSchema = {
     "@context": "https://schema.org",
     "@type": "Service",
-    name: `${puja.titleEn} in Ujjain`,
+
+    name: `${puja.titleEn}${suffix}`,
+
     description,
+
     url: pageUrl,
 
     ...(puja.imageUrl && {
@@ -156,10 +207,9 @@ export default async function PujaLayout({
       url: BASE_URL,
     },
 
-    areaServed: {
-      "@type": "City",
-      name: "Ujjain",
-    },
+    ...(areaServed && {
+      areaServed,
+    }),
 
     serviceType: puja.titleEn,
   };
