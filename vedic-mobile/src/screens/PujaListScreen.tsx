@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+
 import {
   View,
   Text,
@@ -15,13 +16,16 @@ import {
   RouteProp,
 } from '@react-navigation/native';
 
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import {
+  ChevronLeft,
   ChevronRight,
-  Clock3,
   Flame,
   MapPin,
+  Clock3,
 } from 'lucide-react-native';
 
 import * as Haptics from 'expo-haptics';
@@ -40,12 +44,10 @@ type NavigationProp =
 
 export default function PujaListScreen() {
   const route = useRoute<PujaListRouteProp>();
+  const navigation = useNavigation<NavigationProp>();
+  const insets = useSafeAreaInsets();
 
-  const navigation =
-    useNavigation<NavigationProp>();
-
-  const { subcategoryId, title } =
-    route.params;
+  const { subcategoryId, title } = route.params;
 
   const {
     pujas,
@@ -64,18 +66,18 @@ export default function PujaListScreen() {
 
     Animated.timing(screenAnim, {
       toValue: 1,
-      duration: 450,
+      duration: 380,
       useNativeDriver: true,
     }).start();
   }, [subcategoryId]);
 
-  const screenStyle = {
+  const animationStyle = {
     opacity: screenAnim,
     transform: [
       {
         translateY: screenAnim.interpolate({
           inputRange: [0, 1],
-          outputRange: [18, 0],
+          outputRange: [12, 0],
         }),
       },
     ],
@@ -93,7 +95,7 @@ export default function PujaListScreen() {
       >
         <ActivityIndicator
           size="large"
-          color="#7f1d1d"
+          color="#971f1f"
         />
 
         <Text
@@ -121,29 +123,17 @@ export default function PujaListScreen() {
           padding: 24,
         }}
       >
-        <View
-          style={{
-            width: 58,
-            height: 58,
-            borderRadius: 29,
-            backgroundColor: '#f8ead7',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Flame
-            size={26}
-            color="#7f1d1d"
-          />
-        </View>
+        <Flame
+          size={35}
+          color="#971f1f"
+        />
 
         <Text
           style={{
             marginTop: 14,
-            color: '#7f1d1d',
+            color: '#971f1f',
             textAlign: 'center',
             fontWeight: '800',
-            fontSize: 14,
           }}
         >
           {error}
@@ -151,24 +141,20 @@ export default function PujaListScreen() {
 
         <TouchableOpacity
           onPress={() =>
-            fetchPujas(
-              subcategoryId as string
-            )
+            fetchPujas(subcategoryId as string)
           }
-          activeOpacity={0.85}
           style={{
             marginTop: 18,
-            backgroundColor: '#7f1d1d',
+            backgroundColor: '#971f1f',
             paddingHorizontal: 22,
             paddingVertical: 12,
-            borderRadius: 12,
+            borderRadius: 14,
           }}
         >
           <Text
             style={{
               color: '#fffaf2',
               fontWeight: '800',
-              fontSize: 13,
             }}
           >
             फिर से प्रयास करें
@@ -189,20 +175,49 @@ export default function PujaListScreen() {
 
       <View
         style={{
-          backgroundColor: '#7f1d1d',
-          paddingHorizontal: 18,
-          paddingTop: 22,
-          paddingBottom: 22,
+          backgroundColor: '#971f1f',
 
-          borderBottomLeftRadius: 28,
-          borderBottomRightRadius: 28,
+          paddingTop: insets.top + 12,
+          paddingHorizontal: 20,
+          paddingBottom: 24,
+
+          borderBottomLeftRadius: 34,
+          borderBottomRightRadius: 34,
         }}
       >
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          activeOpacity={0.8}
+          style={{
+            width: 40,
+            height: 40,
+
+            borderRadius: 20,
+
+            backgroundColor:
+              'rgba(255,250,242,0.14)',
+
+            alignItems: 'center',
+            justifyContent: 'center',
+
+            marginBottom: 12,
+          }}
+        >
+          <ChevronLeft
+            size={23}
+            color="#fffaf2"
+          />
+        </TouchableOpacity>
+
         <Text
+          numberOfLines={2}
           style={{
             color: '#fffaf2',
+
             fontWeight: '900',
-            fontSize: 22,
+
+            fontSize: 25,
+            lineHeight: 33,
           }}
         >
           {title}
@@ -211,8 +226,9 @@ export default function PujaListScreen() {
         <Text
           style={{
             color: '#f2d7b1',
-            fontSize: 11,
-            marginTop: 4,
+
+            fontSize: 13,
+            marginTop: 5,
           }}
         >
           अपनी आवश्यकता के अनुसार पूजा चुनें
@@ -220,13 +236,15 @@ export default function PujaListScreen() {
 
         <View
           style={{
-            marginTop: 12,
-            alignSelf: 'flex-start',
-            backgroundColor:
-              'rgba(255,247,237,0.12)',
+            marginTop: 14,
 
-            paddingHorizontal: 10,
-            paddingVertical: 5,
+            alignSelf: 'flex-start',
+
+            backgroundColor:
+              'rgba(255,247,237,0.13)',
+
+            paddingHorizontal: 12,
+            paddingVertical: 6,
 
             borderRadius: 999,
           }}
@@ -234,7 +252,8 @@ export default function PujaListScreen() {
           <Text
             style={{
               color: '#fff7ed',
-              fontSize: 10,
+
+              fontSize: 12,
               fontWeight: '800',
             }}
           >
@@ -243,439 +262,252 @@ export default function PujaListScreen() {
         </View>
       </View>
 
-      <Animated.View
+      {/* LIST */}
+
+      <View
         style={[
           {
             flex: 1,
           },
-          screenStyle,
         ]}
       >
         <FlatList
           data={pujas}
-          keyExtractor={(
-            item,
-            index
-          ) =>
+          keyExtractor={(item, index) =>
             item?.id?.toString() ||
             index.toString()
           }
-          showsVerticalScrollIndicator={
-            false
-          }
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={{
-            paddingHorizontal: 16,
-            paddingTop: 20,
-            paddingBottom: 28,
+            paddingHorizontal: 20,
+            paddingTop: 24,
+            paddingBottom: 110,
           }}
-          renderItem={({
-            item,
-            index,
-          }) => (
-            <Animated.View
-              style={{
-                opacity: screenAnim,
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              activeOpacity={0.86}
+              onPress={() => {
+                Haptics.impactAsync(
+                  Haptics
+                    .ImpactFeedbackStyle
+                    .Light
+                );
 
-                transform: [
+                navigation.navigate(
+                  'PujaDetails',
                   {
-                    translateY:
-                      screenAnim.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [
-                          15 + index * 2,
-                          0,
-                        ],
-                      }),
-                  },
-                ],
+                    pujaId: item.id,
+                  }
+                );
+              }}
+              style={{
+                backgroundColor: '#fffdf8',
+
+                borderRadius: 22,
+
+                borderWidth: 1,
+                borderColor: '#eadfce',
+
+                marginBottom: 14,
+
+                padding: 14,
+
+                flexDirection: 'row',
+                alignItems: 'center',
+
+                shadowColor: '#7f1d1d',
+                shadowOffset: {
+                  width: 0,
+                  height: 3,
+                },
+
+                shadowOpacity: 0.06,
+                shadowRadius: 8,
+
+                elevation: 2,
               }}
             >
-              <TouchableOpacity
-                activeOpacity={0.9}
-                onPress={() => {
-                  Haptics.impactAsync(
-                    Haptics
-                      .ImpactFeedbackStyle
-                      .Light
-                  );
+              {/* IMAGE */}
 
-                  navigation.navigate(
-                    'PujaDetails',
-                    {
-                      pujaId: item.id,
-                    }
-                  );
-                }}
+              <View
                 style={{
-                  backgroundColor:
-                    '#fffdf8',
+                  width: 88,
+                  height: 88,
 
-                  borderRadius: 24,
+                  borderRadius: 18,
 
                   overflow: 'hidden',
 
-                  marginBottom: 18,
+                  backgroundColor: '#f7e8d8',
 
-                  borderWidth: 1,
-                  borderColor:
-                    '#eadfce',
-
-                  shadowColor:
-                    '#7f1d1d',
-
-                  shadowOffset: {
-                    width: 0,
-                    height: 6,
-                  },
-
-                  shadowOpacity: 0.07,
-
-                  shadowRadius: 12,
-
-                  elevation: 4,
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
-                {/* IMAGE */}
+                {!!item.imageUrl ? (
+                  <Image
+                    source={{
+                      uri: item.imageUrl,
+                    }}
+                    style={{
+                      width: 88,
+                      height: 88,
+                    }}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Flame
+                    size={31}
+                    color="#971f1f"
+                    strokeWidth={1.6}
+                  />
+                )}
+              </View>
 
-                <View
+              {/* DETAILS */}
+
+              <View
+                style={{
+                  flex: 1,
+                  marginLeft: 14,
+                }}
+              >
+                <Text
+                  numberOfLines={2}
                   style={{
-                    height: 175,
-                    backgroundColor:
-                      '#f5ead8',
+                    color: '#1c1917',
 
-                    position: 'relative',
+                    fontWeight: '900',
+
+                    fontSize: 17,
+                    lineHeight: 22,
                   }}
                 >
-                  {item.imageUrl ? (
-                    <Image
-                      source={{
-                        uri: item.imageUrl,
-                      }}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                      }}
-                      resizeMode="cover"
-                    />
-                  ) : (
-                    <View
-                      style={{
-                        flex: 1,
+                  {item.titleHi?.trim() ||
+                    item.titleEn?.trim()}
+                </Text>
 
-                        alignItems:
-                          'center',
+                {!!item.titleEn?.trim() && (
+                  <Text
+                    numberOfLines={1}
+                    style={{
+                      color: '#971f1f',
 
-                        justifyContent:
-                          'center',
+                      fontSize: 12,
 
-                        backgroundColor:
-                          '#f8ead7',
-                      }}
-                    >
-                      <Flame
-                        size={44}
-                        color="#7f1d1d"
-                        strokeWidth={1.5}
-                      />
-                    </View>
-                  )}
+                      marginTop: 3,
+                    }}
+                  >
+                    {item.titleEn.trim()}
+                  </Text>
+                )}
 
-                  {/* TOP BADGE */}
+                {/* META */}
 
+                {(item.placeOfPuja ||
+                  item.location) && (
                   <View
                     style={{
-                      position:
-                        'absolute',
+                      flexDirection: 'row',
+                      alignItems: 'center',
 
-                      top: 12,
-                      left: 12,
-
-                      backgroundColor:
-                        'rgba(255,250,242,0.95)',
-
-                      paddingHorizontal: 10,
-                      paddingVertical: 5,
-
-                      borderRadius: 999,
+                      marginTop: 8,
                     }}
                   >
-                    <Text
-                      style={{
-                        color:
-                          '#7f1d1d',
+                    <MapPin
+                      size={13}
+                      color="#78716c"
+                    />
 
-                        fontWeight:
-                          '900',
-
-                        fontSize: 10,
-                      }}
-                    >
-                      {item.tag ||
-                        'विशेष पूजा'}
-                    </Text>
-                  </View>
-
-                  {/* PRICE BADGE */}
-
-                  {item.charges && (
-                    <View
-                      style={{
-                        position:
-                          'absolute',
-
-                        top: 12,
-                        right: 12,
-
-                        backgroundColor:
-                          '#7f1d1d',
-
-                        paddingHorizontal: 11,
-                        paddingVertical: 6,
-
-                        borderRadius: 999,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color:
-                            '#fffaf2',
-
-                          fontWeight:
-                            '900',
-
-                          fontSize: 11,
-                        }}
-                      >
-                        {String(
-                          item.charges
-                        ).includes('₹')
-                          ? item.charges
-                          : `₹ ${item.charges}`}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-
-                {/* CONTENT */}
-
-                <View
-                  style={{
-                    padding: 16,
-                  }}
-                >
-                  {/* TITLE */}
-
-                  <Text
-                    numberOfLines={2}
-                    style={{
-                      color: '#1c1917',
-
-                      fontWeight: '900',
-
-                      fontSize: 18,
-
-                      lineHeight: 23,
-                    }}
-                  >
-                    {item.titleHi?.trim() ||
-                      item.titleEn?.trim()}
-                  </Text>
-
-                  {item.titleEn && (
                     <Text
                       numberOfLines={1}
                       style={{
+                        marginLeft: 5,
+
                         color: '#78716c',
 
                         fontSize: 11,
 
-                        marginTop: 4,
-                      }}
-                    >
-                      {item.titleEn?.trim()}
-                    </Text>
-                  )}
-
-                  {/* INFO ROW */}
-
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-
-                      marginTop: 14,
-
-                      flexWrap: 'wrap',
-                    }}
-                  >
-                    {/* LOCATION */}
-
-                    {(item.placeOfPuja ||
-                      item.location) && (
-                      <View
-                        style={{
-                          flexDirection:
-                            'row',
-
-                          alignItems:
-                            'center',
-
-                          backgroundColor:
-                            '#fff1dd',
-
-                          paddingHorizontal: 9,
-                          paddingVertical: 6,
-
-                          borderRadius: 10,
-
-                          marginRight: 8,
-                          marginBottom: 8,
-                        }}
-                      >
-                        <MapPin
-                          size={13}
-                          color="#9a3412"
-                        />
-
-                        <Text
-                          numberOfLines={1}
-                          style={{
-                            marginLeft: 5,
-
-                            color:
-                              '#57534e',
-
-                            fontSize: 10,
-
-                            fontWeight:
-                              '700',
-
-                            maxWidth: 120,
-                          }}
-                        >
-                          {item.placeOfPuja ||
-                            item.location}
-                        </Text>
-                      </View>
-                    )}
-
-                    {/* DURATION */}
-
-                    {item.estimatedTime && (
-                      <View
-                        style={{
-                          flexDirection:
-                            'row',
-
-                          alignItems:
-                            'center',
-
-                          backgroundColor:
-                            '#f4efe8',
-
-                          paddingHorizontal: 9,
-                          paddingVertical: 6,
-
-                          borderRadius: 10,
-
-                          marginBottom: 8,
-                        }}
-                      >
-                        <Clock3
-                          size={13}
-                          color="#7f1d1d"
-                        />
-
-                        <Text
-                          style={{
-                            marginLeft: 5,
-
-                            color:
-                              '#57534e',
-
-                            fontSize: 10,
-
-                            fontWeight:
-                              '700',
-                          }}
-                        >
-                          {item.estimatedTime}
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-
-                  {/* BOTTOM */}
-
-                  <View
-                    style={{
-                      marginTop: 8,
-
-                      paddingTop: 14,
-
-                      borderTopWidth: 1,
-                      borderTopColor:
-                        '#efe3d4',
-
-                      flexDirection: 'row',
-                      alignItems: 'center',
-
-                      justifyContent:
-                        'space-between',
-                    }}
-                  >
-                    <View
-                      style={{
                         flex: 1,
-                        paddingRight: 10,
                       }}
                     >
-                      <Text
-                        style={{
-                          color: '#a8a29e',
-                          fontSize: 10,
-                          fontWeight: '700',
-                        }}
-                      >
-                        अधिक जानकारी
-                      </Text>
-
-                      <Text
-                        style={{
-                          color: '#7f1d1d',
-                          fontWeight: '900',
-                          fontSize: 12,
-                          marginTop: 2,
-                        }}
-                      >
-                        पूजा विवरण देखें
-                      </Text>
-                    </View>
-
-                    <View
-                      style={{
-                        width: 42,
-                        height: 42,
-
-                        borderRadius: 21,
-
-                        backgroundColor:
-                          '#7f1d1d',
-
-                        alignItems: 'center',
-                        justifyContent:
-                          'center',
-                      }}
-                    >
-                      <ChevronRight
-                        size={19}
-                        color="#fffaf2"
-                      />
-                    </View>
+                      {item.placeOfPuja ||
+                        item.location}
+                    </Text>
                   </View>
-                </View>
-              </TouchableOpacity>
-            </Animated.View>
+                )}
+
+                {!!item.estimatedTime && (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+
+                      marginTop: 5,
+                    }}
+                  >
+                    <Clock3
+                      size={13}
+                      color="#78716c"
+                    />
+
+                    <Text
+                      style={{
+                        marginLeft: 5,
+
+                        color: '#78716c',
+
+                        fontSize: 11,
+                      }}
+                    >
+                      {item.estimatedTime}
+                    </Text>
+                  </View>
+                )}
+
+                {!!item.charges && (
+                  <Text
+                    style={{
+                      color: '#971f1f',
+
+                      fontSize: 14,
+                      fontWeight: '900',
+
+                      marginTop: 7,
+                    }}
+                  >
+                    {String(
+                      item.charges
+                    ).includes('₹')
+                      ? item.charges
+                      : `₹ ${item.charges}`}
+                  </Text>
+                )}
+              </View>
+
+              {/* ARROW */}
+
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+
+                  borderRadius: 20,
+
+                  backgroundColor: '#971f1f',
+
+                  alignItems: 'center',
+                  justifyContent: 'center',
+
+                  marginLeft: 8,
+                }}
+              >
+                <ChevronRight
+                  size={19}
+                  color="#fffaf2"
+                />
+              </View>
+            </TouchableOpacity>
           )}
           ListEmptyComponent={
             <View
@@ -691,17 +523,15 @@ export default function PujaListScreen() {
 
                   borderRadius: 30,
 
-                  backgroundColor:
-                    '#f8ead7',
+                  backgroundColor: '#f8ead7',
 
                   alignItems: 'center',
-                  justifyContent:
-                    'center',
+                  justifyContent: 'center',
                 }}
               >
                 <Flame
-                  size={26}
-                  color="#7f1d1d"
+                  size={27}
+                  color="#971f1f"
                 />
               </View>
 
@@ -718,22 +548,10 @@ export default function PujaListScreen() {
               >
                 कोई पूजा उपलब्ध नहीं
               </Text>
-
-              <Text
-                style={{
-                  color: '#a8a29e',
-
-                  fontSize: 11,
-
-                  marginTop: 4,
-                }}
-              >
-                कृपया दूसरी श्रेणी चुनें
-              </Text>
             </View>
           }
         />
-      </Animated.View>
+      </View>
     </View>
   );
 }

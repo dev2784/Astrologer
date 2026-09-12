@@ -17,7 +17,7 @@ import {
 } from '@react-navigation/native';
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import RenderHtml from 'react-native-render-html';
 
 import {
@@ -47,7 +47,7 @@ export default function PujaDetailsScreen() {
   const route = useRoute<PujaDetailsRouteProp>();
   const navigation =
     useNavigation<NavigationProp>();
-
+  const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
 
   const { pujaId } = route.params;
@@ -258,6 +258,7 @@ export default function PujaDetailsScreen() {
       style={{
         flex: 1,
         backgroundColor: '#fffaf2',
+        paddingTop: insets.top,
       }}
     >
       <Animated.View

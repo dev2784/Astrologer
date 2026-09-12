@@ -12,11 +12,13 @@ import {
   useNavigation,
   RouteProp,
 } from '@react-navigation/native';
+
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import {
+  ChevronLeft,
   ChevronRight,
   Flame,
 } from 'lucide-react-native';
@@ -36,9 +38,8 @@ type NavigationProp =
 
 export default function SubcategoriesScreen() {
   const route = useRoute<SubcategoriesRouteProp>();
+  const navigation = useNavigation<NavigationProp>();
   const insets = useSafeAreaInsets();
-  const navigation =
-    useNavigation<NavigationProp>();
 
   const { category } = route.params;
 
@@ -59,7 +60,7 @@ export default function SubcategoriesScreen() {
       {
         translateY: screenAnim.interpolate({
           inputRange: [0, 1],
-          outputRange: [16, 0],
+          outputRange: [14, 0],
         }),
       },
     ],
@@ -68,27 +69,57 @@ export default function SubcategoriesScreen() {
   return (
     <View
       style={{
-        paddingTop: insets.top + 16,
+        flex: 1,
+        backgroundColor: '#fffaf2',
       }}
-      className="bg-[#971f1f] px-5 pb-7 rounded-b-[34px]"
     >
       {/* HEADER */}
-
       <View
         style={{
-          backgroundColor: '#7f1d1d',
-          paddingHorizontal: 18,
-          paddingTop: 22,
-          paddingBottom: 22,
+          backgroundColor: '#971f1f',
 
-          borderBottomLeftRadius: 28,
-          borderBottomRightRadius: 28,
+          paddingTop: insets.top + 12,
+          paddingHorizontal: 20,
+          paddingBottom: 24,
+
+          borderBottomLeftRadius: 34,
+          borderBottomRightRadius: 34,
         }}
       >
+        {/* BACK BUTTON */}
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => navigation.goBack()}
+          style={{
+            width: 40,
+            height: 40,
+
+            borderRadius: 20,
+
+            backgroundColor:
+              'rgba(255,250,242,0.14)',
+
+            alignItems: 'center',
+            justifyContent: 'center',
+
+            marginBottom: 14,
+          }}
+        >
+          <ChevronLeft
+            size={23}
+            color="#fffaf2"
+            strokeWidth={2.2}
+          />
+        </TouchableOpacity>
+
+        {/* TITLE */}
         <Text
           style={{
             color: '#fffaf2',
-            fontSize: 22,
+
+            fontSize: 25,
+            lineHeight: 34,
+
             fontWeight: '900',
           }}
         >
@@ -96,29 +127,35 @@ export default function SubcategoriesScreen() {
             category.nameEn?.trim()}
         </Text>
 
-        {category.nameEn && (
+        {/* ENGLISH NAME */}
+        {!!category.nameEn?.trim() && (
           <Text
+            numberOfLines={2}
             style={{
               color: '#f2d7b1',
-              fontSize: 12,
-              marginTop: 4,
+
+              fontSize: 13,
+              lineHeight: 19,
+
+              marginTop: 6,
             }}
           >
-            {category.nameEn?.trim()}
+            {category.nameEn.trim()}
           </Text>
         )}
 
+        {/* OPTION COUNT */}
         <View
           style={{
-            marginTop: 12,
+            marginTop: 14,
 
             backgroundColor:
               'rgba(255,247,237,0.12)',
 
             alignSelf: 'flex-start',
 
-            paddingHorizontal: 10,
-            paddingVertical: 5,
+            paddingHorizontal: 12,
+            paddingVertical: 6,
 
             borderRadius: 999,
           }}
@@ -127,14 +164,16 @@ export default function SubcategoriesScreen() {
             style={{
               color: '#fff7ed',
               fontWeight: '800',
-              fontSize: 10,
+              fontSize: 12,
             }}
           >
-            {category.subcategories?.length || 0} विकल्प
+            {category.subcategories?.length || 0}{' '}
+            विकल्प
           </Text>
         </View>
       </View>
 
+      {/* SUBCATEGORY LIST */}
       <Animated.View
         style={[
           {
@@ -144,13 +183,13 @@ export default function SubcategoriesScreen() {
         ]}
       >
         <FlatList
-          data={category.subcategories}
+          data={category.subcategories || []}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
-            paddingHorizontal: 16,
-            paddingTop: 20,
-            paddingBottom: 28,
+            paddingHorizontal: 20,
+            paddingTop: 24,
+            paddingBottom: 110,
           }}
           renderItem={({ item, index }) => (
             <Animated.View
@@ -163,7 +202,7 @@ export default function SubcategoriesScreen() {
                       screenAnim.interpolate({
                         inputRange: [0, 1],
                         outputRange: [
-                          12 + index * 2,
+                          10 + index * 2,
                           0,
                         ],
                       }),
@@ -172,7 +211,7 @@ export default function SubcategoriesScreen() {
               }}
             >
               <TouchableOpacity
-                activeOpacity={0.88}
+                activeOpacity={0.86}
                 onPress={() => {
                   Haptics.impactAsync(
                     Haptics
@@ -184,6 +223,7 @@ export default function SubcategoriesScreen() {
                     'PujaList',
                     {
                       subcategoryId: item.id,
+
                       title:
                         item.nameHi?.trim() ||
                         item.nameEn?.trim(),
@@ -193,37 +233,39 @@ export default function SubcategoriesScreen() {
                 style={{
                   backgroundColor: '#fffdf8',
 
-                  borderRadius: 20,
+                  borderRadius: 22,
 
                   borderWidth: 1,
                   borderColor: '#eadfce',
 
                   marginBottom: 14,
 
-                  padding: 16,
+                  paddingHorizontal: 16,
+                  paddingVertical: 16,
 
                   flexDirection: 'row',
                   alignItems: 'center',
 
                   shadowColor: '#7f1d1d',
+
                   shadowOffset: {
                     width: 0,
-                    height: 4,
+                    height: 3,
                   },
-                  shadowOpacity: 0.05,
-                  shadowRadius: 9,
+
+                  shadowOpacity: 0.06,
+                  shadowRadius: 8,
 
                   elevation: 2,
                 }}
               >
                 {/* ICON */}
-
                 <View
                   style={{
-                    width: 46,
-                    height: 46,
+                    width: 52,
+                    height: 52,
 
-                    borderRadius: 23,
+                    borderRadius: 26,
 
                     backgroundColor: '#f7e8d8',
 
@@ -232,18 +274,17 @@ export default function SubcategoriesScreen() {
                   }}
                 >
                   <Flame
-                    size={20}
-                    color="#7f1d1d"
+                    size={23}
+                    color="#971f1f"
                     strokeWidth={1.9}
                   />
                 </View>
 
                 {/* TEXT */}
-
                 <View
                   style={{
                     flex: 1,
-                    marginLeft: 13,
+                    marginLeft: 15,
                   }}
                 >
                   <Text
@@ -253,41 +294,39 @@ export default function SubcategoriesScreen() {
 
                       fontWeight: '900',
 
-                      fontSize: 15,
-
-                      lineHeight: 20,
+                      fontSize: 17,
+                      lineHeight: 23,
                     }}
                   >
                     {item.nameHi?.trim() ||
                       item.nameEn?.trim()}
                   </Text>
 
-                  {item.nameEn && (
+                  {!!item.nameEn?.trim() && (
                     <Text
                       numberOfLines={1}
                       style={{
                         color: '#78716c',
 
-                        fontSize: 11,
+                        fontSize: 13,
 
                         marginTop: 4,
                       }}
                     >
-                      {item.nameEn?.trim()}
+                      {item.nameEn.trim()}
                     </Text>
                   )}
                 </View>
 
                 {/* ARROW */}
-
                 <View
                   style={{
-                    width: 34,
-                    height: 34,
+                    width: 42,
+                    height: 42,
 
-                    borderRadius: 17,
+                    borderRadius: 21,
 
-                    backgroundColor: '#7f1d1d',
+                    backgroundColor: '#971f1f',
 
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -296,8 +335,9 @@ export default function SubcategoriesScreen() {
                   }}
                 >
                   <ChevronRight
-                    size={17}
+                    size={20}
                     color="#fffaf2"
+                    strokeWidth={2}
                   />
                 </View>
               </TouchableOpacity>
@@ -325,7 +365,7 @@ export default function SubcategoriesScreen() {
               >
                 <Flame
                   size={25}
-                  color="#7f1d1d"
+                  color="#971f1f"
                 />
               </View>
 
