@@ -1,30 +1,43 @@
 {
   "expo": {
-    "name": "vedic-mobile",
-    "slug": "vedic-mobile",
+    "name": "HatkeshwarJyotish",
+    "slug": "hatkeshwar-jyotish",
     "version": "1.0.0",
     "orientation": "portrait",
+
     "icon": "./assets/icon.png",
+
     "userInterfaceStyle": "light",
-    "ios": {
-      "supportsTablet": true
+
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#fffaf2"
     },
+
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hatkeshwarjyotish.app"
+    },
+
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#971f1f"
       },
+
       "predictiveBackGestureEnabled": false,
-      "package": "com.dev2784.vedicmobile"
+      "package": "com.hatkeshwarjyotish.app"
     },
+
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icon.png"
     },
+
     "plugins": [
       "@react-native-community/datetimepicker"
     ],
+
     "extra": {
       "eas": {
         "projectId": "6f4cb100-307d-43d4-be50-f7d4d518426e"

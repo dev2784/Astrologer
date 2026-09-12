@@ -37,7 +37,9 @@ function HomeFlowStack() {
       <HomeFlow.Screen 
         name="WriteReview" 
         component={WriteReviewScreen} 
-        options={{ title: 'Write Review', headerBackButtonDisplayMode: 'minimal' }}
+        options={{
+          headerShown: false,
+        }}
       />
     </HomeFlow.Navigator>
   );
