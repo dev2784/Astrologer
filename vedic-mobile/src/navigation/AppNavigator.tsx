@@ -87,16 +87,35 @@ function ProfileFlowStack() {
   const { userToken } = useAuthStore();
 
   return (
-    <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
+    <ProfileStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        contentStyle: {
+          backgroundColor: '#fffaf2',
+        },
+      }}
+    >
       {userToken ? (
-        <ProfileStack.Screen name="Profile" component={ProfileScreen} />
+        <>
+          <ProfileStack.Screen
+            name="Profile"
+            component={ProfileScreen}
+          />
+
+          <ProfileStack.Screen
+            name="Contact"
+            component={ContactScreen}
+          />
+        </>
       ) : (
-        <ProfileStack.Screen name="Auth" component={AuthScreen} />
+        <ProfileStack.Screen
+          name="Auth"
+          component={AuthScreen}
+        />
       )}
     </ProfileStack.Navigator>
   );
 }
-
 // 3. Tab Navigator
 function TabNavigator() {
   const tabIcon = (
