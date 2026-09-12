@@ -46,36 +46,38 @@ function HomeFlowStack() {
 // 1. Existing Puja Flow
 function PujaFlowStack() {
   return (
-    <HomeStack.Navigator screenOptions={{ 
-    headerShown: true,
-    
-    // 1. HEADER BACKGROUND COLOR
-    headerStyle: {
-      backgroundColor: '#ffc864', // Example: Orange background
-    },
-    
-    // 2. HEADER TEXT & BACK BUTTON COLOR
-    headerTintColor: '#ffffff', // Example: White text and back arrows
-    
-    // 3. HEADER TITLE FONT STYLING (Optional, for specific text tweaks)
-    headerTitleStyle: {
-      fontWeight: 'bold',
-      fontSize: 18,
-    },
+    <HomeStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        contentStyle: {
+          backgroundColor: '#fffaf2',
+        },
+      }}
+    >
+      <HomeStack.Screen
+        name="Categories"
+        component={PujasScreen}
+      />
 
-    // 4. SCREEN BACKGROUND COLOR (The actual page content below the header)
-    // Note: If you are using @react-navigation/native-stack use 'contentStyle'
-    // If you are using @react-navigation/stack use 'cardStyle'
-    contentStyle: {
-      backgroundColor: '#ffc864', // Example: Stone-50 background
-    }
-  }}>
-      <HomeStack.Screen name="Categories" component={PujasScreen} options={{ title: 'Book a Puja' }} />
-      <HomeStack.Screen name="Subcategories" component={SubcategoriesScreen} options={{ title: 'Select Option' }} />
-      <HomeStack.Screen name="PujaList" component={PujaListScreen} options={({ route }) => ({ title: route.params?.title || 'Pujas' })} />
-      <HomeStack.Screen name="BookingForm" component={BookingFormScreen} options={{ title: 'Book Puja' }} />
-      <HomeStack.Screen name="PujaDetails" component={PujaDetailsScreen} options={{ title: 'Details', headerBackButtonDisplayMode: 'minimal' }} />
-    
+      <HomeStack.Screen
+        name="Subcategories"
+        component={SubcategoriesScreen}
+      />
+
+      <HomeStack.Screen
+        name="PujaList"
+        component={PujaListScreen}
+      />
+
+      <HomeStack.Screen
+        name="BookingForm"
+        component={BookingFormScreen}
+      />
+
+      <HomeStack.Screen
+        name="PujaDetails"
+        component={PujaDetailsScreen}
+      />
     </HomeStack.Navigator>
   );
 }
