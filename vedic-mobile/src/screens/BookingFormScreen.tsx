@@ -8,8 +8,8 @@ import {
   LockKeyhole,
   Sparkles,
   ChevronLeft,
+  ArrowLeft
 } from 'lucide-react-native';
-
 import { api } from '../utils/api';
 import { HomeStackParamList } from '../navigation/types';
 import { useAuthStore } from '../store/useAuthStore';
@@ -207,34 +207,111 @@ export default function BookingFormScreen() {
 
   // 4. Authorized View: Only Address and Date
   return (
-    <ScrollView className="flex-1 bg-amber-500 px-4 pt-4" showsVerticalScrollIndicator={false}>
-      <Text className="text-2xl font-bold text-slate-800 mb-2">Complete Booking</Text>
-      
-      {/* Show the user who they are booking as, since we removed the inputs */}
-      <Text className="text-sm text-slate-500 mb-6">
-        Booking as: <Text className="font-bold text-slate-700">{userData.name} ({userData.phone})</Text>
+  <ScrollView
+    className="flex-1 bg-[#fffaf2]"
+    showsVerticalScrollIndicator={false}
+    contentContainerStyle={{
+      paddingBottom: 120,
+    }}
+  >
+    {/* HEADER */}
+    <View className="bg-[#971f1f] rounded-b-[34px] px-5 pt-14 pb-8">
+
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => navigation.goBack()}
+        className="w-10 h-10 rounded-full bg-white/15 items-center justify-center mb-5"
+      >
+        <ArrowLeft
+          size={21}
+          color="#fffaf2"
+        />
+      </TouchableOpacity>
+
+      <Text className="text-[#fffaf2] text-[28px] font-black">
+        पूजा बुकिंग
       </Text>
 
-      <View className="bg-white p-5 rounded-xl border border-slate-200 mb-6 shadow-sm">
-        
-        <Text className="text-sm font-bold text-slate-500 mb-1">Full Address *</Text>
-        <TextInput 
-          className="bg-stone-100 p-3 rounded-lg mb-6 text-slate-800 border border-stone-200 min-h-[100px]"
-          placeholder="Enter the exact location/venue for the Puja"
+      <Text className="text-[#f2d7b1] text-[14px] mt-1">
+        पूजा की तिथि और स्थान की जानकारी भरें
+      </Text>
+
+      {/* BOOKING USER */}
+      <View className="mt-5 bg-white/10 rounded-[18px] px-4 py-3">
+        <Text className="text-[#f2d7b1] text-[11px] font-bold">
+          बुकिंग किसके नाम से
+        </Text>
+
+        <Text className="text-[#fffaf2] text-[15px] font-black mt-1">
+          {userData.name}
+        </Text>
+
+        <Text className="text-[#f2d7b1] text-[12px] mt-1">
+          {userData.phone}
+        </Text>
+      </View>
+    </View>
+
+
+    {/* FORM CARD */}
+    <View className="px-5 pt-7">
+
+      <View
+        style={{
+          shadowColor: '#7f1d1d',
+          shadowOffset: {
+            width: 0,
+            height: 4,
+          },
+          shadowOpacity: 0.06,
+          shadowRadius: 10,
+          elevation: 2,
+        }}
+        className="bg-[#fffdf8] border border-[#eadfce] rounded-[26px] px-5 py-6"
+      >
+
+        {/* ADDRESS */}
+        <Text className="text-[#292524] text-[17px] font-black">
+          पूजा का स्थान
+        </Text>
+
+        <Text className="text-stone-500 text-[12px] mt-1 mb-3">
+          जहां पूजा करानी है उसका पूरा पता दर्ज करें
+        </Text>
+
+        <TextInput
+          className="bg-[#fffaf2] border border-[#eadfce] rounded-2xl px-4 py-4 text-[#292524] min-h-[120px]"
+          placeholder="पूरा पता दर्ज करें"
+          placeholderTextColor="#a8a29e"
           multiline
-          numberOfLines={4}
+          numberOfLines={5}
           textAlignVertical="top"
           value={address}
           onChangeText={setAddress}
         />
 
-        <Text className="text-sm font-bold text-slate-500 mb-1">Select Date *</Text>
-        <TouchableOpacity 
-          className="bg-stone-100 p-4 rounded-lg mb-2 border border-stone-200 items-center"
+
+        {/* DATE */}
+        <Text className="text-[#292524] text-[17px] font-black mt-6">
+          पूजा की तिथि
+        </Text>
+
+        <Text className="text-stone-500 text-[12px] mt-1 mb-3">
+          अपनी सुविधानुसार दिन चुनें
+        </Text>
+
+        <TouchableOpacity
+          activeOpacity={0.85}
           onPress={() => setShowPicker(true)}
+          className="bg-[#fffaf2] border border-[#eadfce] rounded-2xl px-4 py-4"
         >
-          <Text className="text-slate-800 font-medium text-base">
-            {bookingDate.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' })}
+          <Text className="text-[#971f1f] text-center font-black text-[15px]">
+            {bookingDate.toLocaleDateString('hi-IN', {
+              weekday: 'short',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
           </Text>
         </TouchableOpacity>
 
@@ -249,17 +326,40 @@ export default function BookingFormScreen() {
         )}
       </View>
 
-      <TouchableOpacity 
-        className={`rounded-xl py-4 items-center mb-10 shadow-sm ${isSubmitting ? 'bg-slate-400' : 'bg-orange-600'}`}
+
+      {/* INFO NOTE */}
+      <View className="bg-[#fff1df] rounded-[18px] px-4 py-4 mt-5">
+        <Text className="text-[#971f1f] font-black text-[13px]">
+          ध्यान दें
+        </Text>
+
+        <Text className="text-stone-600 text-[12px] leading-[19px] mt-1">
+          बुकिंग के बाद हमारी टीम आपसे संपर्क करके तिथि और पूजा की अंतिम पुष्टि करेगी।
+        </Text>
+      </View>
+
+
+      {/* SUBMIT BUTTON */}
+      <TouchableOpacity
+        activeOpacity={0.85}
         onPress={handleSubmit}
         disabled={isSubmitting}
+        className={`rounded-[20px] py-4 items-center mt-6 ${
+          isSubmitting
+            ? 'bg-[#b96a6a]'
+            : 'bg-[#971f1f]'
+        }`}
       >
         {isSubmitting ? (
-          <ActivityIndicator color="#ffffff" />
+          <ActivityIndicator color="#fffaf2" />
         ) : (
-          <Text className="text-white font-bold text-lg">Confirm Booking</Text>
+          <Text className="text-[#fffaf2] font-black text-[17px]">
+            बुकिंग की पुष्टि करें
+          </Text>
         )}
       </TouchableOpacity>
-    </ScrollView>
-  );
+
+    </View>
+  </ScrollView>
+);
 }
