@@ -3,7 +3,12 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, ActivityInd
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { LogIn } from 'lucide-react-native';
+import {
+  LogIn,
+  LockKeyhole,
+  Sparkles,
+  ChevronLeft,
+} from 'lucide-react-native';
 
 import { api } from '../utils/api';
 import { HomeStackParamList } from '../navigation/types';
@@ -80,32 +85,125 @@ export default function BookingFormScreen() {
 
   // 3. HARD GUARD: If user is not logged in, block the form entirely
   if (!userToken || !userData) {
-    return (
-      <View className="flex-1 bg-stone-50 items-center justify-center px-6">
-        <Text className="text-2xl font-black text-slate-900 mb-2 text-center">Login Required</Text>
-        <Text className="text-slate-500 text-center mb-8">
-          You must be logged into your account to book a Puja.
-        </Text>
-        
-        <TouchableOpacity 
-          className="bg-orange-600 w-full py-4 rounded-xl flex-row items-center justify-center shadow-sm"
-          onPress={() => {
-            // SAVE THE RETURN PATH BEFORE LEAVING
-            setRedirect({
-              tab: 'Pujas', // The name of the Tab in AppNavigator
-              screen: 'BookingForm', // The name of the Screen inside PujaFlowStack
-              params: route.params, // Passes pujaId, categoryId, etc.
-            });
-            // Send them to the login tab
-            navigation.navigate('Account' as any);
-          }}
+  return (
+    <View className="flex-1 bg-[#fffaf2]">
+
+      {/* TOP MAROON HEADER */}
+      <View className="bg-[#971f1f] rounded-b-[34px] px-5 pt-14 pb-8">
+
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => navigation.goBack()}
+          className="w-10 h-10 rounded-full bg-white/15 items-center justify-center mb-5"
         >
-          <LogIn size={20} color="#ffffff" />
-          <Text className="text-white font-bold text-lg ml-2">Go to Login</Text>
+          <ChevronLeft
+            size={23}
+            color="#fffaf2"
+          />
         </TouchableOpacity>
+
+        <View className="flex-row items-center">
+          <View className="w-14 h-14 rounded-full bg-[#fff7ed] items-center justify-center">
+            <LockKeyhole
+              size={27}
+              color="#971f1f"
+              strokeWidth={1.9}
+            />
+          </View>
+
+          <View className="flex-1 ml-4">
+            <Text className="text-[#fffaf2] text-[26px] font-black">
+              लॉगिन आवश्यक है
+            </Text>
+
+            <Text className="text-[#f2d7b1] text-[14px] mt-1">
+              पूजा बुकिंग के लिए अपने खाते में लॉगिन करें
+            </Text>
+          </View>
+        </View>
       </View>
-    );
-  }
+
+
+      {/* BODY */}
+      <View className="flex-1 px-5 pt-8">
+
+        <View
+          style={{
+            shadowColor: '#7f1d1d',
+            shadowOffset: {
+              width: 0,
+              height: 5,
+            },
+            shadowOpacity: 0.07,
+            shadowRadius: 12,
+            elevation: 3,
+          }}
+          className="bg-[#fffdf8] border border-[#eadfce] rounded-[26px] px-5 py-6"
+        >
+
+          {/* ICON */}
+          <View className="w-16 h-16 rounded-full bg-[#fff0df] items-center justify-center self-center">
+            <Sparkles
+              size={29}
+              color="#971f1f"
+              strokeWidth={1.8}
+            />
+          </View>
+
+          <Text className="text-[#292524] text-[22px] font-black text-center mt-5">
+            अपनी पूजा बुक करें
+          </Text>
+
+          <Text className="text-stone-500 text-[14px] leading-[22px] text-center mt-2">
+            बुकिंग जारी रखने के लिए कृपया अपने खाते में लॉगिन करें।
+            लॉगिन के बाद आप इसी पूजा पर वापस आ जाएंगे।
+          </Text>
+
+
+          {/* SMALL INFO */}
+          <View className="bg-[#fff4e5] rounded-[18px] px-4 py-4 mt-6">
+
+            <Text className="text-[#7f1d1d] font-bold text-[13px]">
+              लॉगिन क्यों आवश्यक है?
+            </Text>
+
+            <Text className="text-stone-600 text-[12px] leading-[19px] mt-2">
+              आपकी बुकिंग, संपर्क विवरण और पूजा की जानकारी सुरक्षित रखने के लिए।
+            </Text>
+          </View>
+
+
+          {/* LOGIN BUTTON */}
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => {
+              setRedirect({
+                tab: 'Pujas',
+                screen: 'BookingForm',
+                params: route.params,
+              });
+
+              navigation.navigate('Account' as any);
+            }}
+            className="bg-[#971f1f] rounded-[18px] py-4 mt-6 flex-row items-center justify-center"
+          >
+            <LogIn
+              size={20}
+              color="#fffaf2"
+              strokeWidth={2}
+            />
+
+            <Text className="text-[#fffaf2] font-black text-[16px] ml-2">
+              लॉगिन करें
+            </Text>
+          </TouchableOpacity>
+
+        </View>
+
+      </View>
+    </View>
+  );
+}
 
   // 4. Authorized View: Only Address and Date
   return (

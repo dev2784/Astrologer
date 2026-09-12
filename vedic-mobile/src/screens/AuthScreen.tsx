@@ -12,7 +12,15 @@ import {
   ActivityIndicator,
   Alert
 } from 'react-native';
-import { Phone, Lock, User, Mail, LogIn, ArrowLeft } from 'lucide-react-native';
+import {
+  Phone,
+  Lock,
+  User,
+  Mail,
+  LogIn,
+  ArrowLeft,
+  Sparkles,
+} from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 
@@ -90,148 +98,258 @@ export default function AuthScreen({ navigation }: any) {
   }
 };
 
-  return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-stone-50"
+ return (
+  <KeyboardAvoidingView
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    className="flex-1 bg-[#fffaf2]"
+  >
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1 }}
+      showsVerticalScrollIndicator={false}
     >
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-        
-        {/* Header / Back Button */}
-        <View className="px-5 pt-14 pb-4">
-          <TouchableOpacity 
-            onPress={() => navigation.goBack()}
-            className="w-10 h-10 bg-white rounded-full items-center justify-center shadow-sm border border-slate-100"
-          >
-            <ArrowLeft size={20} color="#334155" />
-          </TouchableOpacity>
-        </View>
+      {/* MAROON HEADER */}
+      <View className="bg-[#971f1f] rounded-b-[34px] px-5 pt-14 pb-8">
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          activeOpacity={0.8}
+          className="w-10 h-10 rounded-full bg-white/15 items-center justify-center"
+        >
+          <ArrowLeft
+            size={21}
+            color="#fffaf2"
+          />
+        </TouchableOpacity>
 
-        <View className="px-6 pt-4 flex-1">
-          {/* Title Section */}
-          <View className="mb-8">
-            <Text className="text-3xl font-black text-slate-900 tracking-tight">
-              {isRegister ? 'Create Account' : 'Welcome Back'}
-            </Text>
-            <Text className="text-slate-500 font-medium mt-2">
-              {isRegister 
-                ? 'Register to book Pujas and manage your details.' 
-                : 'Log in securely with your phone number.'}
-            </Text>
+        <View className="mt-6 flex-row items-center">
+          <View className="w-14 h-14 rounded-full bg-[#fff7ed] items-center justify-center">
+            <Sparkles
+              size={27}
+              color="#971f1f"
+              strokeWidth={1.8}
+            />
           </View>
 
-          {/* Form Fields */}
-          <View className="space-y-4 mb-8">
-            
-            {isRegister && (
-              <View>
-                <Text className="text-xs font-bold text-slate-700 uppercase mb-1.5 ml-1">Full Name *</Text>
-                <View className="flex-row items-center bg-white border border-slate-200 rounded-2xl px-4 h-14 shadow-sm">
-                  <User size={20} color="#94a3b8" />
-                  <TextInput
-                    placeholder="e.g. Rahul Sharma"
-                    value={formData.name}
-                    onChangeText={(text) => setFormData({ ...formData, name: text })}
-                    className="flex-1 ml-3 text-slate-900 font-medium"
-                    placeholderTextColor="#94a3b8"
-                  />
-                </View>
-              </View>
-            )}
+          <View className="ml-4 flex-1">
+            <Text className="text-[#fffaf2] text-[27px] font-black">
+              {isRegister
+                ? 'अपना खाता बनाएं'
+                : 'पुनः स्वागत है'}
+            </Text>
 
-            <View>
-              <Text className="text-xs font-bold text-slate-700 uppercase mb-1.5 ml-1">Phone Number *</Text>
-              <View className="flex-row items-center bg-white border border-slate-200 rounded-2xl px-4 h-14 shadow-sm">
-                <Phone size={20} color="#94a3b8" />
+            <Text className="text-[#f2d7b1] text-[14px] mt-1">
+              {isRegister
+                ? 'पूजा बुकिंग और सेवाओं के लिए रजिस्टर करें'
+                : 'अपने मोबाइल नंबर से सुरक्षित लॉगिन करें'}
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      {/* FORM AREA */}
+      <View className="px-5 pt-7 pb-10">
+
+        <View
+          style={{
+            shadowColor: '#7f1d1d',
+            shadowOffset: {
+              width: 0,
+              height: 4,
+            },
+            shadowOpacity: 0.06,
+            shadowRadius: 10,
+            elevation: 2,
+          }}
+          className="bg-[#fffdf8] border border-[#eadfce] rounded-[26px] px-5 py-6"
+        >
+
+          {/* NAME */}
+          {isRegister && (
+            <View className="mb-4">
+              <Text className="text-[#57534e] font-bold text-[12px] mb-2 ml-1">
+                पूरा नाम *
+              </Text>
+
+              <View className="h-14 bg-[#fffaf2] border border-[#eadfce] rounded-2xl px-4 flex-row items-center">
+                <User
+                  size={20}
+                  color="#971f1f"
+                />
+
                 <TextInput
-                  placeholder="+91 9876543210"
-                  keyboardType="phone-pad"
-                  value={formData.phone}
-                  onChangeText={(text) => setFormData({ ...formData, phone: text })}
-                  className="flex-1 ml-3 text-slate-900 font-medium"
-                  placeholderTextColor="#94a3b8"
+                  placeholder="जैसे राहुल शर्मा"
+                  value={formData.name}
+                  onChangeText={(text) =>
+                    setFormData({
+                      ...formData,
+                      name: text,
+                    })
+                  }
+                  className="flex-1 ml-3 text-[#292524] font-medium"
+                  placeholderTextColor="#a8a29e"
+                />
+              </View>
+            </View>
+          )}
+
+          {/* PHONE */}
+          <View className="mb-4">
+            <Text className="text-[#57534e] font-bold text-[12px] mb-2 ml-1">
+              मोबाइल नंबर *
+            </Text>
+
+            <View className="h-14 bg-[#fffaf2] border border-[#eadfce] rounded-2xl px-4 flex-row items-center">
+              <Phone
+                size={20}
+                color="#971f1f"
+              />
+
+              <TextInput
+                placeholder="+91 9876543210"
+                keyboardType="phone-pad"
+                value={formData.phone}
+                onChangeText={(text) =>
+                  setFormData({
+                    ...formData,
+                    phone: text,
+                  })
+                }
+                className="flex-1 ml-3 text-[#292524] font-medium"
+                placeholderTextColor="#a8a29e"
+                autoCapitalize="none"
+              />
+            </View>
+          </View>
+
+          {/* EMAIL */}
+          {isRegister && (
+            <View className="mb-4">
+              <Text className="text-[#57534e] font-bold text-[12px] mb-2 ml-1">
+                ईमेल
+              </Text>
+
+              <View className="h-14 bg-[#fffaf2] border border-[#eadfce] rounded-2xl px-4 flex-row items-center">
+                <Mail
+                  size={20}
+                  color="#971f1f"
+                />
+
+                <TextInput
+                  placeholder="rahul@example.com"
+                  keyboardType="email-address"
+                  value={formData.email}
+                  onChangeText={(text) =>
+                    setFormData({
+                      ...formData,
+                      email: text,
+                    })
+                  }
+                  className="flex-1 ml-3 text-[#292524] font-medium"
+                  placeholderTextColor="#a8a29e"
                   autoCapitalize="none"
                 />
               </View>
             </View>
+          )}
 
-            {isRegister && (
-              <View>
-                <Text className="text-xs font-bold text-slate-700 uppercase mb-1.5 ml-1">Email (Optional)</Text>
-                <View className="flex-row items-center bg-white border border-slate-200 rounded-2xl px-4 h-14 shadow-sm">
-                  <Mail size={20} color="#94a3b8" />
-                  <TextInput
-                    placeholder="rahul@example.com"
-                    keyboardType="email-address"
-                    value={formData.email}
-                    onChangeText={(text) => setFormData({ ...formData, email: text })}
-                    className="flex-1 ml-3 text-slate-900 font-medium"
-                    placeholderTextColor="#94a3b8"
-                    autoCapitalize="none"
-                  />
-                </View>
-              </View>
-            )}
+          {/* PASSWORD */}
+          <View>
+            <Text className="text-[#57534e] font-bold text-[12px] mb-2 ml-1">
+              पासवर्ड *
+            </Text>
 
-            <View>
-              <Text className="text-xs font-bold text-slate-700 uppercase mb-1.5 ml-1">Password *</Text>
-              <View className="flex-row items-center bg-white border border-slate-200 rounded-2xl px-4 h-14 shadow-sm">
-                <Lock size={20} color="#94a3b8" />
-                <TextInput
-                  placeholder="••••••••"
-                  secureTextEntry
-                  value={formData.password}
-                  onChangeText={(text) => setFormData({ ...formData, password: text })}
-                  className="flex-1 ml-3 text-slate-900 font-medium"
-                  placeholderTextColor="#94a3b8"
-                />
-              </View>
+            <View className="h-14 bg-[#fffaf2] border border-[#eadfce] rounded-2xl px-4 flex-row items-center">
+              <Lock
+                size={20}
+                color="#971f1f"
+              />
+
+              <TextInput
+                placeholder="••••••••"
+                secureTextEntry
+                value={formData.password}
+                onChangeText={(text) =>
+                  setFormData({
+                    ...formData,
+                    password: text,
+                  })
+                }
+                className="flex-1 ml-3 text-[#292524] font-medium"
+                placeholderTextColor="#a8a29e"
+              />
             </View>
           </View>
 
-          {/* Action Button */}
+          {/* MAIN BUTTON */}
           <TouchableOpacity
             onPress={handleSubmit}
             disabled={loading}
-            className={`h-14 rounded-2xl flex-row items-center justify-center shadow-sm ${loading ? 'bg-orange-400' : 'bg-orange-600'}`}
+            activeOpacity={0.85}
+            className={`h-14 rounded-2xl flex-row items-center justify-center mt-6 ${
+              loading
+                ? 'bg-[#b96a6a]'
+                : 'bg-[#971f1f]'
+            }`}
           >
             {loading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator
+                color="#fffaf2"
+              />
             ) : (
               <>
-                <LogIn size={20} color="#fff" />
-                <Text className="text-white font-bold text-base ml-2">
-                  {isRegister ? 'Create Account' : 'Log In'}
+                <LogIn
+                  size={20}
+                  color="#fffaf2"
+                />
+
+                <Text className="text-[#fffaf2] font-black text-[16px] ml-2">
+                  {isRegister
+                    ? 'खाता बनाएं'
+                    : 'लॉगिन करें'}
                 </Text>
               </>
             )}
           </TouchableOpacity>
 
-          {/* Google Login Placeholder */}
+          {/* GOOGLE */}
           <TouchableOpacity
-            onPress={() => Alert.alert('Google Auth', 'Requires Expo AuthSession or Firebase setup.')}
-            className="h-14 bg-white border border-slate-200 rounded-2xl flex-row items-center justify-center shadow-sm mt-4"
+            activeOpacity={0.85}
+            onPress={() =>
+              Alert.alert(
+                'Google Auth',
+                'Requires Expo AuthSession or Firebase setup.'
+              )
+            }
+            className="h-14 bg-white border border-[#eadfce] rounded-2xl flex-row items-center justify-center mt-4"
           >
-            <Text className="text-slate-700 font-bold text-base">Sign in with Google</Text>
-          </TouchableOpacity>
-
-          {/* Toggle Register / Login */}
-          <View className="flex-row justify-center mt-8 mb-10">
-            <Text className="text-slate-500 font-medium">
-              {isRegister ? 'Already have an account? ' : "Don't have an account? "}
+            <Text className="text-[#57534e] font-bold text-[14px]">
+              Google से लॉगिन करें
             </Text>
-            <TouchableOpacity onPress={() => {
+          </TouchableOpacity>
+        </View>
+
+        {/* TOGGLE */}
+        <View className="flex-row justify-center items-center mt-6 mb-6">
+          <Text className="text-stone-500 text-[13px]">
+            {isRegister
+              ? 'पहले से खाता है? '
+              : 'अभी तक खाता नहीं है? '}
+          </Text>
+
+          <TouchableOpacity
+            onPress={() => {
               Haptics.selectionAsync();
               setIsRegister(!isRegister);
-            }}>
-              <Text className="text-orange-600 font-bold">
-                {isRegister ? 'Log In' : 'Register Now'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
+            }}
+          >
+            <Text className="text-[#971f1f] font-black text-[13px]">
+              {isRegister
+                ? 'लॉगिन करें'
+                : 'रजिस्टर करें'}
+            </Text>
+          </TouchableOpacity>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  );
+      </View>
+    </ScrollView>
+  </KeyboardAvoidingView>
+);
 }
