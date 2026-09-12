@@ -8,8 +8,21 @@ import {
   LockKeyhole,
   Sparkles,
   ChevronLeft,
-  ArrowLeft
+  ArrowLeft,
+  CheckCircle2,
+  ChevronRight,
 } from 'lucide-react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+  Platform,
+  Modal,
+} from 'react-native';
 import { api } from '../utils/api';
 import { HomeStackParamList } from '../navigation/types';
 import { useAuthStore } from '../store/useAuthStore';
@@ -32,7 +45,7 @@ export default function BookingFormScreen() {
   const [address, setAddress] = useState('');
   const [bookingDate, setBookingDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
-  
+  const [showSuccess, setShowSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
@@ -71,11 +84,7 @@ export default function BookingFormScreen() {
 
     try {
       await api.post('/bookings', payload);
-      Alert.alert(
-        'Success', 
-        'Your Puja has been successfully booked!',
-        [{ text: 'OK', onPress: () => navigation.navigate('Categories') }]
-      );
+      setShowSuccess(true);
     } catch (error: any) {
       Alert.alert('Booking Failed', error?.response?.data?.error || error.message || 'Something went wrong.');
     } finally {
@@ -87,7 +96,153 @@ export default function BookingFormScreen() {
   if (!userToken || !userData) {
   return (
     <View className="flex-1 bg-[#fffaf2]">
+<Modal
+  visible={showSuccess}
+  transparent
+  animationType="fade"
+  onRequestClose={() => setShowSuccess(false)}
+>
+  <View
+    style={{
+      flex: 1,
+      backgroundColor: 'rgba(28,25,23,0.45)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 24,
+    }}
+  >
+    <View
+      style={{
+        width: '100%',
+        backgroundColor: '#fffaf2',
+        borderRadius: 28,
+        padding: 24,
+        borderWidth: 1,
+        borderColor: '#eadfce',
 
+        shadowColor: '#7f1d1d',
+        shadowOffset: {
+          width: 0,
+          height: 8,
+        },
+        shadowOpacity: 0.18,
+        shadowRadius: 18,
+        elevation: 8,
+      }}
+    >
+      <View
+        style={{
+          width: 72,
+          height: 72,
+          borderRadius: 36,
+          backgroundColor: '#971f1f',
+          alignSelf: 'center',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <CheckCircle2
+          size={36}
+          color="#fffaf2"
+          strokeWidth={2}
+        />
+      </View>
+
+      <Text
+        style={{
+          color: '#292524',
+          fontSize: 23,
+          fontWeight: '900',
+          textAlign: 'center',
+          marginTop: 18,
+        }}
+      >
+        बुकिंग सफल हुई
+      </Text>
+
+      <Text
+        style={{
+          color: '#78716c',
+          fontSize: 14,
+          lineHeight: 22,
+          textAlign: 'center',
+          marginTop: 8,
+        }}
+      >
+        आपकी पूजा बुकिंग सफलतापूर्वक दर्ज हो गई है।
+        हमारी टीम जल्द ही आपसे संपर्क करेगी।
+      </Text>
+
+      <View
+        style={{
+          backgroundColor: '#fff1df',
+          borderRadius: 18,
+          paddingHorizontal: 16,
+          paddingVertical: 14,
+          marginTop: 20,
+        }}
+      >
+        <Text
+          style={{
+            color: '#971f1f',
+            fontSize: 12,
+            fontWeight: '800',
+            textAlign: 'center',
+          }}
+        >
+          🙏 धन्यवाद
+        </Text>
+
+        <Text
+          style={{
+            color: '#57534e',
+            fontSize: 12,
+            lineHeight: 18,
+            textAlign: 'center',
+            marginTop: 4,
+          }}
+        >
+          आपकी पूजा की तिथि और अन्य विवरण फोन पर कन्फर्म किए जाएंगे।
+        </Text>
+      </View>
+
+      <TouchableOpacity
+        activeOpacity={0.85}
+        onPress={() => {
+          setShowSuccess(false);
+          navigation.navigate('Categories');
+        }}
+        style={{
+          marginTop: 22,
+          backgroundColor: '#971f1f',
+          borderRadius: 18,
+          paddingVertical: 15,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Text
+          style={{
+            color: '#fffaf2',
+            fontSize: 16,
+            fontWeight: '900',
+          }}
+        >
+          पूजा सेवाएं देखें
+        </Text>
+
+        <ChevronRight
+          size={20}
+          color="#fffaf2"
+          style={{
+            marginLeft: 6,
+          }}
+        />
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
       {/* TOP MAROON HEADER */}
       <View className="bg-[#971f1f] rounded-b-[34px] px-5 pt-14 pb-8">
 
@@ -324,6 +479,7 @@ export default function BookingFormScreen() {
             onChange={handleDateChange}
           />
         )}
+        
       </View>
 
 
