@@ -564,22 +564,22 @@ export default function HomePage() {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center bg-white/10 p-3 rounded-lg">
                       <span className="text-orange-200 text-sm">Tithi</span>
-                      <span className="font-bold text-right">{panchang.tithi?.details?.tithi_name || "—"}</span>
+                      <span className="font-bold text-right">{panchang?.tithi?.details?.tithi_name || "—"}</span>
                     </div>
                     <div className="flex justify-between items-center bg-white/10 p-3 rounded-lg">
                       <span className="text-orange-200 text-sm">Nakshatra</span>
-                      <span className="font-bold text-right">{panchang.nakshatra?.details?.nak_name || "—"}</span>
+                      <span className="font-bold text-right">{panchang?.nakshatra?.details?.nak_name || "—"}</span>
                     </div>
                     <div className="grid grid-cols-2 gap-3 mt-4">
                       <div className="bg-black/20 p-3 rounded-lg text-center">
                         <Sunrise size={18} className="mx-auto mb-1 text-orange-300" />
                         <span className="text-xs block text-orange-200">Sunrise</span>
-                        <span className="font-mono text-sm font-bold">{panchang.sunrise || "—"}</span>
+                        <span className="font-mono text-sm font-bold">{panchang?.sunrise || "—"}</span>
                       </div>
                       <div className="bg-black/20 p-3 rounded-lg text-center">
                         <Sunset size={18} className="mx-auto mb-1 text-orange-300" />
                         <span className="text-xs block text-orange-200">Sunset</span>
-                        <span className="font-mono text-sm font-bold">{panchang.sunset || "—"}</span>
+                        <span className="font-mono text-sm font-bold">{panchang?.sunset || "—"}</span>
                       </div>
                     </div>
                   </div>
@@ -634,7 +634,7 @@ export default function HomePage() {
               <h3 className="text-lg font-bold text-green-900 mb-2">Abhijit Muhurta</h3>
               <p className="text-2xl font-mono text-green-700 font-semibold">
                 {panchang?.abhijit_muhurta?.start && panchang?.abhijit_muhurta?.end ? 
-                  `${panchang.abhijit_muhurta.start} - ${panchang.abhijit_muhurta.end}` : "Not Available"}
+                  `${panchang?.abhijit_muhurta.start} - ${panchang?.abhijit_muhurta.end}` : "Not Available"}
               </p>
               <p className="text-sm text-green-600 mt-2">Highly auspicious for new beginnings.</p>
             </div>
@@ -646,7 +646,7 @@ export default function HomePage() {
               <h3 className="text-lg font-bold text-red-900 mb-2">Rahu Kaal</h3>
               <p className="text-2xl font-mono text-red-700 font-semibold">
                 {panchang?.rahukaal?.start && panchang?.rahukaal?.end ? 
-                  `${panchang.rahukaal.start} - ${panchang.rahukaal.end}` : "Not Available"}
+                  `${panchang?.rahukaal.start} - ${panchang?.rahukaal.end}` : "Not Available"}
               </p>
               <p className="text-sm text-red-600 mt-2">Inauspicious. Avoid starting important tasks.</p>
             </div>
