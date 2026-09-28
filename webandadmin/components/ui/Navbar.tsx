@@ -135,12 +135,14 @@ export default function Navbar() {
               {t("nav.about")}
             </Link>*/}
 
-            <Link href="/muhurat" className="hover:text-orange-600 transition">
-              {t("nav.muhurat")}
-            </Link>
-            <Link href="/panchang" className="hover:text-orange-600 transition">
-              {t("nav.panchang")}
-            </Link>
+{/* temporarily hidden */}
+            {/*             <Link href="/muhurat" className="hover:text-orange-600 transition">
+                          {t("nav.muhurat")}
+                        </Link> */}
+{/* temporarily hidden */}
+            {/*             <Link href="/panchang" className="hover:text-orange-600 transition">
+                          {t("nav.panchang")}
+                        </Link> */}
 
 
             <Link
@@ -266,12 +268,14 @@ export default function Navbar() {
             >
               {language === "hi" ? "गैलरी" : "Gallery"}
             </Link>
-            <Link href="/muhurat" onClick={closeMobileMenu} className="block py-2 text-base font-semibold text-stone-800 hover:text-orange-600">
-              {t("nav.muhurat")}
-            </Link>
-            <Link href="/panchang" onClick={closeMobileMenu} className="block py-2 text-base font-semibold text-stone-800 hover:text-orange-600">
-              {t("nav.panchang")}
-            </Link>
+{/* temporarily hidden */}
+            {/*             <Link href="/muhurat" onClick={closeMobileMenu} className="block py-2 text-base font-semibold text-stone-800 hover:text-orange-600">
+                          {t("nav.muhurat")}
+                        </Link> */}
+{/* temporarily hidden */}
+            {/*             <Link href="/panchang" onClick={closeMobileMenu} className="block py-2 text-base font-semibold text-stone-800 hover:text-orange-600">
+                          {t("nav.panchang")}
+                        </Link> */}
             
             <Link href="/contact" onClick={closeMobileMenu} className="block py-2 text-base font-semibold text-stone-800 hover:text-orange-600">
               {t("nav.contact")}
