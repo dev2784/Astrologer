@@ -634,7 +634,7 @@ export default function HomePage() {
               <h3 className="text-lg font-bold text-green-900 mb-2">Abhijit Muhurta</h3>
               <p className="text-2xl font-mono text-green-700 font-semibold">
                 {panchang?.abhijit_muhurta?.start && panchang?.abhijit_muhurta?.end ? 
-                  `${panchang?.abhijit_muhurta.start} - ${panchang?.abhijit_muhurta.end}` : "Not Available"}
+                  `${panchang?.abhijit_muhurta?.start} - ${panchang?.abhijit_muhurta?.end}` : "Not Available"}
               </p>
               <p className="text-sm text-green-600 mt-2">Highly auspicious for new beginnings.</p>
             </div>
@@ -646,7 +646,7 @@ export default function HomePage() {
               <h3 className="text-lg font-bold text-red-900 mb-2">Rahu Kaal</h3>
               <p className="text-2xl font-mono text-red-700 font-semibold">
                 {panchang?.rahukaal?.start && panchang?.rahukaal?.end ? 
-                  `${panchang?.rahukaal.start} - ${panchang?.rahukaal.end}` : "Not Available"}
+                  `${panchang?.rahukaal?.start} - ${panchang?.rahukaal?.end}` : "Not Available"}
               </p>
               <p className="text-sm text-red-600 mt-2">Inauspicious. Avoid starting important tasks.</p>
             </div>
