@@ -544,7 +544,7 @@ export default function HomePage() {
                 <Sunrise size={20} /> {language === "hi" ? "दिन का चौघड़िया" : "Day Choghadiya"}
               </h3>
               <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
-                {panchang?.choghadiya_day ? panchang.choghadiya_day.map((slot: ChoghadiyaSlot, i: number) => (
+                {panchang?.choghadiya_day ? panchang.choghadiya_day?.map((slot: ChoghadiyaSlot, i: number) => (
                   <div key={i} className={`flex justify-between items-center p-3 rounded-lg border text-sm ${getChoghadiyaColor(slot.type)}`}>
                     <span className="font-bold">{slot.name}</span>
                     <span className="text-xs font-mono font-medium">{slot.start} - {slot.end}</span>
@@ -602,7 +602,7 @@ export default function HomePage() {
                 <Sunset size={20} /> {language === "hi" ? "रात का चौघड़िया" : "Night Choghadiya"}
               </h3>
               <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
-                {panchang?.choghadiya_night ? panchang.choghadiya_night.map((slot: ChoghadiyaSlot, i: number) => (
+                {panchang?.choghadiya_night ? panchang.choghadiya_night?.map((slot: ChoghadiyaSlot, i: number) => (
                   <div key={i} className={`flex justify-between items-center p-3 rounded-lg border text-sm ${getChoghadiyaColor(slot.type)}`}>
                     <span className="font-bold">{slot.name}</span>
                     <span className="text-xs font-mono font-medium">{slot.start} - {slot.end}</span>
