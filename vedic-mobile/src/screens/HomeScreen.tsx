@@ -322,7 +322,8 @@ export default function HomeScreen({ navigation }: any) {
               PANCHANG
           ================================================== */}
 
-          <Animated.View
+          {false && (
+<Animated.View
             style={[
               sectionAnim(panchangAnim),
               {
@@ -698,11 +699,14 @@ export default function HomeScreen({ navigation }: any) {
             )}
           </Animated.View>
 
+          )}
+
           {/* ==================================================
               MUHURAT
           ================================================== */}
 
-          <Animated.View
+          {false && (
+<Animated.View
             style={sectionAnim(muhuratAnim)}
           >
             <TouchableOpacity
@@ -825,6 +829,8 @@ export default function HomeScreen({ navigation }: any) {
               </View>
             </TouchableOpacity>
           </Animated.View>
+
+          )}
 
           {/* ==================================================
               FEATURED PUJAS

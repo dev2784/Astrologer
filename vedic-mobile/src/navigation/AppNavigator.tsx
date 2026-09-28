@@ -203,26 +203,28 @@ function TabNavigator() {
         }}
       />
 
-      <Tab.Screen
-        name="Panchang"
-        component={PanchangScreen}
-        options={{
-          title: 'Panchang',
-          tabBarIcon: ({ focused, color }) =>
-            tabIcon(Calendar, focused, color),
-        }}
-      />
-
-      <Tab.Screen
-        name="Muhurat"
-        component={MuhuratScreen}
-        options={{
-          title: 'Muhurat',
-          tabBarIcon: ({ focused, color }) =>
-            tabIcon(CalendarClock, focused, color),
-        }}
-      />
-
+      {/* temporarily hidden tab */}
+      {/*       <Tab.Screen
+              name="Panchang"
+              component={PanchangScreen}
+              options={{
+                title: 'Panchang',
+                tabBarIcon: ({ focused, color }) =>
+                  tabIcon(Calendar, focused, color),
+              }}
+            />
+       */}
+      {/* temporarily hidden tab */}
+      {/*       <Tab.Screen
+              name="Muhurat"
+              component={MuhuratScreen}
+              options={{
+                title: 'Muhurat',
+                tabBarIcon: ({ focused, color }) =>
+                  tabIcon(CalendarClock, focused, color),
+              }}
+            />
+       */}
       <Tab.Screen
         name="Account"
         component={ProfileFlowStack}
