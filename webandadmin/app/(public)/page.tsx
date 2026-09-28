@@ -526,6 +526,7 @@ export default function HomePage() {
       {/* ================================================================= */}
       {/* 4. PANCHANG & CHOGHADIYA SECTION */}
       {/* ================================================================= */}
+      {false && (
       <section className="py-20 bg-orange-50 border-y border-orange-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -614,9 +615,12 @@ export default function HomePage() {
         </div>
       </section>
 
+      )}
+
       {/* ================================================================= */}
       {/* 5. TODAY'S MUHURAT */}
       {/* ================================================================= */}
+      {false && (
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold font-serif text-slate-900 mb-8">
@@ -649,6 +653,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      )}
 
       {/* ================================================================= */}
       {/* 6. GALLERY SECTION (Static / Placeholder Dummy Images) */}
