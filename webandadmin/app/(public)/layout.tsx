@@ -68,6 +68,9 @@ export default function PublicLayout({
             <Link href="/account-deletion" className="text-slate-300 underline underline-offset-4 transition hover:text-white">
               Request Account Deletion
             </Link>
+            <Link href="/csae-standards" className="text-slate-300 underline underline-offset-4 transition hover:text-white">
+              Child Safety Standards
+            </Link>
           </nav>
         </footer>
         </body>
