@@ -61,6 +61,14 @@ export default function PublicLayout({
         {/* UNIVERSAL FOOTER */}
         <footer className="bg-slate-900 text-slate-400 py-8 text-center text-sm">
           <p>&copy; {new Date().getFullYear()} Jyotishacharya Services. All rights reserved.</p>
+          <nav aria-label="Legal" className="mt-3 flex justify-center gap-5">
+            <Link href="/privacy-policy" className="text-slate-300 underline underline-offset-4 transition hover:text-white">
+              Privacy Policy
+            </Link>
+            <Link href="/account-deletion" className="text-slate-300 underline underline-offset-4 transition hover:text-white">
+              Request Account Deletion
+            </Link>
+          </nav>
         </footer>
         </body>
         </LanguageProvider>
