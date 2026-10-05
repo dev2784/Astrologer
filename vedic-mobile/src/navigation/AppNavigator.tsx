@@ -226,7 +226,6 @@ function TabNavigator() {
         }}
       />
       */}
-
       <Tab.Screen
         name="Account"
         component={ProfileFlowStack}

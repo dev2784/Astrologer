@@ -526,6 +526,7 @@ export default function HomePage() {
       {/* ================================================================= */}
       {/* 4. PANCHANG & CHOGHADIYA SECTION */}
       {/* ================================================================= */}
+      {false && (
       <section className="py-20 bg-orange-50 border-y border-orange-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -543,12 +544,12 @@ export default function HomePage() {
                 <Sunrise size={20} /> {language === "hi" ? "दिन का चौघड़िया" : "Day Choghadiya"}
               </h3>
               <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
-                {panchang?.choghadiya_day ? panchang.choghadiya_day.map((slot: ChoghadiyaSlot, i: number) => (
+                {panchang?.choghadiya_day?.map((slot: ChoghadiyaSlot, i: number) => (
                   <div key={i} className={`flex justify-between items-center p-3 rounded-lg border text-sm ${getChoghadiyaColor(slot.type)}`}>
                     <span className="font-bold">{slot.name}</span>
                     <span className="text-xs font-mono font-medium">{slot.start} - {slot.end}</span>
                   </div>
-                )) : <p className="text-slate-400 text-sm text-center py-4">Data loading...</p>}
+                )) ?? <p className="text-slate-400 text-sm text-center py-4">Data loading...</p>}
               </div>
             </div>
 
@@ -563,22 +564,22 @@ export default function HomePage() {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center bg-white/10 p-3 rounded-lg">
                       <span className="text-orange-200 text-sm">Tithi</span>
-                      <span className="font-bold text-right">{panchang.tithi?.details?.tithi_name || "—"}</span>
+                      <span className="font-bold text-right">{panchang?.tithi?.details?.tithi_name || "—"}</span>
                     </div>
                     <div className="flex justify-between items-center bg-white/10 p-3 rounded-lg">
                       <span className="text-orange-200 text-sm">Nakshatra</span>
-                      <span className="font-bold text-right">{panchang.nakshatra?.details?.nak_name || "—"}</span>
+                      <span className="font-bold text-right">{panchang?.nakshatra?.details?.nak_name || "—"}</span>
                     </div>
                     <div className="grid grid-cols-2 gap-3 mt-4">
                       <div className="bg-black/20 p-3 rounded-lg text-center">
                         <Sunrise size={18} className="mx-auto mb-1 text-orange-300" />
                         <span className="text-xs block text-orange-200">Sunrise</span>
-                        <span className="font-mono text-sm font-bold">{panchang.sunrise || "—"}</span>
+                        <span className="font-mono text-sm font-bold">{panchang?.sunrise || "—"}</span>
                       </div>
                       <div className="bg-black/20 p-3 rounded-lg text-center">
                         <Sunset size={18} className="mx-auto mb-1 text-orange-300" />
                         <span className="text-xs block text-orange-200">Sunset</span>
-                        <span className="font-mono text-sm font-bold">{panchang.sunset || "—"}</span>
+                        <span className="font-mono text-sm font-bold">{panchang?.sunset || "—"}</span>
                       </div>
                     </div>
                   </div>
@@ -601,12 +602,12 @@ export default function HomePage() {
                 <Sunset size={20} /> {language === "hi" ? "रात का चौघड़िया" : "Night Choghadiya"}
               </h3>
               <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
-                {panchang?.choghadiya_night ? panchang.choghadiya_night.map((slot: ChoghadiyaSlot, i: number) => (
+                {panchang?.choghadiya_night?.map((slot: ChoghadiyaSlot, i: number) => (
                   <div key={i} className={`flex justify-between items-center p-3 rounded-lg border text-sm ${getChoghadiyaColor(slot.type)}`}>
                     <span className="font-bold">{slot.name}</span>
                     <span className="text-xs font-mono font-medium">{slot.start} - {slot.end}</span>
                   </div>
-                )) : <p className="text-slate-400 text-sm text-center py-4">Data loading...</p>}
+                )) ?? <p className="text-slate-400 text-sm text-center py-4">Data loading...</p>}
               </div>
             </div>
 
@@ -614,9 +615,12 @@ export default function HomePage() {
         </div>
       </section>
 
+      )}
+
       {/* ================================================================= */}
       {/* 5. TODAY'S MUHURAT */}
       {/* ================================================================= */}
+      {false && (
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold font-serif text-slate-900 mb-8">
@@ -630,7 +634,7 @@ export default function HomePage() {
               <h3 className="text-lg font-bold text-green-900 mb-2">Abhijit Muhurta</h3>
               <p className="text-2xl font-mono text-green-700 font-semibold">
                 {panchang?.abhijit_muhurta?.start && panchang?.abhijit_muhurta?.end ? 
-                  `${panchang.abhijit_muhurta.start} - ${panchang.abhijit_muhurta.end}` : "Not Available"}
+                  `${panchang?.abhijit_muhurta?.start} - ${panchang?.abhijit_muhurta?.end}` : "Not Available"}
               </p>
               <p className="text-sm text-green-600 mt-2">Highly auspicious for new beginnings.</p>
             </div>
@@ -642,13 +646,15 @@ export default function HomePage() {
               <h3 className="text-lg font-bold text-red-900 mb-2">Rahu Kaal</h3>
               <p className="text-2xl font-mono text-red-700 font-semibold">
                 {panchang?.rahukaal?.start && panchang?.rahukaal?.end ? 
-                  `${panchang.rahukaal.start} - ${panchang.rahukaal.end}` : "Not Available"}
+                  `${panchang?.rahukaal?.start} - ${panchang?.rahukaal?.end}` : "Not Available"}
               </p>
               <p className="text-sm text-red-600 mt-2">Inauspicious. Avoid starting important tasks.</p>
             </div>
           </div>
         </div>
       </section>
+
+      )}
 
       {/* ================================================================= */}
       {/* 6. GALLERY SECTION (Static / Placeholder Dummy Images) */}
