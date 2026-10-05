@@ -1,4 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   View,
   Text,
@@ -8,6 +13,7 @@ import {
   Linking,
   Image,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
 import {
   Sparkles,
@@ -54,7 +60,6 @@ export default function HomeScreen({ navigation }: any) {
   const aboutAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    fetchHomeData();
 
     Animated.stagger(90, [
       Animated.timing(greetingAnim, {
@@ -100,6 +105,12 @@ export default function HomeScreen({ navigation }: any) {
       }),
     ]).start();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchHomeData();
+      }, [])
+  );
 
   const sectionAnim = (
     anim: Animated.Value,
@@ -322,7 +333,8 @@ export default function HomeScreen({ navigation }: any) {
               PANCHANG
           ================================================== */}
 
-          <Animated.View
+          {false && (
+<Animated.View
             style={[
               sectionAnim(panchangAnim),
               {
@@ -698,11 +710,14 @@ export default function HomeScreen({ navigation }: any) {
             )}
           </Animated.View>
 
+          )}
+
           {/* ==================================================
               MUHURAT
           ================================================== */}
 
-          <Animated.View
+          {false && (
+<Animated.View
             style={sectionAnim(muhuratAnim)}
           >
             <TouchableOpacity
@@ -825,6 +840,8 @@ export default function HomeScreen({ navigation }: any) {
               </View>
             </TouchableOpacity>
           </Animated.View>
+
+          )}
 
           {/* ==================================================
               FEATURED PUJAS

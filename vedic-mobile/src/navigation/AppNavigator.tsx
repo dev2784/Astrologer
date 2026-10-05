@@ -203,6 +203,7 @@ function TabNavigator() {
         }}
       />
 
+      {/* temporarily hidden tab
       <Tab.Screen
         name="Panchang"
         component={PanchangScreen}
@@ -212,7 +213,9 @@ function TabNavigator() {
             tabIcon(Calendar, focused, color),
         }}
       />
+      */}
 
+      {/* temporarily hidden tab
       <Tab.Screen
         name="Muhurat"
         component={MuhuratScreen}
@@ -222,6 +225,7 @@ function TabNavigator() {
             tabIcon(CalendarClock, focused, color),
         }}
       />
+      */}
 
       <Tab.Screen
         name="Account"

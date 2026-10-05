@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  Linking,
 } from 'react-native';
 
 import {
@@ -17,6 +18,7 @@ import {
   LifeBuoy,
   UserRound,
   ShieldCheck,
+  Trash2,
 } from 'lucide-react-native';
 
 import * as Haptics from 'expo-haptics';
@@ -59,6 +61,15 @@ export default function ProfileScreen({
         },
       ]
     );
+  };
+
+  const openLegalPage = async (path: 'privacy-policy' | 'account-deletion') => {
+    Haptics.selectionAsync();
+    try {
+      await Linking.openURL(`https://hatkeshwarjyotish.com/${path}`);
+    } catch {
+      Alert.alert('लिंक नहीं खुला', 'कृपया बाद में फिर से प्रयास करें।');
+    }
   };
 
   const userInitials =
@@ -284,6 +295,36 @@ export default function ProfileScreen({
                 size={20}
                 color="#a8a29e"
               />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => openLegalPage('privacy-policy')}
+              className="flex-row items-center px-4 py-4 border-t border-[#f1e7da]"
+            >
+              <View className="w-11 h-11 rounded-full bg-[#fff0df] items-center justify-center">
+                <ShieldCheck size={21} color="#971f1f" />
+              </View>
+              <View className="flex-1 ml-3">
+                <Text className="text-[#292524] text-[15px] font-black">गोपनीयता नीति</Text>
+                <Text className="text-stone-500 text-[11px] mt-1">जानें आपकी जानकारी कैसे उपयोग होती है</Text>
+              </View>
+              <ChevronRight size={20} color="#a8a29e" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => openLegalPage('account-deletion')}
+              className="flex-row items-center px-4 py-4 border-t border-[#f1e7da]"
+            >
+              <View className="w-11 h-11 rounded-full bg-red-50 items-center justify-center">
+                <Trash2 size={21} color="#b91c1c" />
+              </View>
+              <View className="flex-1 ml-3">
+                <Text className="text-[#b91c1c] text-[15px] font-black">खाता और डेटा हटाएं</Text>
+                <Text className="text-stone-500 text-[11px] mt-1">खाता हटाने का अनुरोध करें</Text>
+              </View>
+              <ChevronRight size={20} color="#a8a29e" />
             </TouchableOpacity>
           </View>
 

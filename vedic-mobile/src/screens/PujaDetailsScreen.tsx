@@ -261,13 +261,8 @@ export default function PujaDetailsScreen() {
         paddingTop: insets.top,
       }}
     >
-      <Animated.View
-        style={[
-          {
-            flex: 1,
-          },
-          pageStyle,
-        ]}
+      <View
+        style={{ flex: 1 }}
       >
         <ScrollView
           style={{
@@ -756,7 +751,7 @@ export default function PujaDetailsScreen() {
             )}
           </View>
         </ScrollView>
-      </Animated.View>
+      </View>
 
       {/* =========================
           STICKY BOOKING BAR
