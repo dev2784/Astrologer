@@ -21,9 +21,18 @@ interface BookingModalProps {
   onClose: () => void;
   pujaId?: string;
   pujaTitle?: string;
+  subcategoryId?: string;
+  presentation?: "modal" | "inline";
 }
 
-export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: BookingModalProps) {
+export default function BookingModal({
+  isOpen,
+  onClose,
+  pujaId,
+  pujaTitle,
+  subcategoryId,
+  presentation = "modal",
+}: BookingModalProps) {
   const { language } = useLanguage();
 
   const [name, setName] = useState("");
@@ -57,11 +66,31 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
       fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/categories`)
         .then((res) => res.json())
         .then((data) => {
-          if (data.categories) setCategories(data.categories);
+          if (!data.categories) return;
+
+          setCategories(data.categories);
+
+          if (subcategoryId) {
+            const matchingCategory = data.categories.find((category: Category) =>
+              category.subcategories.some((subcategory) => subcategory.id === subcategoryId)
+            );
+
+            if (matchingCategory) {
+              setSelectedCategoryId(matchingCategory.id);
+              setSubcategories(matchingCategory.subcategories || []);
+              setSelectedSubcategoryId(subcategoryId);
+              setLoadingPujas(true);
+              fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/pujas?subcategoryId=${subcategoryId}`)
+                .then((pujaResponse) => pujaResponse.json())
+                .then((pujaData) => setPujas(pujaData.pujas || []))
+                .catch((err) => console.error("Error fetching pujas:", err))
+                .finally(() => setLoadingPujas(false));
+            }
+          }
         })
         .catch((err) => console.error("Error fetching categories:", err));
     }
-  }, [isOpen, pujaId]);
+  }, [isOpen, pujaId, subcategoryId]);
 
   // Handle Category selection -> reset downstream options
   const handleCategoryChange = (catId: string) => {
@@ -144,16 +173,18 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-stone-200 relative animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+    <div className={presentation === "inline" ? "w-full" : "fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"}>
+      <div className={`bg-white rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-stone-200 relative ${presentation === "inline" ? "mx-auto" : "animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto"}`}>
         
         {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-stone-400 hover:text-stone-700 text-2xl font-bold transition"
-        >
-          &times;
-        </button>
+        {presentation === "modal" && (
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-stone-400 hover:text-stone-700 text-2xl font-bold transition"
+          >
+            &times;
+          </button>
+        )}
 
         <h2 className="text-xl font-serif font-bold text-stone-900 mb-1">
           {language === "hi" ? "पूजा बुकिंग फॉर्म" : "Puja Booking Form"}
@@ -221,27 +252,35 @@ export default function BookingModal({ isOpen, onClose, pujaId, pujaTitle }: Boo
                 {/* 3. Dynamic Puja List Dropdown based on Subcategory */}
                 {selectedSubcategoryId && (
                   <div>
-                    <label className="block text-xs font-bold text-stone-700 uppercase mb-1">
-                      {language === "hi" ? "पूजा चुनें *" : "Select Specific Puja *"}
-                    </label>
                     {loadingPujas ? (
                       <div className="text-xs text-stone-500 py-1">
                         {language === "hi" ? "पूजा सूची लोड हो रही है..." : "Loading pujas..."}
                       </div>
+                    ) : pujas.length > 0 ? (
+                      <>
+                        <label className="block text-xs font-bold text-stone-700 uppercase mb-1">
+                          {language === "hi" ? "पूजा चुनें *" : "Select Specific Puja *"}
+                        </label>
+                        <select
+                          required
+                          value={selectedPujaId}
+                          onChange={(e) => setSelectedPujaId(e.target.value)}
+                          className="w-full px-3 py-2 border rounded-xl text-sm bg-white focus:ring-2 focus:ring-orange-500 outline-hidden"
+                        >
+                          <option value="">{language === "hi" ? "-- पूजा चुनें --" : "-- Select Puja --"}</option>
+                          {pujas.map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {language === "hi" && p.titleHi ? p.titleHi : p.titleEn}
+                            </option>
+                          ))}
+                        </select>
+                      </>
                     ) : (
-                      <select
-                        required
-                        value={selectedPujaId}
-                        onChange={(e) => setSelectedPujaId(e.target.value)}
-                        className="w-full px-3 py-2 border rounded-xl text-sm bg-white focus:ring-2 focus:ring-orange-500 outline-hidden"
-                      >
-                        <option value="">{language === "hi" ? "-- पूजा चुनें --" : "-- Select Puja --"}</option>
-                        {pujas.map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {language === "hi" && p.titleHi ? p.titleHi : p.titleEn}
-                          </option>
-                        ))}
-                      </select>
+                      <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-800">
+                        {language === "hi"
+                          ? "इस उप-श्रेणी में अभी कोई पूजा सूचीबद्ध नहीं है। आप इसी श्रेणी के लिए बुकिंग अनुरोध भेज सकते हैं।"
+                          : "No puja is currently listed in this subcategory. You can still send a booking request for it."}
+                      </p>
                     )}
                   </div>
                 )}

@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
+import BookingModal from "@/components/ui/BookingModal";
 
 type Puja = {
   id: string;
@@ -67,11 +68,33 @@ function PublicPujasContent() {
             ))}
           </div>
         ) : pujas.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl border border-slate-200 max-w-md mx-auto space-y-3">
-            <span className="text-4xl">🪔</span>
-            <h3 className="text-lg font-bold text-slate-800">{t("pujaList.noPujasFound")}</h3>
-            <p className="text-slate-500 text-sm">{t("pujaList.noPujasDesc")}</p>
-          </div>
+          subcategoryId ? (
+            <section className="mx-auto max-w-3xl space-y-6">
+              <div className="text-center space-y-2">
+                <span className="text-4xl">🪔</span>
+                <h2 className="text-2xl font-bold text-slate-900">
+                  {language === "hi" ? "इस पूजा के लिए अनुरोध भेजें" : "Request a Puja in This Subcategory"}
+                </h2>
+                <p className="text-slate-600 text-sm">
+                  {language === "hi"
+                    ? "श्रेणी और उप-श्रेणी पहले से चुनी गई हैं। विवरण भरें और हमारी टीम आपसे संपर्क करेगी।"
+                    : "Your category and subcategory are preselected. Share your details and our team will contact you."}
+                </p>
+              </div>
+              <BookingModal
+                isOpen
+                onClose={() => undefined}
+                subcategoryId={subcategoryId}
+                presentation="inline"
+              />
+            </section>
+          ) : (
+            <div className="text-center py-16 bg-white rounded-2xl border border-slate-200 max-w-md mx-auto space-y-3">
+              <span className="text-4xl">🪔</span>
+              <h3 className="text-lg font-bold text-slate-800">{t("pujaList.noPujasFound")}</h3>
+              <p className="text-slate-500 text-sm">{t("pujaList.noPujasDesc")}</p>
+            </div>
+          )
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {pujas.map((puja) => (
